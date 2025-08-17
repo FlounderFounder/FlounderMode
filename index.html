@@ -90,15 +90,15 @@
           flex-direction: column;
           text-align: center;
         }
-        
+
         .page-title {
           font-size: clamp(1.2rem, 5vw, 2rem);
         }
-        
+
         .header-nav {
           justify-content: center;
         }
-        
+
         .nav-button {
           font-size: 0.8rem;
           padding: 0.4rem 0.8rem;
@@ -312,24 +312,28 @@
         <h1 class="page-title">Floundermode Dictionary</h1>
         <nav class="header-nav">
           <button class="nav-button" onclick="showAbout()">About</button>
-          <button class="nav-button" onclick="showContributing()">Contribute</button>
+          <button class="nav-button" onclick="showContributing()">
+            Contribute
+          </button>
         </nav>
       </div>
     </header>
-    
+
     <main class="main-content">
       <div class="search-container">
-      <div class="search-wrapper">
-        <input
-          type="text"
-          class="search-input"
-          id="searchInput"
-          placeholder="Search a term..."
-        />
-        <div class="autocomplete-list hidden" id="autocompleteList"></div>
+        <div class="search-wrapper">
+          <input
+            type="text"
+            class="search-input"
+            id="searchInput"
+            placeholder="Search a term..."
+          />
+          <div class="autocomplete-list hidden" id="autocompleteList"></div>
+        </div>
+        <button class="random-button" onclick="selectRandomTerm()">
+          Random
+        </button>
       </div>
-      <button class="random-button" onclick="selectRandomTerm()">Random</button>
-    </div>
 
       <div class="carousel" id="carousel"></div>
     </main>
@@ -391,13 +395,28 @@
 
         function openModal(term) {
           modalTitle.textContent = term.term;
-          modalContent.innerHTML = `<p><strong>Definition:</strong> ${
-            term.definition
-          }</p><p><strong>Example:</strong> ${
-            term.usage
-          }</p><p><strong>Related to:</strong> ${term.related
+
+          const relatedTerms = term.related
             .map((tag) => `<span class='badge'>${tag}</span>`)
-            .join(" ")}</p>`;
+            .join(" ");
+
+          const relatedSection =
+            term.related.length == 0
+              ? ``
+              : `<p>
+                  <strong>Related to:</strong> ${relatedTerms}
+                </p>`;
+
+          const newContent = `
+            <p>
+              <strong>Definition:</strong> ${term.definition}
+              </p>
+
+                <p><strong>Example:</strong> ${term.usage}</p>
+
+                ${relatedSection}`;
+
+          modalContent.innerHTML = newContent;
           termModal.classList.remove("hide");
           termModal.classList.add("show");
         }
@@ -424,26 +443,30 @@
         }
 
         // Navigation functions
-        window.scrollToTop = function() {
-          window.scrollTo({ top: 0, behavior: 'smooth' });
+        window.scrollToTop = function () {
+          window.scrollTo({ top: 0, behavior: "smooth" });
         };
 
-        window.showAbout = function() {
+        window.showAbout = function () {
           const aboutModal = {
             term: "About Floundermode Dictionary",
-            definition: "A comprehensive dictionary of internet slang, memes, and digital culture terminology. Floundermode captures the evolving language of online communities.",
-            usage: "Navigate through terms using the search bar, browse randomly, or click through the carousel below.",
-            related: ["digital culture", "internet slang", "community", "language evolution"]
+            definition:
+              "A comprehensive dictionary of internet slang, memes, and digital culture terminology. Floundermode captures the evolving language of online communities.",
+            usage:
+              "Navigate through terms using the search bar, browse randomly, or click through the carousel below.",
+            related: [],
           };
           openModal(aboutModal);
         };
 
-        window.showContributing = function() {
+        window.showContributing = function () {
           const contributingModal = {
             term: "Contributing to Floundermode",
-            definition: "Help expand the dictionary by submitting new terms, definitions, and examples. All contributions are reviewed for accuracy and relevance.",
-            usage: "Check the CONTRIBUTING.md file in the repository for detailed guidelines on how to add new terms and improve existing definitions.",
-            related: ["community", "collaboration", "open source", "documentation"]
+            definition:
+              "Help expand the dictionary by submitting new terms, definitions, and examples. All contributions are reviewed for accuracy and relevance.",
+            usage:
+              "Check the CONTRIBUTING.md file in the repository for detailed guidelines on how to add new terms and improve existing definitions.",
+            related: [],
           };
           openModal(contributingModal);
         };
