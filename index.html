@@ -174,6 +174,7 @@
         justify-content: center;
         flex-wrap: wrap;
         gap: 0.5rem;
+        margin-top: 4rem;
       }
 
       .carousel button {
@@ -363,7 +364,6 @@
     </div>
 
     <script>
-      var closeModal;
       async function init() {
         const searchInput = document.getElementById("searchInput");
         const autocompleteList = document.getElementById("autocompleteList");
@@ -374,35 +374,38 @@
 
         const fetchResult = await fetch("/terms/terms.json");
         const flounderTerms = await fetchResult.json();
-        console.log({ flounderTerms });
 
         searchInput.addEventListener("input", () => {
           const value = searchInput.value.toLowerCase();
           autocompleteList.innerHTML = "";
-          if (value) {
-            const matches = flounderTerms.filter((term) =>
-              term.term.toLowerCase().includes(value)
-            );
-            if (matches.length > 0) {
-              autocompleteList.classList.remove("hidden");
-              matches.forEach((match) => {
-                const item = document.createElement("div");
-                item.className = "autocomplete-item";
-                item.textContent = match.term;
-                item.onclick = () => {
-                  searchInput.value = "";
-                  autocompleteList.innerHTML = "";
-                  autocompleteList.classList.add("hidden");
-                  openModal(match);
-                };
-                autocompleteList.appendChild(item);
-              });
-            } else {
-              autocompleteList.classList.add("hidden");
-            }
-          } else {
+
+          if (!value) {
             autocompleteList.classList.add("hidden");
+            return;
           }
+
+          const matches = flounderTerms.filter((term) =>
+            term.term.toLowerCase().includes(value)
+          );
+
+          if (matches.length == 0) {
+            autocompleteList.classList.add("hidden");
+            return;
+          }
+
+          autocompleteList.classList.remove("hidden");
+          matches.forEach((match) => {
+            const item = document.createElement("div");
+            item.className = "autocomplete-item";
+            item.textContent = match.term;
+            item.onclick = () => {
+              searchInput.value = "";
+              autocompleteList.innerHTML = "";
+              autocompleteList.classList.add("hidden");
+              openModal(match);
+            };
+            autocompleteList.appendChild(item);
+          });
         });
 
         function openModal(term) {
@@ -433,10 +436,10 @@
           termModal.classList.add("show");
         }
 
-        function closeModalInner() {
+        window.closeModal = function () {
           termModal.classList.remove("show");
           termModal.classList.add("hide");
-        }
+        };
 
         function populateCarousel() {
           const shuffled = [...flounderTerms].sort(() => 0.5 - Math.random());
@@ -446,6 +449,33 @@
             btn.onclick = () => openModal(term);
             carousel.appendChild(btn);
           });
+        }
+
+        function getWyotd() {
+          // Get UTC midnight timestamp for today
+          const now = new Date();
+          const utcMidnight = new Date(
+            Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate())
+          );
+          const daysSinceEpoch = Math.floor(
+            utcMidnight.getTime() / (1000 * 60 * 60 * 24)
+          );
+
+          // Simple hash function to distribute selection
+          let hash = daysSinceEpoch;
+          hash = ((hash >>> 16) ^ hash) * 0x45d9f3b;
+          hash = ((hash >>> 16) ^ hash) * 0x45d9f3b;
+          hash = (hash >>> 16) ^ hash;
+
+          return flounderTerms[Math.abs(hash) % flounderTerms.length];
+        }
+
+        function populateWyod() {
+          const wyotd = getWyotd();
+          const speechBubble = document.querySelector(".speech-bubble");
+          speechBubble.innerHTML = `
+            <strong>${wyotd.term}</strong> ${wyotd.definition}
+          `;
         }
 
         window.selectRandomTerm = function () {
@@ -483,8 +513,8 @@
           openModal(contributingModal);
         };
 
-        closeModal = closeModalInner;
         populateCarousel();
+        populateWyod();
         termModal.classList.add("hide");
       }
 
