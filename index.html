@@ -297,16 +297,27 @@
         padding: 3rem;
         padding-bottom: 3rem;
         padding-bottom: 233px;
+        opacity: 1;
+        transition: opacity 0.25s ease;
       }
 
-      .wyotd-container {
+      .wotd-container {
         position: fixed;
         bottom: -0.5rem;
         left: -0.25rem;
+        transition: bottom 0.25s ease;
       }
 
-      .wyotd-container img {
+      .wotd-container img {
         height: 25rem;
+      }
+
+      .wotd-container.hide {
+        bottom: -234px;
+      }
+
+      .wotd-container.hide .speech-bubble {
+        opacity: 0;
       }
 
       /* @media screen and (max-width: 764px) {
@@ -346,7 +357,7 @@
       <div class="carousel" id="carousel"></div>
     </main>
 
-    <div class="wyotd-container">
+    <div class="wotd-container" onclick="toggleWotd()">
       <img src="/assets/carter-wynn.png" />
       <div class="speech-bubble">
         <strong>The word of the day:</strong>
@@ -355,7 +366,7 @@
       </div>
     </div>
 
-    <div class="term-modal" id="termModal">
+    <div class="term-modal hide" id="termModal">
       <div class="window-bar">
         <span id="modalTitle"></span>
         <button class="window-button" onclick="closeModal()">✕</button>
@@ -371,6 +382,7 @@
         const termModal = document.getElementById("termModal");
         const modalTitle = document.getElementById("modalTitle");
         const modalContent = document.getElementById("modalContent");
+        const wotdContainer = document.querySelector(".wotd-container");
 
         const fetchResult = await fetch("/terms/terms.json");
         const flounderTerms = await fetchResult.json();
@@ -378,9 +390,11 @@
         searchInput.addEventListener("input", () => {
           const value = searchInput.value.toLowerCase();
           autocompleteList.innerHTML = "";
+          wotdContainer.classList.add("hide");
 
           if (!value) {
             autocompleteList.classList.add("hidden");
+            wotdContainer.classList.remove("hide");
             return;
           }
 
@@ -451,7 +465,7 @@
           });
         }
 
-        function getWyotd() {
+        function getWotd() {
           // Get UTC midnight timestamp for today
           const now = new Date();
           const utcMidnight = new Date(
@@ -470,11 +484,11 @@
           return flounderTerms[Math.abs(hash) % flounderTerms.length];
         }
 
-        function populateWyod() {
-          const wyotd = getWyotd();
+        function populateWotd() {
+          const wotd = getWotd();
           const speechBubble = document.querySelector(".speech-bubble");
           speechBubble.innerHTML = `
-            <strong>${wyotd.term}</strong> ${wyotd.definition}
+            <strong>${wotd.term}</strong> ${wotd.definition}
           `;
         }
 
@@ -513,9 +527,13 @@
           openModal(contributingModal);
         };
 
+        window.toggleWotd = function () {
+          const wotdContainer = document.querySelector(".wotd-container");
+          wotdContainer.classList.toggle("hide");
+        };
+
         populateCarousel();
-        populateWyod();
-        termModal.classList.add("hide");
+        populateWotd();
       }
 
       init();
