@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Floundermode Dictionary</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Roboto Mono", monospace;
+        background-color: #f5f5f5;
+        color: #1a1a1a;
+        margin: 0;
+        padding: 2rem 1rem;
+        line-height: 1.6;
+        overflow-x: hidden;
+      }
+
+      .page-title {
+        font-family: "Bebas Neue", sans-serif;
+        font-size: clamp(2rem, 6vw, 4rem);
+        text-align: center;
+        margin-bottom: 1rem;
+        letter-spacing: 2px;
+      }
+
+      .search-container {
+        max-width: 800px;
+        margin: 0 auto 2rem auto;
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+      }
+
+      .search-wrapper {
+        position: relative;
+        flex: 1 1 60%;
+        min-width: 200px;
+      }
+
+      .search-input {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        font-size: 1rem;
+        border: 2px solid #000;
+        box-shadow: 3px 3px 0 #000;
+      }
+
+      .random-button {
+        flex: 0 0 auto;
+        padding: 0.75rem 1rem;
+        font-size: 1rem;
+        font-weight: bold;
+        border: 2px solid #000;
+        background: #fff;
+        box-shadow: 3px 3px 0 #000;
+        cursor: pointer;
+        transition: transform 0.2s ease, background-color 0.2s ease;
+      }
+
+      .random-button:hover {
+        background-color: #ffe680;
+        transform: translateY(-2px);
+      }
+
+      .autocomplete-list {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        background: #fff;
+        border: 2px solid #000;
+        z-index: 10;
+        box-shadow: 3px 3px 0 #000;
+      }
+
+      .autocomplete-list.hidden {
+        display: none;
+      }
+
+      .autocomplete-item {
+        padding: 0.5rem 1rem;
+        cursor: pointer;
+      }
+
+      .autocomplete-item:hover {
+        background: #ffd166;
+      }
+
+      .carousel {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+      }
+
+      .carousel button {
+        flex: 0 0 auto;
+        padding: 0.5rem 1rem;
+        border: 2px solid #000;
+        background: #fff;
+        font-weight: bold;
+        box-shadow: 3px 3px 0 #000;
+        cursor: pointer;
+        transition: transform 0.2s ease, background-color 0.2s ease;
+      }
+
+      .carousel button:hover {
+        background-color: #ffe680;
+        transform: translateY(-2px);
+      }
+
+      .term-modal {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        width: 90vw;
+        max-width: 500px;
+        max-height: 90vh;
+        background: white;
+        border: 2px solid black;
+        box-shadow: 6px 6px 0 #000;
+        z-index: 1000;
+        display: flex;
+        flex-direction: column;
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.95);
+        pointer-events: none;
+        transition: opacity 0.3s ease, transform 0.3s ease;
+      }
+
+      .term-modal .window-bar {
+        background: #222;
+        color: #fff;
+        padding: 0.5rem 1rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-shrink: 0;
+      }
+
+      .term-modal .window-button {
+        background: #ff4d4d;
+        color: #000;
+        border: 1px solid #000;
+        width: 20px;
+        height: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background-color 0.2s ease, transform 0.2s ease;
+      }
+
+      .term-modal .window-button:hover {
+        background-color: #ff1a1a;
+        transform: scale(1.1);
+      }
+
+      .term-modal .term-content {
+        padding: 1rem 1.25rem;
+        overflow-y: auto;
+      }
+
+      .badge {
+        display: inline-block;
+        margin: 0.25rem 0.5rem 0.25rem 0;
+        vertical-align: top;
+        max-width: 100%;
+        word-wrap: break-word;
+        white-space: normal;
+        background: #e0e0e0;
+        padding: 0.2rem 0.6rem;
+        font-size: 0.75rem;
+        font-weight: bold;
+        border: 2px solid #000;
+        box-shadow: 2px 2px 0 #000;
+        text-transform: uppercase;
+        transition: background-color 0.2s ease, transform 0.2s ease;
+      }
+
+      .badge:hover {
+        background-color: #d4d4d4;
+        transform: scale(1.05);
+      }
+
+      @media (max-width: 500px) {
+        .term-modal {
+          width: 95vw;
+          max-height: 95dvh;
+        }
+      }
+
+      .term-modal.show {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+        pointer-events: auto;
+      }
+
+      .term-modal.hide {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.95);
+        pointer-events: none;
+      }
+
+      .wyotd-container {
+        position: fixed;
+        bottom: -0.5rem;
+        left: -0.25rem;
+      }
+
+      .wyotd-container img {
+        max-height: 55vh;
+        max-width: 25vw;
+      }
+
+      @media screen and (max-width: 764px) {
+        .wyotd-container img {
+          max-height: 50vh;
+          max-width: 75vw;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="search-container">
+      <div class="search-wrapper">
+        <input
+          type="text"
+          class="search-input"
+          id="searchInput"
+          placeholder="Search a term..."
+        />
+        <div class="autocomplete-list hidden" id="autocompleteList"></div>
+      </div>
+      <button class="random-button" onclick="selectRandomTerm()">Random</button>
+    </div>
+
+    <div class="carousel" id="carousel"></div>
+
+    <div class="wyotd-container">
+      <img src="/assets/carter-wynn.png" />
+    </div>
+
+    <div class="term-modal" id="termModal">
+      <div class="window-bar">
+        <span id="modalTitle"></span>
+        <button class="window-button" onclick="closeModal()">✕</button>
+      </div>
+      <div class="term-content" id="modalContent"></div>
+    </div>
+
+    <script>
+      var closeModal;
+      async function init() {
+        const searchInput = document.getElementById("searchInput");
+        const autocompleteList = document.getElementById("autocompleteList");
+        const carousel = document.getElementById("carousel");
+        const termModal = document.getElementById("termModal");
+        const modalTitle = document.getElementById("modalTitle");
+        const modalContent = document.getElementById("modalContent");
+
+        const fetchResult = await fetch("/terms/terms.json");
+        const flounderTerms = await fetchResult.json();
+        console.log({ flounderTerms });
+
+        searchInput.addEventListener("input", () => {
+          const value = searchInput.value.toLowerCase();
+          autocompleteList.innerHTML = "";
+          if (value) {
+            const matches = flounderTerms.filter((term) =>
+              term.term.toLowerCase().includes(value)
+            );
+            if (matches.length > 0) {
+              autocompleteList.classList.remove("hidden");
+              matches.forEach((match) => {
+                const item = document.createElement("div");
+                item.className = "autocomplete-item";
+                item.textContent = match.term;
+                item.onclick = () => {
+                  searchInput.value = "";
+                  autocompleteList.innerHTML = "";
+                  autocompleteList.classList.add("hidden");
+                  openModal(match);
+                };
+                autocompleteList.appendChild(item);
+              });
+            } else {
+              autocompleteList.classList.add("hidden");
+            }
+          } else {
+            autocompleteList.classList.add("hidden");
+          }
+        });
+
+        function openModal(term) {
+          modalTitle.textContent = term.term;
+          modalContent.innerHTML = `<p><strong>Definition:</strong> ${
+            term.definition
+          }</p><p><strong>Example:</strong> ${
+            term.usage
+          }</p><p><strong>Related to:</strong> ${term.related
+            .map((tag) => `<span class='badge'>${tag}</span>`)
+            .join(" ")}</p>`;
+          termModal.classList.remove("hide");
+          termModal.classList.add("show");
+        }
+
+        function closeModalInner() {
+          termModal.classList.remove("show");
+          termModal.classList.add("hide");
+        }
+
+        function populateCarousel() {
+          const shuffled = [...flounderTerms].sort(() => 0.5 - Math.random());
+          shuffled.forEach((term) => {
+            const btn = document.createElement("button");
+            btn.textContent = term.term;
+            btn.onclick = () => openModal(term);
+            carousel.appendChild(btn);
+          });
+        }
+
+        function selectRandomTerm() {
+          const randomIndex = Math.floor(Math.random() * flounderTerms.length);
+          const term = flounderTerms[randomIndex];
+          openModal(term);
+        }
+
+        closeModal = closeModalInner;
+        populateCarousel();
+        termModal.classList.add("hide");
+      }
+
+      init();
+    </script>
+  </body>
+</html>
