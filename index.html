@@ -288,12 +288,11 @@
       }
 
       .speech-bubble {
-        position: fixed;
+        position: absolute;
         background: no-repeat url("/assets/chat_bubble.svg");
-        bottom: 160px;
         height: 400px;
         width: 351px;
-        left: 0;
+        top: -15rem;
         padding: 3rem;
         padding-bottom: 3rem;
         padding-bottom: 233px;
@@ -306,8 +305,7 @@
       }
 
       .wyotd-container img {
-        max-height: 50vh;
-        max-width: 75vw;
+        height: 25rem;
       }
 
       /* @media screen and (max-width: 764px) {
@@ -349,11 +347,11 @@
 
     <div class="wyotd-container">
       <img src="/assets/carter-wynn.png" />
-    </div>
-    <div class="speech-bubble">
-      <strong>The word of the day:</strong>
-      The word definition would go here. If it's long it might not fit. It's
-      important that this text wraps.
+      <div class="speech-bubble">
+        <strong>The word of the day:</strong>
+        The word definition would go here. If it's long it might not fit. It's
+        important that this text wraps.
+      </div>
     </div>
 
     <div class="term-modal" id="termModal">
@@ -450,11 +448,11 @@
           });
         }
 
-        function selectRandomTerm() {
+        window.selectRandomTerm = function () {
           const randomIndex = Math.floor(Math.random() * flounderTerms.length);
           const term = flounderTerms[randomIndex];
           openModal(term);
-        }
+        };
 
         // Navigation functions
         window.scrollToTop = function () {
