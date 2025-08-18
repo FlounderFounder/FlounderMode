@@ -155,12 +155,106 @@ function updateNavigation() {
   }
 }
 
+// Calculate similarity between two strings using Levenshtein distance
+function calculateSimilarity(str1, str2) {
+  const s1 = str1.toLowerCase().trim();
+  const s2 = str2.toLowerCase().trim();
+  
+  if (s1 === s2) return 1.0; // Exact match
+  
+  const longer = s1.length > s2.length ? s1 : s2;
+  const shorter = s1.length > s2.length ? s2 : s1;
+  
+  if (longer.length === 0) return 1.0;
+  
+  const editDistance = levenshteinDistance(longer, shorter);
+  return (longer.length - editDistance) / longer.length;
+}
+
+// Levenshtein distance algorithm
+function levenshteinDistance(str1, str2) {
+  const matrix = [];
+  
+  for (let i = 0; i <= str2.length; i++) {
+    matrix[i] = [i];
+  }
+  
+  for (let j = 0; j <= str1.length; j++) {
+    matrix[0][j] = j;
+  }
+  
+  for (let i = 1; i <= str2.length; i++) {
+    for (let j = 1; j <= str1.length; j++) {
+      if (str2.charAt(i - 1) === str1.charAt(j - 1)) {
+        matrix[i][j] = matrix[i - 1][j - 1];
+      } else {
+        matrix[i][j] = Math.min(
+          matrix[i - 1][j - 1] + 1, // substitution
+          matrix[i][j - 1] + 1,     // insertion
+          matrix[i - 1][j] + 1      // deletion
+        );
+      }
+    }
+  }
+  
+  return matrix[str2.length][str1.length];
+}
+
+// Check for duplicate and similar terms
+function checkDuplicateTerm(termName) {
+  if (!termName || !flounderTerms) return false;
+  
+  // Normalize the term name for comparison (lowercase, trim whitespace)
+  const normalizedInput = termName.toLowerCase().trim();
+  
+  // Check for exact matches first
+  const exactMatch = flounderTerms.find(term => 
+    term.term.toLowerCase().trim() === normalizedInput
+  );
+  
+  if (exactMatch) {
+    showCustomAlert(
+      "Duplicate Term Found", 
+      `The term "${exactMatch.term}" already exists in the dictionary. ` +
+      `Please choose a different term or check if you meant to suggest an edit to the existing one.`
+    );
+    return true; // Exact duplicate found
+  }
+  
+  // Check for similar terms (similarity threshold of 0.8 = 80% similar)
+  const SIMILARITY_THRESHOLD = 0.8;
+  
+  for (const term of flounderTerms) {
+    const similarity = calculateSimilarity(termName, term.term);
+    if (similarity >= SIMILARITY_THRESHOLD && similarity < 1.0) {
+      showCustomAlert(
+        "Similar Term Found", 
+        `The term "${term.term}" is very similar to "${termName}". ` +
+        `This might be a misspelling or variation. Please check the existing term ` +
+        `or choose a more distinct name to avoid confusion.`
+      );
+      return true; // Similar term found
+    }
+  }
+  
+  return false; // No duplicate or similar term
+}
+
 function validateCurrentStep() {
   const step = currentStep;
   
   if (step === 1) {
     const termName = document.getElementById("termName").value.trim();
-    return validateInput(termName, "Term name");
+    
+    // First check basic validation
+    if (!validateInput(termName, "Term name")) {
+      return false;
+    }
+    
+    // Then check for duplicates
+    if (checkDuplicateTerm(termName)) {
+      return false;
+    }
   }
   
   if (step === 2) {
@@ -203,10 +297,68 @@ function resetForm() {
   document.getElementById("definitionCounter").textContent = "0";
   document.getElementById("usageCounter").textContent = "0";
   
+  // Hide duplicate warning
+  hideDuplicateWarning();
+  
   updateNavigation();
 }
 
-// Character counters
+// Show real-time duplicate or similarity warning
+function showDuplicateWarning(termName, existingTerm, isExact = true) {
+  const termInput = document.getElementById("termName");
+  let warningEl = document.getElementById("duplicateWarning");
+  
+  // Create warning element if it doesn't exist
+  if (!warningEl) {
+    warningEl = document.createElement("div");
+    warningEl.id = "duplicateWarning";
+    warningEl.className = "duplicate-warning";
+    termInput.parentNode.insertBefore(warningEl, termInput.nextSibling);
+  }
+  
+  if (isExact) {
+    warningEl.innerHTML = `
+      ⚠️ Term "${existingTerm.term}" already exists. 
+      <button type="button" class="view-existing-btn" onclick="viewExistingTerm('${existingTerm.term.replace(/'/g, "\\'")}')">
+        View existing →
+      </button>
+    `;
+    warningEl.className = "duplicate-warning";
+  } else {
+    warningEl.innerHTML = `
+      🔍 Similar term "${existingTerm.term}" found. Possible misspelling? 
+      <button type="button" class="view-existing-btn" onclick="viewExistingTerm('${existingTerm.term.replace(/'/g, "\\'")}')">
+        View similar →
+      </button>
+    `;
+    warningEl.className = "duplicate-warning similar-warning";
+  }
+  
+  warningEl.style.display = "block";
+}
+
+function hideDuplicateWarning() {
+  const warningEl = document.getElementById("duplicateWarning");
+  if (warningEl) {
+    warningEl.style.display = "none";
+  }
+}
+
+// Function to view an existing term
+window.viewExistingTerm = function(termName) {
+  const existingTerm = flounderTerms.find(term => 
+    term.term.toLowerCase().trim() === termName.toLowerCase().trim()
+  );
+  
+  if (existingTerm && typeof window.openModal === 'function') {
+    // Close easy mode modal first
+    closeEasyModeModal();
+    // Open the existing term modal
+    window.openModal(existingTerm);
+  }
+};
+
+// Character counters and real-time duplicate checking
 function setupCharacterCounters() {
   const counters = [
     { input: "termName", counter: "termCounter" },
@@ -221,6 +373,43 @@ function setupCharacterCounters() {
     if (inputEl && counterEl) {
       inputEl.addEventListener("input", () => {
         counterEl.textContent = inputEl.value.length;
+        
+        // Add real-time duplicate and similarity checking for term name
+        if (input === "termName") {
+          const termName = inputEl.value.trim();
+          if (termName.length > 2) { // Only check after 3+ characters
+            const normalizedInput = termName.toLowerCase().trim();
+            
+            // First check for exact matches
+            const exactMatch = flounderTerms.find(term => 
+              term.term.toLowerCase().trim() === normalizedInput
+            );
+            
+            if (exactMatch) {
+              showDuplicateWarning(termName, exactMatch, true);
+            } else {
+              // Check for similar terms
+              const SIMILARITY_THRESHOLD = 0.8;
+              let similarTerm = null;
+              
+              for (const term of flounderTerms) {
+                const similarity = calculateSimilarity(termName, term.term);
+                if (similarity >= SIMILARITY_THRESHOLD && similarity < 1.0) {
+                  similarTerm = term;
+                  break; // Show the first similar term found
+                }
+              }
+              
+              if (similarTerm) {
+                showDuplicateWarning(termName, similarTerm, false);
+              } else {
+                hideDuplicateWarning();
+              }
+            }
+          } else {
+            hideDuplicateWarning();
+          }
+        }
       });
     }
   });
@@ -324,16 +513,143 @@ function updateTagsDisplay() {
   }
 }
 
+// PR Preview Modal functions
+window.openPrPreviewModal = function() {
+  const modal = document.getElementById("prPreviewModal");
+  modal.classList.remove("hide");
+  modal.classList.add("show");
+};
+
+window.closePrPreviewModal = function() {
+  const modal = document.getElementById("prPreviewModal");
+  modal.classList.remove("show");
+  modal.classList.add("hide");
+};
+
+// Copy to clipboard functionality
+window.copyToClipboard = async function(elementId) {
+  const element = document.getElementById(elementId);
+  const text = element.textContent || element.innerText;
+  
+  try {
+    await navigator.clipboard.writeText(text);
+    
+    // Show feedback by changing the copy button temporarily
+    const copyBtn = element.parentElement.querySelector('.copy-btn');
+    const originalText = copyBtn.textContent;
+    copyBtn.textContent = '✓ Copied!';
+    copyBtn.style.background = '#4CAF50';
+    copyBtn.style.color = 'white';
+    
+    setTimeout(() => {
+      copyBtn.textContent = originalText;
+      copyBtn.style.background = '#ffe680';
+      copyBtn.style.color = '#000';
+    }, 2000);
+    
+  } catch (err) {
+    console.error('Failed to copy text: ', err);
+    // Fallback for older browsers
+    fallbackCopyToClipboard(text);
+  }
+};
+
+function fallbackCopyToClipboard(text) {
+  const textArea = document.createElement("textarea");
+  textArea.value = text;
+  textArea.style.position = "fixed";
+  textArea.style.left = "-999999px";
+  textArea.style.top = "-999999px";
+  document.body.appendChild(textArea);
+  textArea.focus();
+  textArea.select();
+  
+  try {
+    document.execCommand('copy');
+    showCustomAlert('Copied!', 'Content copied to clipboard successfully.');
+  } catch (err) {
+    showCustomAlert('Copy Failed', 'Unable to copy to clipboard. Please copy manually.');
+  }
+  
+  document.body.removeChild(textArea);
+}
+
+// Generate JSON code for the new term
+function generateTermJson(termData) {
+  // Create a properly formatted JSON object
+  const termObject = {
+    term: termData.term,
+    definition: termData.definition,
+    usage: termData.usage,
+    related: termData.related || []
+  };
+  
+  // Format with proper indentation (2 spaces)
+  return JSON.stringify(termObject, null, 2);
+}
+
+// Generate PR title
+function generatePrTitle(termData) {
+  return `Add new term: ${termData.term}`;
+}
+
+// Generate PR description
+function generatePrDescription(termData) {
+  return `## Adding New Term: ${termData.term}
+
+**Definition:** ${termData.definition}
+
+**Usage Example:** ${termData.usage}
+
+**Related Tags:** ${termData.related.length > 0 ? termData.related.join(', ') : 'None'}
+
+---
+
+This pull request adds a new term to the Floundermode Dictionary. The term has been validated and follows the contribution guidelines.
+
+### Checklist
+- [x] Term is unique and not already in the dictionary
+- [x] Definition is clear and concise
+- [x] Usage example demonstrates the term appropriately
+- [x] Related tags are relevant and helpful`;
+}
+
+// Show PR preview with generated content
+function showPrPreview(termData) {
+  // Generate the content
+  const prTitle = generatePrTitle(termData);
+  const prDescription = generatePrDescription(termData);
+  const jsonCode = generateTermJson(termData);
+  
+  // Populate the modal content
+  document.getElementById('prTitle').textContent = prTitle;
+  document.getElementById('prDescription').textContent = prDescription;
+  document.getElementById('codeChanges').textContent = jsonCode;
+  
+  // Show the modal
+  openPrPreviewModal();
+}
+
 // Form submission
 async function submitTerm(termData) {
-  // For now, show a preview of what would be submitted
-  const previewMessage = 'Term: ' + termData.term + '\n\nDefinition: ' + termData.definition + '\n\nUsage: ' + termData.usage + '\n\nTags: ' + termData.related.join(", ") + '\n\nGitHub PR creation coming soon!';
-  
-  showCustomAlert('Term Ready for Submission!', previewMessage);
-  
-  setTimeout(() => {
-    closeEasyModeModal();
-  }, 1000);
+  try {
+    // Final duplicate check before submission
+    if (checkDuplicateTerm(termData.term)) {
+      return; // Stop submission if duplicate found
+    }
+    
+    // Show the PR preview instead of the simple alert
+    showPrPreview(termData);
+    
+    // Close the easy mode modal after a short delay
+    setTimeout(() => {
+      closeEasyModeModal();
+    }, 500);
+    
+  } catch (error) {
+    console.error("Error generating PR preview:", error);
+    showCustomAlert("Error", "There was an error generating the PR preview. Please try again.");
+  }
 }
 
 // Initialize Easy Mode when DOM is loaded

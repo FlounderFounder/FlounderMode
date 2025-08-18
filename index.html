@@ -146,6 +146,72 @@
       </div>
     </div>
 
+    <div class="pr-preview-modal hide" id="prPreviewModal">
+      <div class="window-bar">
+        <span>Pull Request Preview</span>
+        <button class="window-button" onclick="closePrPreviewModal()">✕</button>
+      </div>
+      <div class="pr-preview-content">
+        <div class="pr-header">
+          <h3>🎉 Your term is ready for submission!</h3>
+          <p>Copy the information below to create a pull request on GitHub.</p>
+        </div>
+        
+        <div class="pr-section">
+          <h4>📝 Pull Request Title</h4>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-label">Copy this title</span>
+              <button class="copy-btn" onclick="copyToClipboard('prTitle')">📋 Copy</button>
+            </div>
+            <code id="prTitle"></code>
+          </div>
+        </div>
+
+        <div class="pr-section">
+          <h4>📄 Pull Request Description</h4>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-label">Copy this description</span>
+              <button class="copy-btn" onclick="copyToClipboard('prDescription')">📋 Copy</button>
+            </div>
+            <pre id="prDescription"></pre>
+          </div>
+        </div>
+
+        <div class="pr-section">
+          <h4>💻 Code Changes</h4>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-label">Add this to terms/terms.json</span>
+              <button class="copy-btn" onclick="copyToClipboard('codeChanges')">📋 Copy</button>
+            </div>
+            <pre id="codeChanges"></pre>
+          </div>
+        </div>
+
+        <div class="pr-section">
+          <h4>🚀 Next Steps</h4>
+          <div class="next-steps">
+            <ol>
+              <li>Go to <a href="https://github.com/FlounderFounder/default_website" target="_blank">GitHub Repository</a></li>
+              <li>Fork the repository (if you haven't already)</li>
+              <li>Edit the <code>terms/terms.json</code> file</li>
+              <li>Add the JSON code above to the file</li>
+              <li>Create a pull request with the title and description above</li>
+            </ol>
+          </div>
+        </div>
+
+        <div class="pr-actions">
+          <button class="pr-btn secondary" onclick="closePrPreviewModal()">Close</button>
+          <button class="pr-btn primary" onclick="window.open('https://github.com/FlounderFounder/default_website', '_blank')">
+            Open GitHub →
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- JavaScript Files -->
     <script src="/scripts/main.js"></script>
     <script src="/scripts/easy-mode.js"></script>
