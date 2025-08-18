@@ -127,6 +127,13 @@
         font-size: 1rem;
         border: 2px solid #000;
         box-shadow: 3px 3px 0 #000;
+        transition: none;
+      }
+
+      .search-input:focus {
+        outline: none;
+        border: 2px solid #000;
+        box-shadow: 3px 3px 0 #000;
       }
 
       .random-button {
@@ -349,6 +356,458 @@
         box-shadow: 1px 1px 0 #000;
       }
 
+      .easy-mode-modal {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        width: 90vw;
+        max-width: 600px;
+        max-height: 90vh;
+        background: white;
+        border: 4px solid black;
+        box-shadow: 8px 8px 0 #000;
+        z-index: 1001;
+        display: flex;
+        flex-direction: column;
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.95);
+        pointer-events: none;
+        transition: opacity 0.3s ease, transform 0.3s ease;
+      }
+
+      .easy-mode-modal.show {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+        pointer-events: auto;
+      }
+
+      .easy-mode-modal .window-bar {
+        background: #222;
+        color: #fff;
+        padding: 0.5rem 1rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-shrink: 0;
+      }
+
+      .easy-mode-modal .window-button {
+        background: #ff4d4d;
+        color: #000;
+        border: 1px solid #000;
+        width: 20px;
+        height: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background-color 0.2s ease, transform 0.2s ease;
+      }
+
+      .easy-mode-modal .window-button:hover {
+        background-color: #ff1a1a;
+        transform: scale(1.1);
+      }
+
+      .easy-mode-modal .window-button:active {
+        transform: scale(0.95);
+        background-color: #cc0000;
+      }
+
+      .easy-mode-content {
+        padding: 2rem;
+        overflow-y: auto;
+        flex: 1;
+      }
+
+      .progress-container {
+        margin-bottom: 2rem;
+      }
+
+      .progress-bar {
+        width: 100%;
+        height: 20px;
+        border: 3px solid #000;
+        background: #f0f0f0;
+        box-shadow: 3px 3px 0 #000;
+        overflow: hidden;
+        margin-bottom: 0.5rem;
+      }
+
+      .progress-fill {
+        height: 100%;
+        background: #ffe680;
+        width: 25%;
+        transition: width 0.3s ease;
+        border-right: 2px solid #000;
+      }
+
+      .progress-text {
+        text-align: center;
+        font-weight: bold;
+        font-size: 0.9rem;
+        color: #666;
+      }
+
+      .form-step {
+        display: none;
+        animation: fadeIn 0.3s ease;
+      }
+
+      .form-step.active {
+        display: block;
+      }
+
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+
+      .form-step h3 {
+        font-size: 1.5rem;
+        margin-bottom: 0.5rem;
+        font-family: "Bebas Neue", sans-serif;
+        letter-spacing: 1px;
+      }
+
+      .form-step p {
+        margin-bottom: 1.5rem;
+        color: #666;
+        line-height: 1.4;
+      }
+
+      .easy-mode-form input,
+      .easy-mode-form textarea {
+        width: 100%;
+        padding: 0.75rem;
+        border: 3px solid #000;
+        box-shadow: 3px 3px 0 #000;
+        font-family: "Roboto Mono", monospace;
+        font-size: 1rem;
+        resize: vertical;
+        transition: box-shadow 0.2s ease;
+      }
+
+      .easy-mode-form input:focus,
+      .easy-mode-form textarea:focus {
+        outline: none;
+        box-shadow: 5px 5px 0 #000;
+      }
+
+      .easy-mode-form textarea {
+        min-height: 100px;
+      }
+
+      .char-counter {
+        text-align: right;
+        font-size: 0.8rem;
+        color: #666;
+        margin-top: 0.5rem;
+        margin-bottom: 1rem;
+      }
+
+      .tag-input-container {
+        position: relative;
+        margin-bottom: 1rem;
+      }
+
+      .tag-input-wrapper {
+        display: flex;
+        gap: 0.5rem;
+        align-items: stretch;
+      }
+
+      .tag-input-wrapper input {
+        flex: 1;
+      }
+
+      .tag-enter-btn {
+        flex: 0 0 auto;
+        border: 3px solid #000;
+        background: #fff;
+        box-shadow: 3px 3px 0 #000;
+        cursor: pointer;
+        transition: transform 0.2s ease, background-color 0.2s ease;
+        font-size: 1.1rem;
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 3rem;
+        padding: 0.75rem;
+      }
+
+      .tag-enter-btn:hover {
+        background: #ffe680;
+        transform: translateY(-1px);
+      }
+
+      .tag-enter-btn:active {
+        transform: translateY(0);
+        box-shadow: 1px 1px 0 #000;
+      }
+
+      .tag-enter-btn:disabled {
+        background: #f0f0f0;
+        color: #999;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      .tag-enter-btn:disabled:hover {
+        background: #f0f0f0;
+        transform: none;
+      }
+
+      .tag-suggestions {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: white;
+        border: 3px solid #000;
+        box-shadow: 3px 3px 0 #000;
+        max-height: 150px;
+        overflow-y: auto;
+        z-index: 10;
+        display: none;
+      }
+
+      .tag-suggestion {
+        padding: 0.5rem;
+        cursor: pointer;
+        border-bottom: 1px solid #eee;
+        transition: background-color 0.2s ease;
+      }
+
+      .tag-suggestion:hover {
+        background: #ffe680;
+      }
+
+      .selected-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+        min-height: 2rem;
+      }
+
+      .selected-tag {
+        background: #e0e0e0;
+        border: 2px solid #000;
+        padding: 0.3rem 0.7rem;
+        font-size: 0.8rem;
+        font-weight: bold;
+        text-transform: uppercase;
+        box-shadow: 2px 2px 0 #000;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .selected-tag .remove-tag {
+        cursor: pointer;
+        font-weight: bold;
+        color: #666;
+        transition: color 0.2s ease;
+      }
+
+      .selected-tag .remove-tag:hover {
+        color: #000;
+      }
+
+      .tag-limit {
+        font-size: 0.9rem;
+        color: #666;
+        margin-bottom: 1rem;
+      }
+
+      .form-navigation {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+        margin-top: 2rem;
+        padding-top: 1.5rem;
+        border-top: 2px solid #eee;
+      }
+
+      .nav-btn {
+        padding: 0.75rem 1.5rem;
+        border: 3px solid #000;
+        background: #fff;
+        box-shadow: 3px 3px 0 #000;
+        font-family: "Roboto Mono", monospace;
+        font-weight: bold;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: transform 0.2s ease, background-color 0.2s ease;
+        position: relative;
+        min-width: 120px;
+      }
+
+      .prev-btn {
+        align-self: flex-start;
+      }
+
+      .next-btn, .submit-btn {
+        align-self: flex-end;
+        margin-left: auto;
+      }
+
+      .btn-arrow {
+        display: none;
+        font-size: 1.2rem;
+      }
+
+      .btn-text {
+        display: inline;
+      }
+
+      .nav-btn:hover {
+        background: #ffe680;
+        transform: translateY(-1px);
+      }
+
+      .nav-btn:active {
+        transform: translateY(0);
+        box-shadow: 1px 1px 0 #000;
+      }
+
+      .nav-btn.submit-btn {
+        background: #4CAF50;
+        color: white;
+      }
+
+      .nav-btn.submit-btn:hover {
+        background: #45a049;
+      }
+
+      /* Custom Alert Modal */
+      .custom-alert {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        width: 90vw;
+        max-width: 400px;
+        background: white;
+        border: 4px solid black;
+        box-shadow: 8px 8px 0 #000;
+        z-index: 2000;
+        transform: translate(-50%, -50%) scale(0.95);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease, transform 0.3s ease;
+      }
+
+      .custom-alert.show {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+        pointer-events: auto;
+      }
+
+      .alert-header {
+        background: #ff4d4d;
+        color: white;
+        padding: 0.75rem 1rem;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .alert-content {
+        padding: 1.5rem;
+        font-family: "Roboto Mono", monospace;
+        line-height: 1.4;
+      }
+
+      .alert-actions {
+        padding: 1rem 1.5rem;
+        border-top: 2px solid #eee;
+        text-align: center;
+      }
+
+      .alert-btn {
+        padding: 0.5rem 1.5rem;
+        border: 3px solid #000;
+        background: #fff;
+        box-shadow: 3px 3px 0 #000;
+        font-family: "Roboto Mono", monospace;
+        font-weight: bold;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: transform 0.2s ease, background-color 0.2s ease;
+      }
+
+      .alert-btn:hover {
+        background: #ffe680;
+        transform: translateY(-1px);
+      }
+
+      .alert-btn:active {
+        transform: translateY(0);
+        box-shadow: 1px 1px 0 #000;
+      }
+
+      @media (max-width: 600px) {
+        .easy-mode-modal {
+          width: 95vw;
+          max-height: 95vh;
+        }
+        
+        .easy-mode-content {
+          padding: 1rem;
+        }
+        
+        .form-navigation {
+          flex-direction: row;
+          justify-content: space-between;
+          gap: 0.5rem;
+        }
+        
+        .nav-btn {
+          min-width: auto;
+          width: 50px;
+          height: 50px;
+          padding: 0.5rem;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        
+        .btn-text {
+          display: none;
+        }
+        
+        .btn-arrow {
+          display: inline;
+          font-size: 1.4rem;
+        }
+        
+        .prev-btn {
+          margin-right: auto;
+        }
+        
+        .next-btn, .submit-btn {
+          margin-left: auto;
+        }
+        
+        .custom-alert {
+          width: 95vw;
+          max-width: 350px;
+        }
+        
+        .alert-content {
+          padding: 1rem;
+          font-size: 0.9rem;
+        }
+      }
+
       @media (max-width: 500px) {
         .term-modal {
           width: 95vw;
@@ -455,22 +914,22 @@
     </header>
 
     <main class="main-content">
-      <div class="search-container">
-        <div class="search-wrapper">
-          <input
-            type="text"
-            class="search-input"
-            id="searchInput"
-            placeholder="Search a term..."
-          />
-          <div class="autocomplete-list hidden" id="autocompleteList"></div>
-        </div>
+    <div class="search-container">
+      <div class="search-wrapper">
+        <input
+          type="text"
+          class="search-input"
+          id="searchInput"
+          placeholder="Search a term..."
+        />
+        <div class="autocomplete-list hidden" id="autocompleteList"></div>
+      </div>
         <button class="random-button" onclick="selectRandomTerm()">
           Random
         </button>
-      </div>
+    </div>
 
-      <div class="carousel" id="carousel"></div>
+    <div class="carousel" id="carousel"></div>
     </main>
 
     <div class="wotd-container hide" onclick="toggleWotd()">
@@ -488,6 +947,85 @@
         <button class="window-button" onclick="closeModal()">✕</button>
       </div>
       <div class="term-content" id="modalContent"></div>
+    </div>
+
+    <div class="easy-mode-modal hide" id="easyModeModal">
+      <div class="window-bar">
+        <span>Easy Mode - Add New Term</span>
+        <button class="window-button" onclick="closeEasyModeModal()">✕</button>
+      </div>
+      <div class="easy-mode-content">
+        <div class="progress-container">
+          <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+          </div>
+          <div class="progress-text">Step <span id="currentStepText">1</span> of 4</div>
+        </div>
+
+        <form id="easyModeForm" class="easy-mode-form">
+          <div class="form-step active" data-step="1">
+            <h3>What's the term?</h3>
+            <p>Enter the name of the concept or phrase you want to define.</p>
+            <input type="text" id="termName" name="termName" placeholder="e.g., Zoom Gloom" maxlength="50" required>
+            <div class="char-counter"><span id="termCounter">0</span>/50</div>
+          </div>
+
+          <div class="form-step" data-step="2">
+            <h3>Define it</h3>
+            <p>Write a clear, concise definition. What does this term mean?</p>
+            <textarea id="termDefinition" name="termDefinition" placeholder="e.g., That fading stare that sets in during your fourth video call of the day." maxlength="200" required></textarea>
+            <div class="char-counter"><span id="definitionCounter">0</span>/200</div>
+          </div>
+
+          <div class="form-step" data-step="3">
+            <h3>Give an example</h3>
+            <p>Show how this term would be used in a sentence or context.</p>
+            <textarea id="termUsage" name="termUsage" placeholder="e.g., By hour three I had full-blown Zoom Gloom." maxlength="150" required></textarea>
+            <div class="char-counter"><span id="usageCounter">0</span>/150</div>
+          </div>
+
+          <div class="form-step" data-step="4">
+            <h3>Add related tags (optional)</h3>
+            <p>Choose up to 4 tags that relate to your term. You can select from suggestions or add your own.</p>
+            <div class="tag-input-container">
+              <div class="tag-input-wrapper">
+                <input type="text" id="tagInput" placeholder="Type a tag and press Enter" maxlength="30">
+                <button type="button" class="tag-enter-btn" onclick="addTagFromInput()" title="Add tag">⏎</button>
+              </div>
+              <div class="tag-suggestions" id="tagSuggestions"></div>
+            </div>
+            <div class="selected-tags" id="selectedTags"></div>
+            <div class="tag-limit">Tags: <span id="tagCount">0</span>/4</div>
+          </div>
+
+          <div class="form-navigation">
+            <button type="button" class="nav-btn prev-btn" onclick="previousStep()" style="display: none;">
+              <span class="btn-text">Previous</span>
+              <span class="btn-arrow">←</span>
+            </button>
+            <button type="button" class="nav-btn next-btn" onclick="nextStep()">
+              <span class="btn-text">Next</span>
+              <span class="btn-arrow">→</span>
+            </button>
+            <button type="submit" class="nav-btn submit-btn" style="display: none;">
+              <span class="btn-text">Create Pull Request</span>
+              <span class="btn-arrow">✓</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="custom-alert" id="customAlert">
+      <div class="alert-header">
+        <span id="alertTitle">Validation Error</span>
+      </div>
+      <div class="alert-content" id="alertContent">
+        Please enter a term name.
+      </div>
+      <div class="alert-actions">
+        <button class="alert-btn" onclick="closeCustomAlert()">OK</button>
+      </div>
     </div>
 
     <script>
@@ -514,28 +1052,28 @@
             return;
           }
 
-          const matches = flounderTerms.filter((term) =>
-            term.term.toLowerCase().includes(value)
-          );
+            const matches = flounderTerms.filter((term) =>
+              term.term.toLowerCase().includes(value)
+            );
 
           if (matches.length == 0) {
             autocompleteList.classList.add("hidden");
             return;
           }
 
-          autocompleteList.classList.remove("hidden");
-          matches.forEach((match) => {
-            const item = document.createElement("div");
-            item.className = "autocomplete-item";
-            item.textContent = match.term;
-            item.onclick = () => {
-              searchInput.value = "";
-              autocompleteList.innerHTML = "";
-              autocompleteList.classList.add("hidden");
-              openModal(match);
-            };
-            autocompleteList.appendChild(item);
-          });
+              autocompleteList.classList.remove("hidden");
+              matches.forEach((match) => {
+                const item = document.createElement("div");
+                item.className = "autocomplete-item";
+                item.textContent = match.term;
+                item.onclick = () => {
+                  searchInput.value = "";
+                  autocompleteList.innerHTML = "";
+                  autocompleteList.classList.add("hidden");
+                  openModal(match);
+                };
+                autocompleteList.appendChild(item);
+              });
         });
 
         function openModal(term) {
@@ -654,7 +1192,7 @@
                         class="contribute-button github-button">
                   GitHub
                 </button>
-                <button onclick="alert('Easy Mode coming soon!')" 
+                <button onclick="openEasyModeModal()" 
                         class="contribute-button easy-mode-button">
                   Easy Mode
                 </button>
@@ -668,8 +1206,350 @@
           wotdContainer.classList.toggle("hide");
         };
 
+        // Easy Mode functionality
+        let currentStep = 1;
+        let selectedTags = [];
+        let existingTags = [];
+
+        // Custom Alert System
+        window.showCustomAlert = function(title, message) {
+          const alertModal = document.getElementById("customAlert");
+          const alertTitle = document.getElementById("alertTitle");
+          const alertContent = document.getElementById("alertContent");
+          
+          alertTitle.textContent = title;
+          alertContent.textContent = message;
+          
+          alertModal.classList.add("show");
+        };
+
+        window.closeCustomAlert = function() {
+          const alertModal = document.getElementById("customAlert");
+          alertModal.classList.remove("show");
+        };
+
+        // Input Validation and Security
+        const DANGEROUS_PATTERNS = [
+          /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, // Script tags
+          /javascript:/gi, // javascript: protocol
+          /on\w+\s*=/gi, // Event handlers (onclick, onload, etc.)
+          /data:(?!image\/)/gi, // Data URLs (except images)
+          /vbscript:/gi, // VBScript
+          /expression\s*\(/gi, // CSS expressions
+          /import\s+/gi, // ES6 imports
+          /eval\s*\(/gi, // eval() calls
+          /Function\s*\(/gi, // Function constructor
+          /setTimeout\s*\(/gi, // setTimeout with string
+          /setInterval\s*\(/gi, // setInterval with string
+        ];
+
+        function validateInput(text, fieldName) {
+          if (!text || text.trim().length === 0) {
+            showCustomAlert("Validation Error", "Please enter a " + fieldName.toLowerCase() + ".");
+            return false;
+          }
+
+          // Check for dangerous patterns
+          for (let pattern of DANGEROUS_PATTERNS) {
+            if (pattern.test(text)) {
+              showCustomAlert("Security Error", "Your input contains potentially dangerous content. Please remove any script tags or executable code.");
+              return false;
+            }
+          }
+
+          // Check length limits
+          const limits = {
+            'term name': 50,
+            'definition': 200,
+            'usage example': 150
+          };
+
+          if (text.length > limits[fieldName.toLowerCase()]) {
+            showCustomAlert("Length Error", fieldName + " must be " + limits[fieldName.toLowerCase()] + " characters or less.");
+            return false;
+          }
+
+          return true;
+        }
+
+        // Extract tags from existing terms
+        function extractExistingTags() {
+          const allTags = new Set();
+          flounderTerms.forEach(term => {
+            term.related.forEach(tag => allTags.add(tag));
+          });
+          existingTags = Array.from(allTags).sort();
+        }
+
+        window.openEasyModeModal = function() {
+          const modal = document.getElementById("easyModeModal");
+          closeModal(); // Close any other open modal
+          modal.classList.remove("hide");
+          modal.classList.add("show");
+          resetForm();
+          extractExistingTags();
+        };
+
+        window.closeEasyModeModal = function() {
+          const modal = document.getElementById("easyModeModal");
+          modal.classList.remove("show");
+          modal.classList.add("hide");
+        };
+
+        window.nextStep = function() {
+          if (validateCurrentStep()) {
+            if (currentStep < 4) {
+              updateStep(currentStep + 1);
+            }
+          }
+        };
+
+        window.previousStep = function() {
+          if (currentStep > 1) {
+            updateStep(currentStep - 1);
+          }
+        };
+
+        function updateStep(newStep) {
+          // Hide current step
+          document.querySelector('.form-step[data-step="' + currentStep + '"]').classList.remove("active");
+
+          // Show new step
+          currentStep = newStep;
+          document.querySelector('.form-step[data-step="' + currentStep + '"]').classList.add("active");
+
+          // Update progress bar
+          updateProgressBar();
+
+          // Update navigation buttons
+          updateNavigation();
+        }
+
+        function updateProgressBar() {
+          const progressFill = document.getElementById("progressFill");
+          const currentStepText = document.getElementById("currentStepText");
+          
+          const progressWidth = (currentStep / 4) * 100;
+          progressFill.style.width = progressWidth + '%';
+          currentStepText.textContent = currentStep;
+        }
+
+        function updateNavigation() {
+          const prevBtn = document.querySelector(".prev-btn");
+          const nextBtn = document.querySelector(".next-btn");
+          const submitBtn = document.querySelector(".submit-btn");
+
+          prevBtn.style.display = currentStep > 1 ? "block" : "none";
+          
+          if (currentStep === 4) {
+            nextBtn.style.display = "none";
+            submitBtn.style.display = "block";
+          } else {
+            nextBtn.style.display = "block";
+            submitBtn.style.display = "none";
+          }
+        }
+
+        function validateCurrentStep() {
+          const step = currentStep;
+          
+          if (step === 1) {
+            const termName = document.getElementById("termName").value.trim();
+            return validateInput(termName, "Term name");
+          }
+          
+          if (step === 2) {
+            const definition = document.getElementById("termDefinition").value.trim();
+            return validateInput(definition, "Definition");
+          }
+          
+          if (step === 3) {
+            const usage = document.getElementById("termUsage").value.trim();
+            return validateInput(usage, "Usage example");
+          }
+          
+          return true;
+        }
+
+        function resetForm() {
+          currentStep = 1;
+          selectedTags = [];
+          
+          // Reset form fields
+          document.getElementById("easyModeForm").reset();
+          
+          // Reset form steps
+          document.querySelectorAll(".form-step").forEach(step => {
+            step.classList.remove("active");
+          });
+          
+          // Show first step
+          document.querySelector('.form-step[data-step="1"]').classList.add("active");
+          
+          // Reset progress bar
+          updateProgressBar();
+          
+          // Reset selected tags display
+          document.getElementById("selectedTags").innerHTML = "";
+          document.getElementById("tagCount").textContent = "0";
+          
+          // Reset character counters
+          document.getElementById("termCounter").textContent = "0";
+          document.getElementById("definitionCounter").textContent = "0";
+          document.getElementById("usageCounter").textContent = "0";
+          
+          updateNavigation();
+        }
+
+        // Character counters
+        function setupCharacterCounters() {
+          const counters = [
+            { input: "termName", counter: "termCounter" },
+            { input: "termDefinition", counter: "definitionCounter" },
+            { input: "termUsage", counter: "usageCounter" }
+          ];
+
+          counters.forEach(({ input, counter }) => {
+            const inputEl = document.getElementById(input);
+            const counterEl = document.getElementById(counter);
+            
+            inputEl.addEventListener("input", () => {
+              counterEl.textContent = inputEl.value.length;
+            });
+          });
+        }
+
+        // Tag system
+        function setupTagSystem() {
+          const tagInput = document.getElementById("tagInput");
+          const tagSuggestions = document.getElementById("tagSuggestions");
+          
+          tagInput.addEventListener("input", () => {
+            const value = tagInput.value.toLowerCase().trim();
+            if (value && selectedTags.length < 4) {
+              showTagSuggestions(value);
+            } else {
+              hideTagSuggestions();
+            }
+          });
+
+          tagInput.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              addTag(tagInput.value.trim());
+            }
+          });
+        }
+
+        function showTagSuggestions(query) {
+          const suggestions = existingTags.filter(tag => 
+            tag.toLowerCase().includes(query) && !selectedTags.includes(tag)
+          );
+
+          const suggestionsEl = document.getElementById("tagSuggestions");
+          
+          if (suggestions.length > 0) {
+            suggestionsEl.innerHTML = suggestions.map(tag => 
+              '<div class="tag-suggestion" onclick="addTag(\'' + tag + '\')">' + tag + '</div>'
+            ).join("");
+            suggestionsEl.style.display = "block";
+          } else {
+            hideTagSuggestions();
+          }
+        }
+
+        function hideTagSuggestions() {
+          document.getElementById("tagSuggestions").style.display = "none";
+        }
+
+        window.addTag = function(tag) {
+          if (!tag || selectedTags.includes(tag) || selectedTags.length >= 4) return;
+          
+          selectedTags.push(tag);
+          updateTagsDisplay();
+          document.getElementById("tagInput").value = "";
+          hideTagSuggestions();
+        };
+
+        window.addTagFromInput = function() {
+          const tagInput = document.getElementById("tagInput");
+          const tag = tagInput.value.trim();
+          if (tag) {
+            addTag(tag);
+          }
+        };
+
+        window.removeTag = function(tag) {
+          selectedTags = selectedTags.filter(t => t !== tag);
+          updateTagsDisplay();
+        };
+
+        function updateTagsDisplay() {
+          const selectedTagsEl = document.getElementById("selectedTags");
+          const tagCountEl = document.getElementById("tagCount");
+          
+          selectedTagsEl.innerHTML = selectedTags.map(tag => 
+            '<div class="selected-tag">' +
+              tag +
+              '<span class="remove-tag" onclick="removeTag(\'' + tag + '\')">✕</span>' +
+            '</div>'
+          ).join("");
+          
+          tagCountEl.textContent = selectedTags.length;
+          
+          // Disable tag input and button if limit reached
+          const tagInput = document.getElementById("tagInput");
+          const tagEnterBtn = document.querySelector(".tag-enter-btn");
+          
+          if (selectedTags.length >= 4) {
+            tagInput.disabled = true;
+            tagInput.placeholder = "Maximum 4 tags reached";
+            tagEnterBtn.disabled = true;
+          } else {
+            tagInput.disabled = false;
+            tagInput.placeholder = "Type a tag and press Enter";
+            tagEnterBtn.disabled = false;
+          }
+        }
+
+        // Form submission
+        document.getElementById("easyModeForm").addEventListener("submit", async (e) => {
+          e.preventDefault();
+          
+          if (!validateCurrentStep()) return;
+          
+          const formData = {
+            term: document.getElementById("termName").value.trim(),
+            definition: document.getElementById("termDefinition").value.trim(),
+            usage: document.getElementById("termUsage").value.trim(),
+            related: selectedTags
+          };
+          
+          try {
+            await submitTerm(formData);
+          } catch (error) {
+            console.error("Error submitting term:", error);
+            showCustomAlert("Submission Error", "There was an error submitting your term. Please try again.");
+          }
+        });
+
+        async function submitTerm(termData) {
+          // For now, show a preview of what would be submitted
+          const previewMessage = 'Term: ' + termData.term + '\n\nDefinition: ' + termData.definition + '\n\nUsage: ' + termData.usage + '\n\nTags: ' + termData.related.join(", ") + '\n\nGitHub PR creation coming soon!';
+          
+          showCustomAlert('Term Ready for Submission!', previewMessage);
+          
+          setTimeout(() => {
+            closeEasyModeModal();
+          }, 1000);
+        }
+
         populateCarousel();
         populateWotd();
+        
+        // Initialize Easy Mode features
+        setupCharacterCounters();
+        setupTagSystem();
         
         // Show the fish after everything is loaded
         setTimeout(() => {
