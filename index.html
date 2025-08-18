@@ -19,12 +19,15 @@
     <header class="main-header">
       <div class="header-content">
         <h1 class="page-title">Floundermode Dictionary</h1>
-        <nav class="header-nav">
-          <button class="nav-button" onclick="showAbout()">About</button>
-          <button class="nav-button" onclick="showContributing()">
-            Contribute
-          </button>
-        </nav>
+                    <nav class="header-nav">
+              <button class="nav-button" onclick="showAbout()">About</button>
+              <button class="nav-button" onclick="showContributing()">
+                Contribute
+              </button>
+              <button class="nav-button dark-mode-toggle" onclick="toggleDarkMode()">
+                🌙 Dark
+              </button>
+            </nav>
       </div>
     </header>
 
@@ -47,8 +50,8 @@
     <div class="carousel" id="carousel"></div>
     </main>
 
-    <div class="wotd-container hide" onclick="toggleWotd()">
-      <img src="/assets/carter-wynn.png" />
+              <div class="wotd-container hide" onclick="toggleWotd()">
+            <img src="/assets/carter-wynn.png" />
       <div class="speech-bubble">
         <strong>The word of the day:</strong>
         The word definition would go here. If it's long it might not fit. It's

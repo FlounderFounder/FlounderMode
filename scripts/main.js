@@ -201,5 +201,61 @@ window.toggleWotd = function () {
   wotdContainer.classList.toggle("hide");
 };
 
+window.toggleDarkMode = function () {
+  const wotdContainer = document.querySelector('.wotd-container');
+  const darkModeButton = document.querySelector('.dark-mode-toggle');
+  const carterImg = document.querySelector('.wotd-container img');
+  const isDarkMode = document.body.classList.contains('dark-mode');
+  
+  // Disable button during animation
+  darkModeButton.disabled = true;
+  
+  // Determine target state
+  const targetFish = isDarkMode ? '/assets/carter-wynn.png' : '/assets/dark_carter_wynn.png';
+  const targetButtonText = isDarkMode ? '🌙 Dark' : '☀️ Light';
+  
+  // Start Carter's run animation (always the same - right then left)
+  document.body.classList.add('carter-running');
+  wotdContainer.classList.add('running');
+  
+  // At 1 second (midpoint), swap the fish and toggle dark mode
+  setTimeout(() => {
+    // Toggle dark mode when Carter is off-screen
+    document.body.classList.toggle('dark-mode');
+    carterImg.src = targetFish;
+    darkModeButton.innerHTML = targetButtonText;
+    
+    // Save preference to localStorage
+    const newDarkMode = document.body.classList.contains('dark-mode');
+    localStorage.setItem('darkMode', newDarkMode);
+  }, 1000);
+  
+  // After animation completes, clean up and re-enable button
+  setTimeout(() => {
+    wotdContainer.classList.remove('running');
+    document.body.classList.remove('carter-running');
+    darkModeButton.disabled = false;
+  }, 2000);
+};
+
+// Initialize dark mode from saved preference
+function initDarkMode() {
+  const savedDarkMode = localStorage.getItem('darkMode') === 'true';
+  if (savedDarkMode) {
+    document.body.classList.add('dark-mode');
+    const darkModeButton = document.querySelector('.dark-mode-toggle');
+    const carterImg = document.querySelector('.wotd-container img');
+    if (darkModeButton) {
+      darkModeButton.innerHTML = '☀️ Light';
+    }
+    if (carterImg) {
+      carterImg.src = '/assets/dark_carter_wynn.png';
+    }
+  }
+}
+
 // Initialize the app when DOM is loaded
-document.addEventListener("DOMContentLoaded", init);
+document.addEventListener("DOMContentLoaded", function() {
+  init();
+  initDarkMode();
+});
