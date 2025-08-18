@@ -1,0 +1,448 @@
+/* Floundermode Dictionary - Main Styles */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Roboto Mono", monospace;
+  background-color: #f5f5f5;
+  color: #1a1a1a;
+  margin: 0;
+  padding: 0;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* Header Styles */
+.main-header {
+  background: #fff;
+  border-bottom: 4px solid #000;
+  box-shadow: 0 4px 0 #000;
+  margin-bottom: 2rem;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.page-title {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
+  margin: 0;
+  letter-spacing: 2px;
+  color: #1a1a1a;
+}
+
+.header-nav {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.nav-button {
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  font-weight: bold;
+  border: 2px solid #000;
+  background: #fff;
+  box-shadow: 2px 2px 0 #000;
+  cursor: pointer;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+  text-transform: uppercase;
+  font-family: "Roboto Mono", monospace;
+}
+
+.nav-button:hover {
+  background-color: #ffe680;
+  transform: translateY(-1px);
+}
+
+.nav-button:active {
+  transform: translateY(0);
+  box-shadow: 1px 1px 0 #000;
+}
+
+.main-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+/* Header Responsive */
+@media (max-width: 768px) {
+  .header-content {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .page-title {
+    font-size: clamp(1.2rem, 5vw, 2rem);
+  }
+
+  .header-nav {
+    justify-content: center;
+  }
+
+  .nav-button {
+    font-size: 0.8rem;
+    padding: 0.4rem 0.8rem;
+  }
+}
+
+/* Search Styles */
+.search-container {
+  max-width: 800px;
+  margin: 0 auto 2rem auto;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.search-wrapper {
+  position: relative;
+  flex: 1 1 60%;
+  min-width: 200px;
+}
+
+.search-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  border: 2px solid #000;
+  box-shadow: 3px 3px 0 #000;
+  transition: none;
+}
+
+.search-input:focus {
+  outline: none;
+  border: 2px solid #000;
+  box-shadow: 3px 3px 0 #000;
+}
+
+.random-button {
+  flex: 0 0 auto;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  font-weight: bold;
+  border: 2px solid #000;
+  background: #fff;
+  box-shadow: 3px 3px 0 #000;
+  cursor: pointer;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.random-button:hover {
+  background-color: #ffe680;
+  transform: translateY(-2px);
+}
+
+.random-button:active {
+  transform: translateY(0);
+  box-shadow: 1px 1px 0 #000;
+}
+
+/* Autocomplete Styles */
+.autocomplete-list {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  background: #fff;
+  border: 2px solid #000;
+  z-index: 10;
+  box-shadow: 3px 3px 0 #000;
+}
+
+.autocomplete-list.hidden {
+  display: none;
+}
+
+.autocomplete-item {
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.autocomplete-item:hover {
+  background: #ffe680;
+  transform: translateX(3px);
+}
+
+/* Carousel Styles */
+.carousel {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 4rem;
+}
+
+.carousel button {
+  flex: 0 0 auto;
+  padding: 0.5rem 1rem;
+  border: 2px solid #000;
+  background: #fff;
+  font-weight: bold;
+  box-shadow: 3px 3px 0 #000;
+  cursor: pointer;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.carousel button:hover {
+  background-color: #ffe680;
+  transform: translateY(-2px);
+}
+
+.carousel button:active {
+  transform: translateY(0);
+  box-shadow: 1px 1px 0 #000;
+}
+
+/* Term Modal Styles */
+.term-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 90vw;
+  max-width: 500px;
+  max-height: 90vh;
+  background: white;
+  border: 2px solid black;
+  box-shadow: 6px 6px 0 #000;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.95);
+  pointer-events: none;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.term-modal .window-bar {
+  background: #222;
+  color: #fff;
+  padding: 0.5rem 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.term-modal .window-button {
+  background: #ff4d4d;
+  color: #000;
+  border: 1px solid #000;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.term-modal .window-button:hover {
+  background-color: #ff1a1a;
+  transform: scale(1.1);
+}
+
+.term-modal .window-button:active {
+  transform: scale(0.95);
+  background-color: #cc0000;
+}
+
+.term-modal .term-content {
+  padding: 1rem 1.25rem;
+  overflow-y: auto;
+}
+
+/* Badge Styles */
+.badge {
+  display: inline-block;
+  margin: 0.25rem 0.5rem 0.25rem 0;
+  vertical-align: top;
+  max-width: 100%;
+  word-wrap: break-word;
+  white-space: normal;
+  background: #e0e0e0;
+  padding: 0.2rem 0.6rem;
+  font-size: 0.75rem;
+  font-weight: bold;
+  border: 2px solid #000;
+  box-shadow: 2px 2px 0 #000;
+  text-transform: uppercase;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.badge:hover {
+  background-color: #d4d4d4;
+  transform: scale(1.05);
+}
+
+.badge:active {
+  transform: scale(0.98);
+  background-color: #c0c0c0;
+}
+
+/* Contribute Button Styles */
+.contribute-button {
+  flex: 1;
+  min-width: 120px;
+  padding: 0.75rem 1rem;
+  font-size: 0.9rem;
+  font-weight: bold;
+  border: 2px solid #000;
+  background: #fff;
+  box-shadow: 2px 2px 0 #000;
+  cursor: pointer;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+  text-transform: uppercase;
+  font-family: "Roboto Mono", monospace;
+}
+
+.contribute-button:hover {
+  background-color: #ffe680;
+  transform: translateY(-1px);
+}
+
+.contribute-button:active {
+  transform: translateY(0);
+  box-shadow: 1px 1px 0 #000;
+}
+
+.github-button {
+  background: #4CAF50 !important;
+  color: white;
+}
+
+.github-button:hover {
+  background-color: #45a049 !important;
+  transform: translateY(-1px);
+}
+
+.github-button:active {
+  background-color: #3d8b40 !important;
+  transform: translateY(0);
+  box-shadow: 1px 1px 0 #000;
+}
+
+.easy-mode-button {
+  background: #f44336 !important;
+  color: white;
+}
+
+.easy-mode-button:hover {
+  background-color: #da190b !important;
+  transform: translateY(-1px);
+}
+
+.easy-mode-button:active {
+  background-color: #c41506 !important;
+  transform: translateY(0);
+  box-shadow: 1px 1px 0 #000;
+}
+
+/* Speech Bubble & WOTD Styles */
+.speech-bubble {
+  position: absolute;
+  background: white;
+  border: 3px solid #000;
+  border-radius: 15px;
+  min-height: 120px;
+  width: 280px;
+  max-width: 320px;
+  top: -12rem;
+  left: 3rem;
+  padding: 1.5rem;
+  opacity: 1;
+  transition: opacity 0.25s ease, height 0.3s ease;
+  font-size: 0.85rem;
+  line-height: 1.3;
+  box-shadow: 4px 4px 0 #000;
+  word-wrap: break-word;
+  hyphens: auto;
+}
+
+/* Tail shadow (behind) */
+.speech-bubble::before {
+  content: '';
+  position: absolute;
+  bottom: -74px;
+  right: 58px;
+  width: 0;
+  height: 0;
+  border-left: 24px solid transparent;
+  border-right: 24px solid transparent;
+  border-top: 74px solid #000;
+  z-index: 1;
+}
+
+/* Tail main (front) */
+.speech-bubble::after {
+  content: '';
+  position: absolute;
+  bottom: -70px;
+  right: 62px;
+  width: 0;
+  height: 0;
+  border-left: 20px solid transparent;
+  border-right: 20px solid transparent;
+  border-top: 70px solid white;
+  z-index: 2;
+}
+
+.wotd-container {
+  position: fixed;
+  bottom: -0.5rem;
+  left: -0.25rem;
+  transition: bottom 0.25s ease;
+}
+
+.wotd-container img {
+  height: 25rem;
+}
+
+.wotd-container.hide {
+  bottom: -234px;
+}
+
+.wotd-container.hide .speech-bubble {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Term Modal States */
+@media (max-width: 500px) {
+  .term-modal {
+    width: 95vw;
+    max-height: 95dvh;
+  }
+}
+
+.term-modal.show {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+  pointer-events: auto;
+}
+
+.term-modal.hide {
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.95);
+  pointer-events: none;
+}
