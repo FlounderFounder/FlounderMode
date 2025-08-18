@@ -146,6 +146,11 @@
         transform: translateY(-2px);
       }
 
+      .random-button:active {
+        transform: translateY(0);
+        box-shadow: 1px 1px 0 #000;
+      }
+
       .autocomplete-list {
         position: absolute;
         top: 100%;
@@ -164,10 +169,12 @@
       .autocomplete-item {
         padding: 0.5rem 1rem;
         cursor: pointer;
+        transition: background-color 0.2s ease, transform 0.2s ease;
       }
 
       .autocomplete-item:hover {
-        background: #ffd166;
+        background: #ffe680;
+        transform: translateX(3px);
       }
 
       .carousel {
@@ -192,6 +199,11 @@
       .carousel button:hover {
         background-color: #ffe680;
         transform: translateY(-2px);
+      }
+
+      .carousel button:active {
+        transform: translateY(0);
+        box-shadow: 1px 1px 0 #000;
       }
 
       .term-modal {
@@ -243,6 +255,11 @@
         transform: scale(1.1);
       }
 
+      .term-modal .window-button:active {
+        transform: scale(0.95);
+        background-color: #cc0000;
+      }
+
       .term-modal .term-content {
         padding: 1rem 1.25rem;
         overflow-y: auto;
@@ -270,6 +287,68 @@
         transform: scale(1.05);
       }
 
+      .badge:active {
+        transform: scale(0.98);
+        background-color: #c0c0c0;
+      }
+
+      .contribute-button {
+        flex: 1;
+        min-width: 120px;
+        padding: 0.75rem 1rem;
+        font-size: 0.9rem;
+        font-weight: bold;
+        border: 2px solid #000;
+        background: #fff;
+        box-shadow: 2px 2px 0 #000;
+        cursor: pointer;
+        transition: transform 0.2s ease, background-color 0.2s ease;
+        text-transform: uppercase;
+        font-family: "Roboto Mono", monospace;
+      }
+
+      .contribute-button:hover {
+        background-color: #ffe680;
+        transform: translateY(-1px);
+      }
+
+      .contribute-button:active {
+        transform: translateY(0);
+        box-shadow: 1px 1px 0 #000;
+      }
+
+      .github-button {
+        background: #4CAF50 !important;
+        color: white;
+      }
+
+      .github-button:hover {
+        background-color: #45a049 !important;
+        transform: translateY(-1px);
+      }
+
+      .github-button:active {
+        background-color: #3d8b40 !important;
+        transform: translateY(0);
+        box-shadow: 1px 1px 0 #000;
+      }
+
+      .easy-mode-button {
+        background: #f44336 !important;
+        color: white;
+      }
+
+      .easy-mode-button:hover {
+        background-color: #da190b !important;
+        transform: translateY(-1px);
+      }
+
+      .easy-mode-button:active {
+        background-color: #c41506 !important;
+        transform: translateY(0);
+        box-shadow: 1px 1px 0 #000;
+      }
+
       @media (max-width: 500px) {
         .term-modal {
           width: 95vw;
@@ -291,16 +370,50 @@
 
       .speech-bubble {
         position: absolute;
-        background: no-repeat url("/assets/chat_bubble.svg");
-        height: 400px;
-        width: 351px;
-        top: -15rem;
-        padding: 2rem 2.5rem 8rem 2.5rem;
+        background: white;
+        border: 4px solid #000;
+        border-radius: 20px;
+        min-height: 100px;
+        width: 280px;
+        max-width: 320px;
+        top: -13rem;
+        left: 3rem;
+        padding: 1.5rem;
         opacity: 1;
-        transition: opacity 0.25s ease;
-        font-size: 0.9rem;
-        line-height: 1.4;
-        overflow: hidden;
+        transition: opacity 0.25s ease, height 0.3s ease;
+        font-size: 0.85rem;
+        line-height: 1.3;
+        box-shadow: 6px 6px 0 #000;
+        word-wrap: break-word;
+        hyphens: auto;
+      }
+
+      /* Tail shadow (behind) */
+      .speech-bubble::before {
+        content: '';
+        position: absolute;
+        bottom: -74px;
+        right: 58px;
+        width: 0;
+        height: 0;
+        border-left: 24px solid transparent;
+        border-right: 24px solid transparent;
+        border-top: 74px solid #000;
+        z-index: 1;
+      }
+
+      /* Tail main (front) */
+      .speech-bubble::after {
+        content: '';
+        position: absolute;
+        bottom: -70px;
+        right: 62px;
+        width: 0;
+        height: 0;
+        border-left: 20px solid transparent;
+        border-right: 20px solid transparent;
+        border-top: 70px solid white;
+        z-index: 2;
       }
 
       .wotd-container {
@@ -320,6 +433,7 @@
 
       .wotd-container.hide .speech-bubble {
         opacity: 0;
+        pointer-events: none;
       }
 
       /* @media screen and (max-width: 764px) {
@@ -490,6 +604,7 @@
           const wotd = getWotd();
           const speechBubble = document.querySelector(".speech-bubble");
           speechBubble.innerHTML = `
+            <div style="text-align: center; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; margin-bottom: .5rem; font-size: 1.2rem;">WORD OF THE DAY</div>
             <strong>${wotd.term}</strong> ${wotd.definition}
           `;
         }
@@ -526,7 +641,26 @@
               "Check the CONTRIBUTING.md file in the repository for detailed guidelines on how to add new terms and improve existing definitions.",
             related: [],
           };
+          
+          // Use openModal but then customize the content to add buttons
           openModal(contributingModal);
+          
+          // Add the contribution buttons after modal opens
+          setTimeout(() => {
+            const modalContent = document.getElementById("modalContent");
+            modalContent.innerHTML += `
+              <div style="margin-top: 1.5rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                <button onclick="window.open('https://github.com/FlounderFounder/default_website', '_blank')" 
+                        class="contribute-button github-button">
+                  GitHub
+                </button>
+                <button onclick="alert('Easy Mode coming soon!')" 
+                        class="contribute-button easy-mode-button">
+                  Easy Mode
+                </button>
+              </div>
+            `;
+          }, 100);
         };
 
         window.toggleWotd = function () {
