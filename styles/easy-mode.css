@@ -183,6 +183,20 @@
   color: #0c5460;
 }
 
+/* Profanity Warning */
+.profanity-warning {
+  background: #f8d7da;
+  border: 2px solid #dc3545;
+  color: #721c24;
+  padding: 12px;
+  border-radius: 6px;
+  margin-top: 8px;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  display: none;
+  animation: slideIn 0.3s ease-out;
+}
+
 @keyframes slideDown {
   from {
     opacity: 0;
@@ -1027,6 +1041,13 @@ body.dark-mode .duplicate-warning.similar-warning {
   background: #1e3a4a;
   border: 2px solid #20c997;
   color: #7dd3fc;
+}
+
+/* Dark Mode Styles for Profanity Warning */
+body.dark-mode .profanity-warning {
+  background: #2d1b1e;
+  border: 2px solid #dc3545;
+  color: #f1a2a8;
 }
 
 body.dark-mode .similar-warning .view-existing-btn {

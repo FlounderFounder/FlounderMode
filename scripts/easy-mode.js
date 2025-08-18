@@ -5,6 +5,15 @@ let currentStep = 1;
 let selectedTags = [];
 let existingTags = [];
 
+// Initialize profanity filter
+let profanityFilter;
+try {
+  profanityFilter = new Filter();
+} catch (error) {
+  console.warn('Profanity filter not available:', error);
+  profanityFilter = null;
+}
+
 // Custom Alert System
 window.showCustomAlert = function(title, message) {
   const alertModal = document.getElementById("customAlert");
@@ -40,6 +49,12 @@ const DANGEROUS_PATTERNS = [
 function validateInput(text, fieldName) {
   if (!text || text.trim().length === 0) {
     showCustomAlert("Validation Error", "Please enter a " + fieldName.toLowerCase() + ".");
+    return false;
+  }
+
+  // Check for profanity
+  if (profanityFilter && profanityFilter.isProfane(text)) {
+    showCustomAlert("Content Policy Violation", "Your " + fieldName.toLowerCase() + " contains inappropriate language. Please revise your content to follow our community guidelines.");
     return false;
   }
 
@@ -297,8 +312,11 @@ function resetForm() {
   document.getElementById("definitionCounter").textContent = "0";
   document.getElementById("usageCounter").textContent = "0";
   
-  // Hide duplicate warning
+  // Hide duplicate and profanity warnings
   hideDuplicateWarning();
+  hideProfanityWarning(document.getElementById("termName"));
+  hideProfanityWarning(document.getElementById("termDefinition"));
+  hideProfanityWarning(document.getElementById("termUsage"));
   
   updateNavigation();
 }
@@ -344,6 +362,31 @@ function hideDuplicateWarning() {
   }
 }
 
+// Show real-time profanity warning
+function showProfanityWarning(inputElement, fieldName) {
+  let warningEl = document.getElementById("profanityWarning_" + inputElement.id);
+  
+  // Create warning element if it doesn't exist
+  if (!warningEl) {
+    warningEl = document.createElement("div");
+    warningEl.id = "profanityWarning_" + inputElement.id;
+    warningEl.className = "profanity-warning";
+    inputElement.parentNode.insertBefore(warningEl, inputElement.nextSibling);
+  }
+  
+  warningEl.innerHTML = `
+    🚫 Your ${fieldName.toLowerCase()} contains inappropriate language. Please revise to follow our community guidelines.
+  `;
+  warningEl.style.display = "block";
+}
+
+function hideProfanityWarning(inputElement) {
+  const warningEl = document.getElementById("profanityWarning_" + inputElement.id);
+  if (warningEl) {
+    warningEl.style.display = "none";
+  }
+}
+
 // Function to view an existing term
 window.viewExistingTerm = function(termName) {
   const existingTerm = flounderTerms.find(term => 
@@ -374,6 +417,22 @@ function setupCharacterCounters() {
       inputEl.addEventListener("input", () => {
         counterEl.textContent = inputEl.value.length;
         
+        // Add real-time profanity checking for all fields
+        if (inputEl.value.trim().length > 0) {
+          if (profanityFilter && profanityFilter.isProfane(inputEl.value)) {
+            const fieldNames = {
+              'termName': 'Term name',
+              'termDefinition': 'Definition', 
+              'termUsage': 'Usage example'
+            };
+            showProfanityWarning(inputEl, fieldNames[input] || 'Field');
+          } else {
+            hideProfanityWarning(inputEl);
+          }
+        } else {
+          hideProfanityWarning(inputEl);
+        }
+
         // Add real-time duplicate and similarity checking for term name
         if (input === "termName") {
           const termName = inputEl.value.trim();
@@ -465,6 +524,12 @@ function hideTagSuggestions() {
 
 window.addTag = function(tag) {
   if (!tag || selectedTags.includes(tag) || selectedTags.length >= 4) return;
+  
+  // Check for profanity in tags
+  if (profanityFilter && profanityFilter.isProfane(tag)) {
+    showCustomAlert("Content Policy Violation", "The tag contains inappropriate language. Please choose a different tag that follows our community guidelines.");
+    return;
+  }
   
   selectedTags.push(tag);
   updateTagsDisplay();
