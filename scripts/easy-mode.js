@@ -46,16 +46,28 @@ const DANGEROUS_PATTERNS = [
   /setInterval\s*\(/gi, // setInterval with string
 ];
 
-function validateInput(text, fieldName) {
+async function validateInput(text, fieldName) {
   if (!text || text.trim().length === 0) {
     showCustomAlert("Validation Error", "Please enter a " + fieldName.toLowerCase() + ".");
     return false;
   }
 
-  // Check for profanity
-  if (profanityFilter && profanityFilter.isProfane(text)) {
-    showCustomAlert("Content Policy Violation", "Your " + fieldName.toLowerCase() + " contains inappropriate language. Please revise your content to follow our community guidelines.");
-    return false;
+  // Check for profanity using async API check
+  if (profanityFilter) {
+    try {
+      const hasProfanity = await profanityFilter.isProfaneAsync(text);
+      if (hasProfanity) {
+        showCustomAlert("Content Policy Violation", "Your " + fieldName.toLowerCase() + " contains inappropriate language. You probably wouldn't say this in a pitch deck. Or maybe you would.");
+        return false;
+      }
+    } catch (error) {
+      console.warn('Profanity check failed, using fallback:', error);
+      // Fallback to synchronous pattern check
+      if (profanityFilter.isProfane(text)) {
+        showCustomAlert("Content Policy Violation", "Your " + fieldName.toLowerCase() + " contains inappropriate language. You probably wouldn't say this in a pitch deck. Or maybe you would.");
+        return false;
+      }
+    }
   }
 
   // Check for dangerous patterns
@@ -79,6 +91,35 @@ function validateInput(text, fieldName) {
   }
 
   return true;
+}
+
+// Synchronous version for real-time checking (uses pattern detection only)
+function validateInputSync(text, fieldName) {
+  if (!text || text.trim().length === 0) {
+    return { isValid: true, error: null };
+  }
+
+  // Check for profanity using sync pattern check
+  if (profanityFilter && profanityFilter.isProfane(text)) {
+    return { 
+      isValid: false, 
+      error: "inappropriate_language",
+      message: "If you wouldn't say it in a pitch deck, you probably shouldn't say it here."
+    };
+  }
+
+  // Check for dangerous patterns
+  for (let pattern of DANGEROUS_PATTERNS) {
+    if (pattern.test(text)) {
+      return { 
+        isValid: false, 
+        error: "security_violation",
+        message: "Contains potentially dangerous content."
+      };
+    }
+  }
+
+  return { isValid: true, error: null };
 }
 
 // Extract tags from existing terms
@@ -116,8 +157,8 @@ window.closeEasyModeModal = function() {
 };
 
 // Step navigation
-window.nextStep = function() {
-  if (validateCurrentStep()) {
+window.nextStep = async function() {
+  if (await validateCurrentStep()) {
     if (currentStep < 4) {
       updateStep(currentStep + 1);
     }
@@ -255,14 +296,14 @@ function checkDuplicateTerm(termName) {
   return false; // No duplicate or similar term
 }
 
-function validateCurrentStep() {
+async function validateCurrentStep() {
   const step = currentStep;
   
   if (step === 1) {
     const termName = document.getElementById("termName").value.trim();
     
     // First check basic validation
-    if (!validateInput(termName, "Term name")) {
+    if (!(await validateInput(termName, "Term name"))) {
       return false;
     }
     
@@ -274,12 +315,12 @@ function validateCurrentStep() {
   
   if (step === 2) {
     const definition = document.getElementById("termDefinition").value.trim();
-    return validateInput(definition, "Definition");
+    return await validateInput(definition, "Definition");
   }
   
   if (step === 3) {
     const usage = document.getElementById("termUsage").value.trim();
-    return validateInput(usage, "Usage example");
+    return await validateInput(usage, "Usage example");
   }
   
   return true;
@@ -375,7 +416,7 @@ function showProfanityWarning(inputElement, fieldName) {
   }
   
   warningEl.innerHTML = `
-    🚫 Your ${fieldName.toLowerCase()} contains inappropriate language. Please revise to follow our community guidelines.
+    🚫 Your ${fieldName.toLowerCase()} contains inappropriate language. If you wouldn't say it in a pitch deck, you probably shouldn't say it here.
   `;
   warningEl.style.display = "block";
 }
@@ -419,7 +460,8 @@ function setupCharacterCounters() {
         
         // Add real-time profanity checking for all fields
         if (inputEl.value.trim().length > 0) {
-          if (profanityFilter && profanityFilter.isProfane(inputEl.value)) {
+          const validation = validateInputSync(inputEl.value, input);
+          if (!validation.isValid && validation.error === 'inappropriate_language') {
             const fieldNames = {
               'termName': 'Term name',
               'termDefinition': 'Definition', 
@@ -522,13 +564,24 @@ function hideTagSuggestions() {
   }
 }
 
-window.addTag = function(tag) {
+window.addTag = async function(tag) {
   if (!tag || selectedTags.includes(tag) || selectedTags.length >= 4) return;
   
   // Check for profanity in tags
-  if (profanityFilter && profanityFilter.isProfane(tag)) {
-    showCustomAlert("Content Policy Violation", "The tag contains inappropriate language. Please choose a different tag that follows our community guidelines.");
-    return;
+  if (profanityFilter) {
+    try {
+      const hasProfanity = await profanityFilter.isProfaneAsync(tag);
+      if (hasProfanity) {
+        showCustomAlert("Content Policy Violation", "The tag contains inappropriate language. That's crazy. In 2025? Sheeeesh.");
+        return;
+      }
+    } catch (error) {
+      // Fallback to sync check
+      if (profanityFilter.isProfane(tag)) {
+        showCustomAlert("Content Policy Violation", "The tag contains inappropriate language. That's crazy. In 2025? Sheeeesh.");
+        return;
+      }
+    }
   }
   
   selectedTags.push(tag);
@@ -729,7 +782,7 @@ document.addEventListener("DOMContentLoaded", function() {
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
       
-      if (!validateCurrentStep()) return;
+      if (!(await validateCurrentStep())) return;
       
       const formData = {
         term: document.getElementById("termName").value.trim(),
