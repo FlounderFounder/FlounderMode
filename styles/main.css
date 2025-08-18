@@ -471,6 +471,17 @@ body {
   transition: border-top-color 0.8s ease;
 }
 
+/* WOTD Term Styling */
+.wotd-term {
+  background: #000;
+  color: #fff;
+  padding: 0.3rem 0.6rem;
+  border-radius: 4px;
+  font-weight: bold;
+  display: inline-block;
+  margin-bottom: 0.5rem;
+}
+
 /* Dark Mode Styles */
 body.dark-mode {
   background-color: #1a1a1a;
@@ -500,6 +511,11 @@ body.dark-mode .speech-bubble {
 
 body.dark-mode .speech-bubble::after {
   border-top-color: #333;
+}
+
+body.dark-mode .wotd-term {
+  background: #ffe680;
+  color: #000;
 }
 
 body.dark-mode .autocomplete-list {

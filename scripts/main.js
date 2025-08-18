@@ -130,7 +130,7 @@ async function init() {
     const speechBubble = document.querySelector(".speech-bubble");
     speechBubble.innerHTML = `
       <div style="text-align: center; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; margin-bottom: .5rem; font-size: 1.2rem;">WORD OF THE DAY</div>
-      <strong>${wotd.term}</strong><br/>${wotd.definition}
+      <span class="wotd-term">${wotd.term}</span><br/>${wotd.definition}
     `;
   }
 }
