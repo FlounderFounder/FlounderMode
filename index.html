@@ -473,7 +473,7 @@
       <div class="carousel" id="carousel"></div>
     </main>
 
-    <div class="wotd-container" onclick="toggleWotd()">
+    <div class="wotd-container hide" onclick="toggleWotd()">
       <img src="/assets/carter-wynn.png" />
       <div class="speech-bubble">
         <strong>The word of the day:</strong>
@@ -670,6 +670,11 @@
 
         populateCarousel();
         populateWotd();
+        
+        // Show the fish after everything is loaded
+        setTimeout(() => {
+          wotdContainer.classList.remove("hide");
+        }, 500);
       }
 
       init();
