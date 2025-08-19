@@ -89,10 +89,7 @@ async function init() {
   populateCarousel();
   populateWotd();
   
-  // Show the fish after everything is loaded
-  setTimeout(() => {
-    wotdContainer.classList.remove("hide");
-  }, 500);
+  // Fish starts hidden - users can tap thought bubble to show
 
   // Carousel functionality
   function populateCarousel() {
