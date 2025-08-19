@@ -201,6 +201,11 @@ window.toggleWotd = function () {
   wotdContainer.classList.toggle("hide");
 };
 
+window.showWotd = function () {
+  const wotdContainer = document.querySelector(".wotd-container");
+  wotdContainer.classList.remove("hide");
+};
+
 window.toggleDarkMode = function () {
   const wotdContainer = document.querySelector('.wotd-container');
   const darkModeButton = document.querySelector('.dark-mode-toggle');
