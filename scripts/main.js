@@ -25,7 +25,8 @@ async function init() {
 
     if (!value) {
       autocompleteList.classList.add("hidden");
-      wotdContainer.classList.remove("hide");
+      // Reset to initial state when search is cleared
+      hideWotd();
       return;
     }
 
@@ -195,12 +196,43 @@ window.showContributing = function () {
 
 window.toggleWotd = function () {
   const wotdContainer = document.querySelector(".wotd-container");
-  wotdContainer.classList.toggle("hide");
+  
+  // Use the proper show/hide functions to maintain thought bubble state
+  if (wotdContainer.classList.contains("hide")) {
+    showWotd();
+  } else {
+    hideWotd();
+  }
 };
 
 window.showWotd = function () {
   const wotdContainer = document.querySelector(".wotd-container");
+  const thoughtBubble = document.querySelector(".thought-bubble");
+  
+  // Show the fish
   wotdContainer.classList.remove("hide");
+  
+  // Change thought bubble to dismissal message
+  const dismissalMessages = ["Go Away!", "Thanks, Carter!"];
+  const randomMessage = dismissalMessages[Math.floor(Math.random() * dismissalMessages.length)];
+  thoughtBubble.textContent = randomMessage;
+  
+  // Update click handler to hide fish
+  thoughtBubble.onclick = hideWotd;
+};
+
+window.hideWotd = function () {
+  const wotdContainer = document.querySelector(".wotd-container");
+  const thoughtBubble = document.querySelector(".thought-bubble");
+  
+  // Hide the fish
+  wotdContainer.classList.add("hide");
+  
+  // Reset thought bubble to original message
+  thoughtBubble.textContent = "💭 Word of the day";
+  
+  // Reset click handler to show fish
+  thoughtBubble.onclick = showWotd;
 };
 
 window.toggleDarkMode = function () {

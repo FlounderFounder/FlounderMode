@@ -548,6 +548,12 @@ body.dark-mode .thought-bubble:hover {
   background: #444;
 }
 
+/* Dark mode dismissal state */
+body.dark-mode .wotd-container:not(.hide) ~ .thought-bubble {
+  background: #663333;
+  border-color: #aa5555;
+}
+
 /* Carter's Running Animation */
 @keyframes carterRun {
   0% {
@@ -623,11 +629,10 @@ body.carter-running {
   transform: translateY(0);
 }
 
-/* Hide thought bubble when fish is visible */
+/* Keep thought bubble visible but change appearance when fish is shown */
 .wotd-container:not(.hide) ~ .thought-bubble {
-  opacity: 0;
-  pointer-events: none;
-  transform: translateY(20px);
+  background: #ffcccc;
+  border-color: #ff4444;
 }
 
 /* Mobile-specific thought bubble adjustments */
