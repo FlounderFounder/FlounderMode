@@ -2,7 +2,7 @@
  * Serverless API endpoint for Floundermode Dictionary
  * Acts as a secure proxy between frontend and Airtable
  */
-const AirtableService = require('../scripts/airtable-service');
+const AirtableService = require('../scripts/airtable-service.js');
 
 export default async function handler(req, res) {
   // Set CORS headers for cross-origin requests
