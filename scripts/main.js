@@ -472,7 +472,7 @@ async function loadTermsData() {
               slug: term.slug,
               definition: firstDef.definition,
               usage: firstDef.usage,
-              related: [], // Will populate from categories later
+              related: term.categories || [], // Use categories from Airtable
               multipleDefinitions: definitions.length > 1
             };
           }
@@ -486,7 +486,7 @@ async function loadTermsData() {
           slug: term.slug,
           definition: "Definition loading...",
           usage: "",
-          related: [],
+          related: term.categories || [], // Use categories from Airtable
           multipleDefinitions: false
         };
       }));
@@ -518,7 +518,8 @@ async function loadTermsData() {
       flounderTerms = jsonTerms.map(term => ({
         ...term,
         slug: airtableService ? airtableService.generateSlug(term.term) : term.term.toLowerCase().replace(/\s+/g, '-'),
-        multipleDefinitions: false
+        multipleDefinitions: false,
+        related: term.related || [] // Preserve the related tags from JSON
       }));
       console.log(`✅ Loaded ${flounderTerms.length} terms from JSON fallback`);
     } catch (fallbackError) {
