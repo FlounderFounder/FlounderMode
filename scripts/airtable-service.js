@@ -217,14 +217,8 @@ class AirtableService {
     }
 
     try {
-      // Expand Categories to get linked record data instead of just IDs
-      // Use proper expand syntax for Airtable API
-      const data = await this.makeRequest('Terms?sort[0][field]=Term%20Name&expand[]=Categories');
-      
-      // Debug: Log first record to see the actual structure
-      if (data.records && data.records.length > 0) {
-        console.log('Sample Airtable record structure:', JSON.stringify(data.records[0], null, 2));
-      }
+      // Try different expand syntax - Airtable can be picky about this
+      const data = await this.makeRequest('Terms?sort%5B0%5D%5Bfield%5D=Term%20Name&expand%5B%5D=Categories');
       
       const formatted = this.formatTermsData(data.records);
       
@@ -488,8 +482,6 @@ class AirtableService {
         // Handle expanded Categories data - extract category names from linked records
         let categories = [];
         if (record.fields['Categories']) {
-          console.log(`Categories for ${record.fields['Term Name']}:`, record.fields['Categories']);
-          
           if (Array.isArray(record.fields['Categories'])) {
             categories = record.fields['Categories']
               .map(catRecord => {
@@ -497,14 +489,20 @@ class AirtableService {
                 if (typeof catRecord === 'object' && catRecord.fields && catRecord.fields['Category Name']) {
                   return catRecord.fields['Category Name'];
                 }
-                // If it's still just an ID (fallback), return as is
+                // If it's still just an ID, try different field names
+                if (typeof catRecord === 'object' && catRecord.fields) {
+                  // Try common field names for categories
+                  return catRecord.fields['Name'] || catRecord.fields['Category'] || catRecord.fields['Title'];
+                }
+                // If it's a string, check if it's an Airtable ID (starts with 'rec')
+                if (typeof catRecord === 'string' && catRecord.toLowerCase().startsWith('rec')) {
+                  return null; // Filter out Airtable record IDs
+                }
                 return catRecord;
               })
-              .filter(cat => cat && typeof cat === 'string'); // Only keep valid category names
+              .filter(cat => cat && typeof cat === 'string' && cat.length > 0); // Only keep valid category names
           }
         }
-        
-        console.log(`Final categories for ${record.fields['Term Name']}:`, categories);
         
         return {
           id: record.id,
