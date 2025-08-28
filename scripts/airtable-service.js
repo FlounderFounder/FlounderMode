@@ -169,6 +169,9 @@ class AirtableService {
    * Generate URL-friendly slug from term name
    */
   generateSlug(text) {
+    if (!text || typeof text !== 'string') {
+      return 'untitled-term';
+    }
     return text
       .toLowerCase()
       .replace(/[^a-z0-9\s-]/g, '')
@@ -435,13 +438,15 @@ class AirtableService {
    * Format terms data for frontend consumption
    */
   formatTermsData(records) {
-    return records.map(record => ({
-      id: record.id,
-      name: record.fields['Term Name'],
-      slug: record.fields['Slug'] || this.generateSlug(record.fields['Term Name']),
-      totalDefinitions: record.fields['Total Definitions'] || 0,
-      categories: record.fields['Categories'] || []
-    }));
+    return records
+      .filter(record => record.fields && record.fields['Term Name']) // Filter out records without names
+      .map(record => ({
+        id: record.id,
+        name: record.fields['Term Name'],
+        slug: record.fields['Slug'] || this.generateSlug(record.fields['Term Name']),
+        totalDefinitions: record.fields['Total Definitions'] || 0,
+        categories: record.fields['Categories'] || []
+      }));
   }
 
   /**
