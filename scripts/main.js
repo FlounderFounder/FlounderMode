@@ -264,6 +264,28 @@ async function init() {
       
       const termName = definitions[0].termName;
       modalTitle.textContent = termName;
+      
+      // Get term data to access categories/tags
+      let termCategories = [];
+      try {
+        const allTerms = await airtableService.fetchTerms();
+        const currentTerm = allTerms.find(term => term.slug === termSlug);
+        if (currentTerm && currentTerm.categories) {
+          termCategories = currentTerm.categories;
+        }
+      } catch (error) {
+        console.warn('Could not fetch term categories:', error.message);
+        // Fallback: try to get from flounderTerms
+        const fallbackTerm = flounderTerms.find(t => t.slug === termSlug);
+        if (fallbackTerm && fallbackTerm.related) {
+          termCategories = fallbackTerm.related;
+        }
+      }
+
+      // Generate tags section
+      const tagsSection = termCategories.length > 0 
+        ? `<p><strong>Related to:</strong> ${termCategories.map(tag => `<span class='badge'>${tag}</span>`).join(' ')}</p>`
+        : '';
 
       let content = '';
       
@@ -278,6 +300,7 @@ async function init() {
           <div class="definition-single">
             <p><strong>Definition:</strong> ${def.definition}</p>
             <p><strong>Example:</strong> ${def.usage}</p>
+            ${tagsSection}
             <div class="definition-votes">
               <button class="vote-btn vote-up${upVoted}" onclick="submitVote('${def.id}', 'up')">
                 👍 ${def.upvotes}
@@ -285,7 +308,6 @@ async function init() {
               <button class="vote-btn vote-down${downVoted}" onclick="submitVote('${def.id}', 'down')">
                 👎 ${def.downvotes}
               </button>
-              <span class="net-score">Net: ${def.netScore}</span>
             </div>
           </div>
         `;
@@ -293,7 +315,6 @@ async function init() {
         // Multiple definitions - show all with voting
         content = `
           <div class="definitions-multiple">
-            <p class="definition-count">${definitions.length} definitions available</p>
         `;
         
         definitions.forEach((def, index) => {
@@ -304,24 +325,23 @@ async function init() {
           content += `
             <div class="definition-item ${index === 0 ? 'primary' : 'secondary'}">
               <div class="definition-header">
-                <span class="definition-rank">#${index + 1}</span>
-                <div class="definition-votes">
-                  <button class="vote-btn vote-up${upVoted}" onclick="submitVote('${def.id}', 'up')">
-                    👍 ${def.upvotes}
-                  </button>
-                  <button class="vote-btn vote-down${downVoted}" onclick="submitVote('${def.id}', 'down')">
-                    👎 ${def.downvotes}
-                  </button>
-                  <span class="net-score">Net: ${def.netScore}</span>
-                </div>
+                <span class="definition-rank">${termName}</span>
               </div>
               <p class="definition-text">${def.definition}</p>
               <p class="definition-usage"><strong>Example:</strong> ${def.usage}</p>
+              <div class="definition-votes">
+                <button class="vote-btn vote-up${upVoted}" onclick="submitVote('${def.id}', 'up')">
+                  👍 ${def.upvotes}
+                </button>
+                <button class="vote-btn vote-down${downVoted}" onclick="submitVote('${def.id}', 'down')">
+                  👎 ${def.downvotes}
+                </button>
+              </div>
             </div>
           `;
         });
         
-        content += '</div>';
+        content += `${tagsSection}</div>`;
       }
 
       modalContent.innerHTML = content;
