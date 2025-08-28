@@ -217,7 +217,8 @@ class AirtableService {
     }
 
     try {
-      const data = await this.makeRequest('Terms?sort%5B0%5D%5Bfield%5D=Term%20Name');
+      // Expand Categories to get linked record data instead of just IDs
+      const data = await this.makeRequest('Terms?sort%5B0%5D%5Bfield%5D=Term%20Name&expand%5B%5D=Categories');
       const formatted = this.formatTermsData(data.records);
       
       // Cache for 5 minutes
@@ -476,13 +477,30 @@ class AirtableService {
   formatTermsData(records) {
     return records
       .filter(record => record.fields && record.fields['Term Name']) // Filter out records without names
-      .map(record => ({
-        id: record.id,
-        name: record.fields['Term Name'],
-        slug: record.fields['Slug'] || this.generateSlug(record.fields['Term Name']),
-        totalDefinitions: record.fields['Total Definitions'] || 0,
-        categories: record.fields['Categories'] || []
-      }));
+      .map(record => {
+        // Handle expanded Categories data - extract category names from linked records
+        let categories = [];
+        if (record.fields['Categories'] && Array.isArray(record.fields['Categories'])) {
+          categories = record.fields['Categories']
+            .map(catRecord => {
+              // If it's an expanded record with fields, get the category name
+              if (typeof catRecord === 'object' && catRecord.fields && catRecord.fields['Category Name']) {
+                return catRecord.fields['Category Name'];
+              }
+              // If it's still just an ID (fallback), return as is
+              return catRecord;
+            })
+            .filter(cat => cat && typeof cat === 'string'); // Only keep valid category names
+        }
+        
+        return {
+          id: record.id,
+          name: record.fields['Term Name'],
+          slug: record.fields['Slug'] || this.generateSlug(record.fields['Term Name']),
+          totalDefinitions: record.fields['Total Definitions'] || 0,
+          categories: categories
+        };
+      });
   }
 
   /**
