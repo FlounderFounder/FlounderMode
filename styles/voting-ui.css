@@ -35,6 +35,24 @@
   border-color: #dc3545;
 }
 
+/* Voted state styles */
+.vote-btn.voted {
+  font-weight: bold;
+  transform: scale(1.05);
+}
+
+.vote-btn.vote-up.voted {
+  background: #d4edda;
+  border-color: #28a745;
+  color: #155724;
+}
+
+.vote-btn.vote-down.voted {
+  background: #f8d7da;
+  border-color: #dc3545;
+  color: #721c24;
+}
+
 .net-score {
   font-weight: bold;
   color: #495057;
@@ -128,6 +146,19 @@ body.dark-mode .vote-btn.vote-up:hover {
 body.dark-mode .vote-btn.vote-down:hover {
   background: #e53e3e;
   border-color: #fc8181;
+}
+
+/* Dark mode voted state styles */
+body.dark-mode .vote-btn.vote-up.voted {
+  background: #38a169;
+  border-color: #48bb78;
+  color: #f0fff4;
+}
+
+body.dark-mode .vote-btn.vote-down.voted {
+  background: #e53e3e;
+  border-color: #fc8181;
+  color: #fed7d7;
 }
 
 body.dark-mode .net-score {

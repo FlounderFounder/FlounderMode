@@ -323,18 +323,18 @@ class AirtableService {
 
     await Promise.allSettled(searchPromises);
 
-    // Sort by relevance score and remove duplicates
+    // Sort by relevance score and remove duplicates by slug (show each term only once)
     return results
       .sort((a, b) => b.score - a.score)
       .filter((result, index, self) => 
-        index === self.findIndex(r => r.slug === result.slug && r.type === result.type)
+        index === self.findIndex(r => r.slug === result.slug)
       );
   }
 
   /**
    * Submit a vote for a definition
    */
-  async submitVote(definitionId, voteType, userId) {
+  async submitVote(definitionId, voteType, userId, previousVote = null) {
     try {
       // In a real implementation, you'd track individual votes
       // For now, we'll directly update the upvote/downvote counts
@@ -344,16 +344,37 @@ class AirtableService {
       const currentDownvotes = currentDef.fields.Downvotes || 0;
       
       const updates = {};
+      
+      // Handle different vote types
       if (voteType === 'up') {
+        // Simple upvote
         updates.Upvotes = currentUpvotes + 1;
       } else if (voteType === 'down') {
+        // Simple downvote
         updates.Downvotes = currentDownvotes + 1;
+      } else if (voteType === 'remove_up') {
+        // Remove upvote
+        updates.Upvotes = Math.max(0, currentUpvotes - 1);
+      } else if (voteType === 'remove_down') {
+        // Remove downvote
+        updates.Downvotes = Math.max(0, currentDownvotes - 1);
+      } else if (voteType === 'switch_to_up') {
+        // Switch from down to up
+        updates.Upvotes = currentUpvotes + 1;
+        updates.Downvotes = Math.max(0, currentDownvotes - 1);
+      } else if (voteType === 'switch_to_down') {
+        // Switch from up to down
+        updates.Downvotes = currentDownvotes + 1;
+        updates.Upvotes = Math.max(0, currentUpvotes - 1);
       }
       
-      await this.makeRequest(`Definitions/${definitionId}`, {
-        method: 'PATCH',
-        body: JSON.stringify({ fields: updates })
-      });
+      // Only update if we have changes
+      if (Object.keys(updates).length > 0) {
+        await this.makeRequest(`Definitions/${definitionId}`, {
+          method: 'PATCH',
+          body: JSON.stringify({ fields: updates })
+        });
+      }
       
       // Clear relevant caches
       this.cache.clear();

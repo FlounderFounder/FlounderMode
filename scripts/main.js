@@ -270,15 +270,19 @@ async function init() {
       if (definitions.length === 1) {
         // Single definition - use simple layout
         const def = definitions[0];
+        const userVote = getUserVoteForDefinition(def.id);
+        const upVoted = userVote === 'up' ? ' voted' : '';
+        const downVoted = userVote === 'down' ? ' voted' : '';
+        
         content = `
           <div class="definition-single">
             <p><strong>Definition:</strong> ${def.definition}</p>
             <p><strong>Example:</strong> ${def.usage}</p>
             <div class="definition-votes">
-              <button class="vote-btn vote-up" onclick="submitVote('${def.id}', 'up')">
+              <button class="vote-btn vote-up${upVoted}" onclick="submitVote('${def.id}', 'up')">
                 👍 ${def.upvotes}
               </button>
-              <button class="vote-btn vote-down" onclick="submitVote('${def.id}', 'down')">
+              <button class="vote-btn vote-down${downVoted}" onclick="submitVote('${def.id}', 'down')">
                 👎 ${def.downvotes}
               </button>
               <span class="net-score">Net: ${def.netScore}</span>
@@ -293,15 +297,19 @@ async function init() {
         `;
         
         definitions.forEach((def, index) => {
+          const userVote = getUserVoteForDefinition(def.id);
+          const upVoted = userVote === 'up' ? ' voted' : '';
+          const downVoted = userVote === 'down' ? ' voted' : '';
+          
           content += `
             <div class="definition-item ${index === 0 ? 'primary' : 'secondary'}">
               <div class="definition-header">
                 <span class="definition-rank">#${index + 1}</span>
                 <div class="definition-votes">
-                  <button class="vote-btn vote-up" onclick="submitVote('${def.id}', 'up')">
+                  <button class="vote-btn vote-up${upVoted}" onclick="submitVote('${def.id}', 'up')">
                     👍 ${def.upvotes}
                   </button>
-                  <button class="vote-btn vote-down" onclick="submitVote('${def.id}', 'down')">
+                  <button class="vote-btn vote-down${downVoted}" onclick="submitVote('${def.id}', 'down')">
                     👎 ${def.downvotes}
                   </button>
                   <span class="net-score">Net: ${def.netScore}</span>
@@ -331,6 +339,31 @@ async function init() {
     }
   }
 
+  // Vote tracking functions
+  function getUserVotes() {
+    const votes = localStorage.getItem('flounder-votes');
+    return votes ? JSON.parse(votes) : {};
+  }
+
+  function saveUserVotes(votes) {
+    localStorage.setItem('flounder-votes', JSON.stringify(votes));
+  }
+
+  function getUserVoteForDefinition(definitionId) {
+    const votes = getUserVotes();
+    return votes[definitionId] || null; // returns 'up', 'down', or null
+  }
+
+  function setUserVoteForDefinition(definitionId, voteType) {
+    const votes = getUserVotes();
+    if (voteType === null) {
+      delete votes[definitionId];
+    } else {
+      votes[definitionId] = voteType;
+    }
+    saveUserVotes(votes);
+  }
+
   // Vote submission function
   window.submitVote = async function(definitionId, voteType) {
     if (!airtableService) {
@@ -339,11 +372,34 @@ async function init() {
     }
 
     try {
+      const currentVote = getUserVoteForDefinition(definitionId);
+      
+      // Determine the action based on current vote state
+      let actionVoteType = null;
+      let newVoteState = null;
+      
+      if (currentVote === null) {
+        // No previous vote - add new vote
+        actionVoteType = voteType;
+        newVoteState = voteType;
+      } else if (currentVote === voteType) {
+        // Clicking same vote - remove vote
+        actionVoteType = 'remove_' + voteType;
+        newVoteState = null;
+      } else {
+        // Switching from one vote to another
+        actionVoteType = 'switch_to_' + voteType;
+        newVoteState = voteType;
+      }
+      
       const userId = airtableService.generateUserId();
-      const result = await airtableService.submitVote(definitionId, voteType, userId);
+      const result = await airtableService.submitVote(definitionId, actionVoteType, userId, currentVote);
       
       if (result.success) {
-        // Refresh the current modal
+        // Update local vote tracking
+        setUserVoteForDefinition(definitionId, newVoteState);
+        
+        // Refresh the current modal to show updated state
         const currentTermSlug = getCurrentModalTermSlug();
         if (currentTermSlug) {
           await openModalForTerm(currentTermSlug);
@@ -414,6 +470,19 @@ async function loadTermsData() {
           multipleDefinitions: false
         };
       }));
+      
+      // Filter out any undefined/null terms that might result from failed definition loading
+      flounderTerms = flounderTerms.filter(term => term && term.term);
+      
+      // Remove any duplicate terms by slug (extra safety measure)
+      const seen = new Set();
+      flounderTerms = flounderTerms.filter(term => {
+        if (seen.has(term.slug)) {
+          return false;
+        }
+        seen.add(term.slug);
+        return true;
+      });
       
     } else {
       throw new Error('AirtableService not available');
