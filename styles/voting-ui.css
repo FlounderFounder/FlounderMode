@@ -8,6 +8,7 @@
   margin-top: 1rem;
   padding-top: 1rem;
   border-top: 1px solid #ddd;
+  justify-content: flex-end; /* Move to right side */
 }
 
 .vote-btn {
@@ -25,9 +26,19 @@
   transform: translateY(-1px);
 }
 
+.vote-btn.vote-up {
+  color: #28a745;
+  border-color: #28a745;
+}
+
 .vote-btn.vote-up:hover {
   background: #d4edda;
   border-color: #28a745;
+}
+
+.vote-btn.vote-down {
+  color: #dc3545;
+  border-color: #dc3545;
 }
 
 .vote-btn.vote-down:hover {
@@ -42,15 +53,15 @@
 }
 
 .vote-btn.vote-up.voted {
-  background: #d4edda;
+  background: #28a745;
   border-color: #28a745;
-  color: #155724;
+  color: white;
 }
 
 .vote-btn.vote-down.voted {
-  background: #f8d7da;
+  background: #dc3545;
   border-color: #dc3545;
-  color: #721c24;
+  color: white;
 }
 
 .net-score {
@@ -138,9 +149,19 @@ body.dark-mode .vote-btn:hover {
   background: #4a5568;
 }
 
+body.dark-mode .vote-btn.vote-up {
+  color: #48bb78;
+  border-color: #48bb78;
+}
+
 body.dark-mode .vote-btn.vote-up:hover {
   background: #38a169;
   border-color: #48bb78;
+}
+
+body.dark-mode .vote-btn.vote-down {
+  color: #fc8181;
+  border-color: #fc8181;
 }
 
 body.dark-mode .vote-btn.vote-down:hover {
@@ -150,15 +171,15 @@ body.dark-mode .vote-btn.vote-down:hover {
 
 /* Dark mode voted state styles */
 body.dark-mode .vote-btn.vote-up.voted {
-  background: #38a169;
+  background: #48bb78;
   border-color: #48bb78;
-  color: #f0fff4;
+  color: white;
 }
 
 body.dark-mode .vote-btn.vote-down.voted {
-  background: #e53e3e;
+  background: #fc8181;
   border-color: #fc8181;
-  color: #fed7d7;
+  color: white;
 }
 
 body.dark-mode .net-score {

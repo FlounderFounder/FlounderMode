@@ -303,10 +303,10 @@ async function init() {
             ${tagsSection}
             <div class="definition-votes">
               <button class="vote-btn vote-up${upVoted}" onclick="submitVote('${def.id}', 'up')">
-                👍 ${def.upvotes}
+                ↑ ${def.upvotes}
               </button>
               <button class="vote-btn vote-down${downVoted}" onclick="submitVote('${def.id}', 'down')">
-                👎 ${def.downvotes}
+                ↓ ${def.downvotes}
               </button>
             </div>
           </div>
@@ -331,10 +331,10 @@ async function init() {
               <p class="definition-usage"><strong>Example:</strong> ${def.usage}</p>
               <div class="definition-votes">
                 <button class="vote-btn vote-up${upVoted}" onclick="submitVote('${def.id}', 'up')">
-                  👍 ${def.upvotes}
+                  ↑ ${def.upvotes}
                 </button>
                 <button class="vote-btn vote-down${downVoted}" onclick="submitVote('${def.id}', 'down')">
-                  👎 ${def.downvotes}
+                  ↓ ${def.downvotes}
                 </button>
               </div>
             </div>
