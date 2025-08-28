@@ -15,142 +15,21 @@ async function init() {
   const modalContent = document.getElementById("modalContent");
   const wotdContainer = document.querySelector(".wotd-container");
 
-  console.log('🚀 Initializing Floundermode Dictionary with API...');
+  console.log('🚀 Initializing Floundermode Dictionary with Airtable...');
 
-  // Use API endpoints instead of direct Airtable connection
-  const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-    ? '/api'  // Local development
-    : '/api'; // Production (same path for Vercel)
-
-  // Custom API service that replaces AirtableService
-  const apiService = {
-    async fetchTerms() {
-      try {
-        const response = await fetch(`${API_BASE}/terms`);
-        if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        const result = await response.json();
-        if (!result.success) throw new Error(result.error || 'API returned error');
-        return result.data;
-      } catch (error) {
-        console.warn('API fetchTerms failed, using fallback:', error.message);
-        return this.getFallbackTerms();
-      }
-    },
-
-    async fetchDefinitionsForTerm(slug) {
-      try {
-        const response = await fetch(`${API_BASE}/terms?slug=${encodeURIComponent(slug)}`);
-        if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        const result = await response.json();
-        if (!result.success) throw new Error(result.error || 'API returned error');
-        return result.data;
-      } catch (error) {
-        console.warn('API fetchDefinitionsForTerm failed, using fallback:', error.message);
-        return this.getFallbackDefinitions(slug);
-      }
-    },
-
-    async searchTerms(query) {
-      try {
-        const response = await fetch(`${API_BASE}/terms?search=${encodeURIComponent(query)}`);
-        if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        const result = await response.json();
-        if (!result.success) throw new Error(result.error || 'API returned error');
-        return result.data;
-      } catch (error) {
-        console.warn('API searchTerms failed, using fallback:', error.message);
-        // Fallback to local search
-        const terms = await this.fetchTerms();
-        return terms.filter(term => 
-          term.name && term.name.toLowerCase().includes(query.toLowerCase())
-        ).map(term => ({
-          type: 'term',
-          term: term.name,
-          slug: term.slug
-        }));
-      }
-    },
-
-    async submitVote(definitionId, voteType, userId) {
-      try {
-        const response = await fetch(`${API_BASE}/terms`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ action: 'vote', definitionId, voteType, userId })
-        });
-        if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        const result = await response.json();
-        return result;
-      } catch (error) {
-        console.error('Vote submission failed:', error.message);
-        return { success: false, error: error.message };
-      }
-    },
-
-    // Utility functions
-    generateSlug(text) {
-      return text
-        .toLowerCase()
-        .replace(/[^a-z0-9\s-]/g, '')
-        .replace(/\s+/g, '-')
-        .replace(/-+/g, '-')
-        .trim();
-    },
-
-    generateUserId() {
-      let userId = localStorage.getItem('flounder-user-id');
-      if (!userId) {
-        userId = 'user-' + Math.random().toString(36).substr(2, 9) + '-' + Date.now().toString(36);
-        localStorage.setItem('flounder-user-id', userId);
-      }
-      return userId;
-    },
-
-    // Fallback methods for when API is unavailable
-    async getFallbackTerms() {
-      try {
-        const response = await fetch('/terms/terms.json');
-        const jsonData = await response.json();
-        return jsonData.map(term => ({
-          id: `fallback-${this.generateSlug(term.term)}`,
-          name: term.term,
-          slug: this.generateSlug(term.term),
-          totalDefinitions: 1
-        }));
-      } catch (error) {
-        console.error('Fallback terms failed:', error.message);
-        return [];
-      }
-    },
-
-    async getFallbackDefinitions(slug) {
-      try {
-        const response = await fetch('/terms/terms.json');
-        const jsonData = await response.json();
-        const term = jsonData.find(t => this.generateSlug(t.term) === slug);
-        if (term) {
-          return [{
-            id: `fallback-def-${slug}`,
-            definition: term.definition,
-            usage: term.usage,
-            upvotes: 10,
-            downvotes: 0,
-            netScore: 10,
-            termName: term.term
-          }];
-        }
-        return [];
-      } catch (error) {
-        console.error('Fallback definitions failed:', error.message);
-        return [];
-      }
-    }
-  };
-
-  // Replace airtableService with apiService
-  airtableService = apiService;
-  
-  console.log('📊 API service initialized');
+  // Initialize AirtableService (browser mode - will use fallback data)
+  try {
+    // In browser mode, initialize without credentials to use fallback data only
+    airtableService = new AirtableService({
+      // No credentials in browser for security
+      // This will automatically fallback to JSON data
+    });
+    
+    console.log('📊 AirtableService initialized in fallback mode (browser)');
+    
+  } catch (error) {
+    console.warn('⚠️ AirtableService initialization failed, using JSON fallback:', error.message);
+  }
 
   // Fetch terms data (from Airtable or JSON fallback)
   await loadTermsData();
