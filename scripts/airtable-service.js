@@ -324,11 +324,26 @@ class AirtableService {
     await Promise.allSettled(searchPromises);
 
     // Sort by relevance score and remove duplicates by slug (show each term only once)
-    return results
+    // Prioritize term name matches over definition matches for the same term
+    const uniqueResults = new Map();
+    
+    results
       .sort((a, b) => b.score - a.score)
-      .filter((result, index, self) => 
-        index === self.findIndex(r => r.slug === result.slug)
-      );
+      .forEach(result => {
+        const key = result.slug;
+        if (!uniqueResults.has(key) || result.type === 'term') {
+          // Only add if we haven't seen this term, or if this is a higher-priority term name match
+          uniqueResults.set(key, {
+            type: 'term', // Always show as term type for consistency
+            term: result.term,
+            slug: result.slug,
+            score: Math.max(result.score, uniqueResults.get(key)?.score || 0)
+          });
+        }
+      });
+    
+    return Array.from(uniqueResults.values())
+      .sort((a, b) => b.score - a.score);
   }
 
   /**
