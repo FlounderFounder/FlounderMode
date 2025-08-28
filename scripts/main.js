@@ -290,25 +290,30 @@ async function init() {
       let content = '';
       
       if (definitions.length === 1) {
-        // Single definition - use simple layout
+        // Single definition - use same layout as multiple definitions for consistency
         const def = definitions[0];
         const userVote = getUserVoteForDefinition(def.id);
         const upVoted = userVote === 'up' ? ' voted' : '';
         const downVoted = userVote === 'down' ? ' voted' : '';
         
         content = `
-          <div class="definition-single">
-            <p><strong>Definition:</strong> ${def.definition}</p>
-            <p><strong>Example:</strong> ${def.usage}</p>
-            ${tagsSection}
-            <div class="definition-votes">
-              <button class="vote-btn vote-up${upVoted}" onclick="submitVote('${def.id}', 'up')">
-                ↑ ${def.upvotes}
-              </button>
-              <button class="vote-btn vote-down${downVoted}" onclick="submitVote('${def.id}', 'down')">
-                ↓ ${def.downvotes}
-              </button>
+          <div class="definitions-multiple">
+            <div class="definition-item primary">
+              <div class="definition-header">
+                <span class="definition-rank">${termName}</span>
+              </div>
+              <p class="definition-text">${def.definition}</p>
+              <p class="definition-usage"><strong>Example:</strong> ${def.usage}</p>
+              <div class="definition-votes">
+                <button class="vote-btn vote-up${upVoted}" onclick="submitVote('${def.id}', 'up')">
+                  ↑ ${def.upvotes}
+                </button>
+                <button class="vote-btn vote-down${downVoted}" onclick="submitVote('${def.id}', 'down')">
+                  ↓ ${def.downvotes}
+                </button>
+              </div>
             </div>
+            ${tagsSection}
           </div>
         `;
       } else {
