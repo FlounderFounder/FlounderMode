@@ -196,8 +196,8 @@ async function init() {
               <div class="definition-content">
                 <div class="definition-text">${def.definition}</div>
                 <div class="definition-example">"${def.usage}"</div>
-                ${def.author ? `<div class="definition-meta">— ${def.author}</div>` : ''}
               </div>
+              ${def.author ? `<div class="definition-author">by ${def.author} ${def.date}</div>` : ''}
               <div class="definition-votes">
                 <button class="vote-btn vote-up" onclick="submitVote('${def.id}', 'up')" data-def-id="${def.id}">
                   ▲
@@ -224,8 +224,8 @@ async function init() {
                 <div class="definition-content">
                   <div class="definition-text">${def.definition}</div>
                   <div class="definition-example">"${def.usage}"</div>
-                  ${def.author ? `<div class="definition-meta">— ${def.author}</div>` : ''}
                 </div>
+                ${def.author ? `<div class="definition-author">by ${def.author} ${def.date}</div>` : ''}
                 <div class="definition-votes">
                   <button class="vote-btn vote-up" onclick="submitVote('${def.id}', 'up')" data-def-id="${def.id}">
                     ▲
@@ -742,13 +742,27 @@ window.submitVote = async function(definitionId, voteType) {
   // Check if user already voted on this definition
   const existingVote = userVotes.get(definitionId);
   
+  // Calculate the optimistic vote change
+  let voteChange = 0;
   if (existingVote === voteType) {
     // User is trying to vote the same way again - remove the vote
     userVotes.delete(definitionId);
+    voteChange = voteType === 'up' ? -1 : 1; // Remove the vote
   } else {
     // User is voting (or changing their vote)
     userVotes.set(definitionId, voteType);
+    if (existingVote) {
+      // Changing vote: remove old vote, add new vote
+      voteChange = voteType === 'up' ? 2 : -2; // +1 for new vote, -1 for removing old vote
+    } else {
+      // First time voting
+      voteChange = voteType === 'up' ? 1 : -1;
+    }
   }
+  
+  // Update UI immediately for instant feedback
+  updateVoteCountOptimistically(definitionId, voteChange);
+  updateVoteButtons(definitionId);
   
   // Save to localStorage for UI state
   saveUserVotes();
@@ -758,9 +772,11 @@ window.submitVote = async function(definitionId, voteType) {
     const result = await window.supabaseVoting.submitVote(definitionId, voteType);
     if (result) {
       allVotes = result;
+      // Update with real data from server
       updateVoteButtons(definitionId);
     } else {
-      // Fallback: revert the vote if Supabase failed
+      // Fallback: revert the optimistic change if Supabase failed
+      updateVoteCountOptimistically(definitionId, -voteChange);
       if (existingVote === voteType) {
         userVotes.set(definitionId, voteType);
       } else {
@@ -770,11 +786,37 @@ window.submitVote = async function(definitionId, voteType) {
       updateVoteButtons(definitionId);
     }
   } else {
-    // Use localStorage fallback - just update UI
-    updateVoteButtons(definitionId);
+    // Use localStorage fallback - update allVotes for consistency
+    if (!allVotes[definitionId]) {
+      allVotes[definitionId] = { upvotes: 0, downvotes: 0, netScore: 0 };
+    }
+    allVotes[definitionId].netScore += voteChange;
+    if (voteType === 'up') {
+      allVotes[definitionId].upvotes += (voteChange > 0 ? 1 : -1);
+    } else {
+      allVotes[definitionId].downvotes += (voteChange < 0 ? 1 : -1);
+    }
   }
 };
 
+
+// Update vote count optimistically (immediately for instant feedback)
+function updateVoteCountOptimistically(definitionId, voteChange) {
+  const voteCount = document.querySelector(`button[data-def-id="${definitionId}"].vote-up`).parentElement.querySelector('.vote-count');
+  
+  if (voteCount) {
+    // Get current displayed count
+    const currentCount = parseInt(voteCount.textContent) || 0;
+    // Update immediately
+    voteCount.textContent = currentCount + voteChange;
+    
+    // Add a subtle animation class for visual feedback
+    voteCount.classList.add('vote-updated');
+    setTimeout(() => {
+      voteCount.classList.remove('vote-updated');
+    }, 200);
+  }
+}
 
 // Update the vote button UI
 function updateVoteButtons(definitionId) {

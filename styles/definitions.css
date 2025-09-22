@@ -86,13 +86,6 @@
   box-shadow: 1px 1px 0 #000;
 }
 
-.definition-meta {
-  font-size: 0.8rem;
-  color: #666;
-  font-style: italic;
-  margin-top: 0.5rem;
-  text-align: right;
-}
 
 /* Dark mode styles for definition navigation */
 body.dark-mode .definition-tab {
@@ -113,9 +106,6 @@ body.dark-mode .definition-tab.active {
   box-shadow: 3px 3px 0 #666;
 }
 
-body.dark-mode .definition-meta {
-  color: #ccc;
-}
 
 /* Dark mode styles for arrow navigation */
 body.dark-mode .definition-arrow {
