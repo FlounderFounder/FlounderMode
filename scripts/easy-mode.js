@@ -159,7 +159,23 @@ window.closeEasyModeModal = function() {
 // Step navigation
 window.nextStep = async function() {
   if (await validateCurrentStep()) {
-    if (currentStep < 4) {
+    // Special handling for step 1 - check if we're dealing with a duplicate
+    if (currentStep === 1) {
+      const termName = document.getElementById("termName").value.trim();
+      if (hasDuplicateTerm(termName)) {
+        // Find the existing term and show modal
+        const existingTerm = flounderTerms.find(term => 
+          term.term.toLowerCase().trim() === termName.toLowerCase().trim()
+        );
+        if (existingTerm) {
+          showExistingTermModal(existingTerm);
+        }
+        // Don't proceed to next step - the modal will handle the flow
+        return;
+      }
+    }
+    
+    if (currentStep < 5) {
       updateStep(currentStep + 1);
     }
   }
@@ -202,7 +218,7 @@ function updateNavigation() {
 
   prevBtn.style.display = currentStep > 1 ? "block" : "none";
   
-  if (currentStep === 4) {
+  if (currentStep === 5) {
     nextBtn.style.display = "none";
     submitBtn.style.display = "block";
   } else {
@@ -269,11 +285,7 @@ function checkDuplicateTerm(termName) {
   );
   
   if (exactMatch) {
-    showCustomAlert(
-      "Duplicate Term Found", 
-      `The term "${exactMatch.term}" already exists in the dictionary. ` +
-      `Please choose a different term or check if you meant to suggest an edit to the existing one.`
-    );
+    showExistingTermModal(exactMatch);
     return true; // Exact duplicate found
   }
   
@@ -296,6 +308,74 @@ function checkDuplicateTerm(termName) {
   return false; // No duplicate or similar term
 }
 
+// Check for duplicates without showing modal (for validation)
+function hasDuplicateTerm(termName) {
+  if (!termName || !flounderTerms) return false;
+  
+  const normalizedInput = termName.toLowerCase().trim();
+  return flounderTerms.some(term => 
+    term.term.toLowerCase().trim() === normalizedInput
+  );
+}
+
+// Show modal for existing term with option to add definition
+function showExistingTermModal(existingTerm) {
+  const definitionsList = existingTerm.definitions.map((def, index) => 
+    `<div style="margin-bottom: 1rem; padding: 0.75rem; background: #f8f9fa; border-radius: 4px;">
+      <strong>Definition ${index + 1}:</strong> ${def.definition}
+      ${def.author ? `<br><small style="color: #666;">— ${def.author}</small>` : ''}
+    </div>`
+  ).join('');
+  
+  const modalContent = `
+    <div style="text-align: center; padding: 1rem 0;">
+      <h3 style="margin-bottom: 1.5rem; font-family: 'Bebas Neue', sans-serif; font-size: 1.5rem; letter-spacing: 1px;">Term Already Exists</h3>
+      <p style="margin-bottom: 1rem; line-height: 1.7;">
+        The term <strong>"${existingTerm.term}"</strong> already exists with ${existingTerm.definitions.length} definition${existingTerm.definitions.length > 1 ? 's' : ''}.
+      </p>
+      <div style="margin-bottom: 1.5rem; text-align: left;">
+        <strong>Existing definitions:</strong>
+        ${definitionsList}
+      </div>
+      <p style="margin-bottom: 2rem; line-height: 1.7;">
+        Would you like to add another definition to this term?
+      </p>
+      <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center;">
+        <button onclick="proceedWithAddDefinition('${existingTerm.term.replace(/'/g, "\\'")}')" 
+                class="contribute-button easy-mode-button">
+          Add Definition
+        </button>
+        <button onclick="closeCustomAlert(); document.getElementById('termName').value = '';" 
+                class="contribute-button github-button">
+          Choose Different Term
+        </button>
+      </div>
+    </div>
+  `;
+  
+  // Update the custom alert content
+  document.getElementById('alertTitle').textContent = 'Existing Term Found';
+  document.getElementById('alertContent').innerHTML = modalContent;
+  
+  // Show the alert
+  const alertModal = document.getElementById("customAlert");
+  alertModal.classList.add("show");
+}
+
+// Proceed with adding definition to existing term
+window.proceedWithAddDefinition = function(termName) {
+  closeCustomAlert();
+  
+  // Store the existing term name for later use
+  window.existingTermName = termName;
+  
+  // Update the modal title to indicate we're adding a definition
+  document.querySelector('.easy-mode-modal .window-bar span').textContent = 'Easy Mode - Add Definition';
+  
+  // Move to step 2 (author name)
+  updateStep(2);
+};
+
 async function validateCurrentStep() {
   const step = currentStep;
   
@@ -307,18 +387,21 @@ async function validateCurrentStep() {
       return false;
     }
     
-    // Then check for duplicates
-    if (checkDuplicateTerm(termName)) {
-      return false;
-    }
+    // Don't show modal here - let nextStep handle it
+    return true;
   }
   
   if (step === 2) {
+    // Author name is optional, so just return true
+    return true;
+  }
+  
+  if (step === 3) {
     const definition = document.getElementById("termDefinition").value.trim();
     return await validateInput(definition, "Definition");
   }
   
-  if (step === 3) {
+  if (step === 4) {
     const usage = document.getElementById("termUsage").value.trim();
     return await validateInput(usage, "Usage example");
   }
@@ -350,12 +433,14 @@ function resetForm() {
   
   // Reset character counters
   document.getElementById("termCounter").textContent = "0";
+  document.getElementById("authorCounter").textContent = "0";
   document.getElementById("definitionCounter").textContent = "0";
   document.getElementById("usageCounter").textContent = "0";
   
   // Hide duplicate and profanity warnings
   hideDuplicateWarning();
   hideProfanityWarning(document.getElementById("termName"));
+  hideProfanityWarning(document.getElementById("authorName"));
   hideProfanityWarning(document.getElementById("termDefinition"));
   hideProfanityWarning(document.getElementById("termUsage"));
   
@@ -446,6 +531,7 @@ window.viewExistingTerm = function(termName) {
 function setupCharacterCounters() {
   const counters = [
     { input: "termName", counter: "termCounter" },
+    { input: "authorName", counter: "authorCounter" },
     { input: "termDefinition", counter: "definitionCounter" },
     { input: "termUsage", counter: "usageCounter" }
   ];
@@ -464,6 +550,7 @@ function setupCharacterCounters() {
           if (!validation.isValid && validation.error === 'inappropriate_language') {
             const fieldNames = {
               'termName': 'Term name',
+              'authorName': 'Author name',
               'termDefinition': 'Definition', 
               'termUsage': 'Usage example'
             };
@@ -479,34 +566,9 @@ function setupCharacterCounters() {
         if (input === "termName") {
           const termName = inputEl.value.trim();
           if (termName.length > 2) { // Only check after 3+ characters
-            const normalizedInput = termName.toLowerCase().trim();
-            
-            // First check for exact matches
-            const exactMatch = flounderTerms.find(term => 
-              term.term.toLowerCase().trim() === normalizedInput
-            );
-            
-            if (exactMatch) {
-              showDuplicateWarning(termName, exactMatch, true);
-            } else {
-              // Check for similar terms
-              const SIMILARITY_THRESHOLD = 0.8;
-              let similarTerm = null;
-              
-              for (const term of flounderTerms) {
-                const similarity = calculateSimilarity(termName, term.term);
-                if (similarity >= SIMILARITY_THRESHOLD && similarity < 1.0) {
-                  similarTerm = term;
-                  break; // Show the first similar term found
-                }
-              }
-              
-              if (similarTerm) {
-                showDuplicateWarning(termName, similarTerm, false);
-              } else {
-                hideDuplicateWarning();
-              }
-            }
+            // Disabled real-time duplicate checking - now handled in nextStep()
+            // This prevents the old warning system from interfering
+            hideDuplicateWarning();
           } else {
             hideDuplicateWarning();
           }
@@ -705,21 +767,49 @@ function generateTermFilename(termName) {
 
 // Generate JSON code for the new term
 function generateTermJson(termData) {
-  // Create a properly formatted JSON object
-  const termObject = {
-    term: termData.term,
-    definition: termData.definition,
-    usage: termData.usage,
-    related: termData.related || []
-  };
-  
-  // Format with proper indentation (2 spaces)
-  return JSON.stringify(termObject, null, 2);
+  if (termData.isAddingDefinition) {
+    // Generate JSON for adding a definition to existing term
+    const newDefinition = {
+      id: `def-${Date.now()}`, // Generate unique ID
+      definition: termData.definition,
+      usage: termData.usage,
+      author: termData.author,
+      date: new Date().toISOString().split('T')[0], // YYYY-MM-DD format
+      isPrimary: false,
+      votes: 0
+    };
+    
+    return `// Add this definition object to the existing definitions array in terms/${generateTermFilename(termData.term)}.json
+// Insert it after the last definition in the array
+
+${JSON.stringify(newDefinition, null, 2)}`;
+  } else {
+    // Generate JSON for new term
+    const termObject = {
+      term: termData.term,
+      definitions: [{
+        id: 'def-1',
+        definition: termData.definition,
+        usage: termData.usage,
+        author: termData.author,
+        date: new Date().toISOString().split('T')[0],
+        isPrimary: true,
+        votes: 0
+      }],
+      related: termData.related || []
+    };
+    
+    return JSON.stringify(termObject, null, 2);
+  }
 }
 
 // Generate PR title
 function generatePrTitle(termData) {
-  return `Add new term: ${termData.term}`;
+  if (termData.isAddingDefinition) {
+    return `Add definition to existing term: ${termData.term}`;
+  } else {
+    return `Add new term: ${termData.term}`;
+  }
 }
 
 // Generate GitHub URL for creating PR with pre-filled content
@@ -785,13 +875,49 @@ async function openGitHubWithContent(termData) {
 // Generate PR description
 function generatePrDescription(termData) {
   const filename = generateTermFilename(termData.term);
-  return `## Adding New Term: ${termData.term}
+  
+  if (termData.isAddingDefinition) {
+    return `## Adding Definition to Existing Term: ${termData.term}
+
+**File:** \`terms/${filename}.json\` (existing file)
+
+**New Definition:** ${termData.definition}
+
+**Usage Example:** ${termData.usage}
+
+**Author:** ${termData.author}
+
+---
+
+This pull request adds a new definition to the existing term "${termData.term}" in the Floundermode Dictionary. The definition has been validated and follows the contribution guidelines.
+
+### Changes Made
+- ✅ Added new definition to existing file: \`terms/${filename}.json\`
+- ✅ Updated HTML page: \`pages/${filename}.html\` (automated)
+- ✅ Updated site to include the new definition
+
+### Instructions for Adding Definition
+1. 🚀 Open the existing file: \`terms/${filename}.json\`
+2. 📝 Add the new definition object to the \`definitions\` array
+3. 📋 Use the JSON content provided below
+4. ✅ Commit with the PR title and description above
+
+### Checklist
+- [x] Definition is clear and concise
+- [x] Usage example demonstrates the term appropriately
+- [x] Author attribution provided
+- [x] Definition adds value to existing term
+- [x] Added to existing \`definitions\` array (not creating new file)`;
+  } else {
+    return `## Adding New Term: ${termData.term}
 
 **File:** \`terms/${filename}.json\`
 
 **Definition:** ${termData.definition}
 
 **Usage Example:** ${termData.usage}
+
+**Author:** ${termData.author}
 
 **Related Tags:** ${termData.related.length > 0 ? termData.related.join(', ') : 'None'}
 
@@ -811,6 +937,7 @@ This pull request adds a new term to the Floundermode Dictionary by creating a n
 - [x] Usage example demonstrates the term appropriately
 - [x] Related tags are relevant and helpful
 - [x] Filename follows kebab-case convention`;
+  }
 }
 
 // Show PR preview with generated content
@@ -832,10 +959,12 @@ function showPrPreview(termData) {
   
   // Update the code header to show the filename
   const codeLabelEl = document.querySelector('#codeChanges').parentElement.querySelector('.code-label');
-    console.log("Code label element:", codeLabelEl);
   if (codeLabelEl) {
-    codeLabelEl.textContent = `New file: terms/${filename}.json`;
-    console.log("Setting filename:", filename);
+    if (termData.isAddingDefinition) {
+      codeLabelEl.textContent = `Add to existing file: terms/${filename}.json`;
+    } else {
+      codeLabelEl.textContent = `New file: terms/${filename}.json`;
+    }
   }
   
   // Update the GitHub button to use the automated URL
@@ -852,8 +981,8 @@ function showPrPreview(termData) {
 // Form submission
 async function submitTerm(termData) {
   try {
-    // Final duplicate check before submission
-    if (checkDuplicateTerm(termData.term)) {
+    // Only check for duplicates if we're not adding a definition to existing term
+    if (!termData.isAddingDefinition && checkDuplicateTerm(termData.term)) {
       return; // Stop submission if duplicate found
     }
     
@@ -887,9 +1016,11 @@ document.addEventListener("DOMContentLoaded", function() {
       
       const formData = {
         term: document.getElementById("termName").value.trim(),
+        author: document.getElementById("authorName").value.trim() || "Anonymous Contributor",
         definition: document.getElementById("termDefinition").value.trim(),
         usage: document.getElementById("termUsage").value.trim(),
-        related: selectedTags
+        related: selectedTags,
+        isAddingDefinition: !!window.existingTermName
       };
       
       try {

@@ -31,19 +31,30 @@
     <main class="main-content">
       <div class="term-page">
         <h1 class="term-title">Vibe-Driven Dev</h1>
-        <div class="modal-definition-section">
-          <h3 class="modal-section-title">DEFINITION</h3>
-          <div class="modal-content-block definition-block">
-            <div class="modal-accent-bar definition-accent"></div>
-            <div class="modal-text-content">A product methodology where feelings override all measurable success criteria.</div>
-          </div>
-        </div>
-
-        <div class="modal-usage-section">
-          <h3 class="modal-section-title">USAGE EXAMPLE</h3>
-          <div class="modal-content-block usage-block">
-            <div class="modal-accent-bar usage-accent"></div>
-            <div class="modal-text-content">"We don't test features — we ship on vibes."</div>
+        
+        <div class="definitions-container">
+          <h2 class="definitions-title">DEFINITIONS</h2>
+          
+          <div class="definition-item">
+            <div class="definition-header">
+              <span class="definition-number">Definition 1</span>
+              <span class="definition-votes">39 votes</span>
+            </div>
+            <div class="modal-definition-section">
+              <h3 class="modal-section-title">DEFINITION</h3>
+              <div class="modal-content-block definition-block">
+                <div class="modal-accent-bar definition-accent"></div>
+                <div class="modal-text-content">A product methodology where feelings override all measurable success criteria.</div>
+                <div class="definition-meta">— Carter Wynn</div>
+              </div>
+            </div>
+            <div class="modal-usage-section">
+              <h3 class="modal-section-title">USAGE EXAMPLE</h3>
+              <div class="modal-content-block usage-block">
+                <div class="modal-accent-bar usage-accent"></div>
+                <div class="modal-text-content">"We don't test features — we ship on vibes."</div>
+              </div>
+            </div>
           </div>
         </div>
         
@@ -57,10 +68,24 @@
         </div>
         
         <div class="term-actions">
-          <button onclick="shareTerm('Vibe-Driven Dev', 'A product methodology where feelings override all measurable success criteria.', 'We don\'t test features — we ship on vibes.')" class="share-button">
+          <button onclick="shareVibeDrivenDev()" class="share-button">
             📤 Share This Term
           </button>
         </div>
+        
+        <script>
+          function shareVibeDrivenDev() {
+            const definitions = [{
+              id: 'def-1',
+              definition: "A product methodology where feelings override all measurable success criteria.",
+              usage: "We don't test features — we ship on vibes.",
+              author: "Carter Wynn",
+              isPrimary: true,
+              votes: 39
+            }];
+            shareTerm('Vibe-Driven Dev', definitions);
+          }
+        </script>
       </div>
     </main>
 

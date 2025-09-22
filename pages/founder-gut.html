@@ -31,19 +31,52 @@
     <main class="main-content">
       <div class="term-page">
         <h1 class="term-title">Founder Gut</h1>
-        <div class="modal-definition-section">
-          <h3 class="modal-section-title">DEFINITION</h3>
-          <div class="modal-content-block definition-block">
-            <div class="modal-accent-bar definition-accent"></div>
-            <div class="modal-text-content">An internal signal that replaces research, ethics, and customer feedback with a low-grade serotonin burst and a vague sense of destiny.</div>
+        
+        <div class="definitions-container">
+          <h2 class="definitions-title">DEFINITIONS</h2>
+          
+          <div class="definition-item">
+            <div class="definition-header">
+              <span class="definition-number">Definition 1</span>
+              <span class="definition-votes">42 votes</span>
+            </div>
+            <div class="modal-definition-section">
+              <h3 class="modal-section-title">DEFINITION</h3>
+              <div class="modal-content-block definition-block">
+                <div class="modal-accent-bar definition-accent"></div>
+                <div class="modal-text-content">An internal signal that replaces research, ethics, and customer feedback with a low-grade serotonin burst and a vague sense of destiny.</div>
+                <div class="definition-meta">— Carter Wynn</div>
+              </div>
+            </div>
+            <div class="modal-usage-section">
+              <h3 class="modal-section-title">USAGE EXAMPLE</h3>
+              <div class="modal-content-block usage-block">
+                <div class="modal-accent-bar usage-accent"></div>
+                <div class="modal-text-content">"We were going to A/B test the landing page but my Founder Gut said ship it in Comic Sans."</div>
+              </div>
+            </div>
           </div>
-        </div>
 
-        <div class="modal-usage-section">
-          <h3 class="modal-section-title">USAGE EXAMPLE</h3>
-          <div class="modal-content-block usage-block">
-            <div class="modal-accent-bar usage-accent"></div>
-            <div class="modal-text-content">"We were going to A/B test the landing page but my Founder Gut said ship it in Comic Sans."</div>
+          <div class="definition-item">
+            <div class="definition-header">
+              <span class="definition-number">Definition 2</span>
+              <span class="definition-votes">28 votes</span>
+            </div>
+            <div class="modal-definition-section">
+              <h3 class="modal-section-title">DEFINITION</h3>
+              <div class="modal-content-block definition-block">
+                <div class="modal-accent-bar definition-accent"></div>
+                <div class="modal-text-content">The entrepreneurial equivalent of 'trust me bro' but with more conviction and less data.</div>
+                <div class="definition-meta">— Anonymous Contributor</div>
+              </div>
+            </div>
+            <div class="modal-usage-section">
+              <h3 class="modal-section-title">USAGE EXAMPLE</h3>
+              <div class="modal-content-block usage-block">
+                <div class="modal-accent-bar usage-accent"></div>
+                <div class="modal-text-content">"My Founder Gut says we should pivot to blockchain. No, I haven't talked to any users."</div>
+              </div>
+            </div>
           </div>
         </div>
         
@@ -57,10 +90,31 @@
         </div>
         
         <div class="term-actions">
-          <button onclick="shareTerm('Founder Gut', 'An internal signal that replaces research, ethics, and customer feedback with a low-grade serotonin burst and a vague sense of destiny.', 'We were going to A/B test the landing page but my Founder Gut said ship it in Comic Sans.')" class="share-button">
+          <button onclick="shareFounderGut()" class="share-button">
             📤 Share This Term
           </button>
         </div>
+        
+        <script>
+          function shareFounderGut() {
+            const definitions = [{
+              id: 'def-1',
+              definition: "An internal signal that replaces research, ethics, and customer feedback with a low-grade serotonin burst and a vague sense of destiny.",
+              usage: "We were going to A/B test the landing page but my Founder Gut said ship it in Comic Sans.",
+              author: "Carter Wynn",
+              isPrimary: true,
+              votes: 42
+            }, {
+              id: 'def-2',
+              definition: "The entrepreneurial equivalent of 'trust me bro' but with more conviction and less data.",
+              usage: "My Founder Gut says we should pivot to blockchain. No, I haven't talked to any users.",
+              author: "Anonymous Contributor",
+              isPrimary: false,
+              votes: 28
+            }];
+            shareTerm('Founder Gut', definitions);
+          }
+        </script>
       </div>
     </main>
 

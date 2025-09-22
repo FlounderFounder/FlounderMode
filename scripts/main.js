@@ -27,6 +27,22 @@ async function init() {
     try {
       const response = await fetch(`/terms/${file}`);
       const term = await response.json();
+      
+      // Handle backward compatibility - convert old format to new format
+      if (term.definition && !term.definitions) {
+        term.definitions = [{
+          id: 'def-1',
+          definition: term.definition,
+          usage: term.usage,
+          author: 'Carter Wynn',
+          date: '2024-01-15',
+          isPrimary: true,
+          votes: 0
+        }];
+        delete term.definition;
+        delete term.usage;
+      }
+      
       flounderTerms.push(term);
     } catch (error) {
       console.error(`Failed to load term from ${file}:`, error);
@@ -111,51 +127,155 @@ async function init() {
         <a href="/pages/${termFilename}.html" class="term-page-link">
           View Full Page →
         </a>
-        <button class="share-button" data-term="${term.term}" data-definition="${term.definition}" data-usage="${term.usage}">
+        <button class="share-button" onclick="shareCurrentTerm()">
           📤 Share
         </button>
       </div>` : '';
     
+    // Generate definitions HTML
+    const definitionsHtml = generateDefinitionsHtml(term.definitions);
+    
     const newContent = `
-      <div class="modal-definition-section">
-        <h3 class="modal-section-title">DEFINITION</h3>
-        <div class="modal-content-block definition-block">
-          <div class="modal-accent-bar definition-accent"></div>
-          <div class="modal-text-content">${term.definition}</div>
-        </div>
-      </div>
-
-      <div class="modal-usage-section">
-        <h3 class="modal-section-title">USAGE EXAMPLE</h3>
-        <div class="modal-content-block usage-block">
-          <div class="modal-accent-bar usage-accent"></div>
-          <div class="modal-text-content">"${term.usage}"</div>
-        </div>
-      </div>
-
+      ${definitionsHtml}
       ${relatedSection}
-      
       ${viewFullPageButton}`;
 
     modalContent.innerHTML = newContent;
     termModal.classList.remove("hide");
     termModal.classList.add("show");
     
-    // Add event listener for share button
-    const shareButton = modalContent.querySelector('.share-button');
-    if (shareButton) {
-      shareButton.addEventListener('click', function() {
-        const term = this.getAttribute('data-term');
-        const definition = this.getAttribute('data-definition');
-        const usage = this.getAttribute('data-usage');
-        shareTerm(term, definition, usage);
-      });
+    // Store current term data for sharing
+    window.currentTermData = { term: term.term, definitions: term.definitions };
+    
+    // Add event listeners for definition navigation
+    setupDefinitionNavigation();
+  }
+
+  // Generate HTML for multiple definitions
+  function generateDefinitionsHtml(definitions) {
+    if (definitions.length === 1) {
+      // Single definition - use original format
+      const def = definitions[0];
+      return `
+        <div class="modal-definition-section">
+          <h3 class="modal-section-title">DEFINITION</h3>
+          <div class="modal-content-block definition-block">
+            <div class="modal-accent-bar definition-accent"></div>
+            <div class="modal-text-content">${def.definition}</div>
+            ${def.author ? `<div class="definition-meta">— ${def.author}</div>` : ''}
+          </div>
+        </div>
+
+        <div class="modal-usage-section">
+          <h3 class="modal-section-title">USAGE EXAMPLE</h3>
+          <div class="modal-content-block usage-block">
+            <div class="modal-accent-bar usage-accent"></div>
+            <div class="modal-text-content">"${def.usage}"</div>
+          </div>
+        </div>`;
+    } else {
+      // Multiple definitions - show navigation
+      const primaryDef = definitions.find(d => d.isPrimary) || definitions[0];
+      const otherDefs = definitions.filter(d => d.id !== primaryDef.id);
+      
+      return `
+        ${definitions.map((def, index) => `
+          <div class="definition-content-wrapper" data-def-id="${def.id}" style="${index === 0 ? '' : 'display: none;'}">
+            <div class="modal-definition-section">
+              <div class="modal-content-block definition-block">
+                <div class="modal-accent-bar definition-accent"></div>
+                <div class="modal-text-content">${def.definition}</div>
+                ${def.author ? `<div class="definition-meta">— ${def.author}</div>` : ''}
+              </div>
+            </div>
+
+            <div class="modal-usage-section">
+              <h3 class="modal-section-title">USAGE EXAMPLE</h3>
+              <div class="modal-content-block usage-block">
+                <div class="modal-accent-bar usage-accent"></div>
+                <div class="modal-text-content">"${def.usage}"</div>
+              </div>
+            </div>
+          </div>
+        `).join('')}
+
+        ${definitions.length > 1 ? `
+        <div class="definition-arrows">
+          <button class="definition-arrow prev-arrow" onclick="navigateDefinition(-1)" disabled>
+            ← Previous
+          </button>
+          <span class="definition-counter">1 of ${definitions.length}</span>
+          <button class="definition-arrow next-arrow" onclick="navigateDefinition(1)">
+            Next →
+          </button>
+        </div>
+        ` : ''}`;
     }
   }
 
+  // Setup definition navigation
+  function setupDefinitionNavigation() {
+    // Store current definition index for arrow navigation
+    window.currentDefinitionIndex = 0;
+    const allDefinitionElements = document.querySelectorAll('.definition-content-wrapper');
+    
+    window.allDefinitions = Array.from(allDefinitionElements).map(wrapper => ({
+      id: wrapper.getAttribute('data-def-id'),
+      element: wrapper
+    }));
+  }
+
+  // Switch to a specific definition
+  function switchToDefinition(defId) {
+    // Show/hide definition content wrappers
+    document.querySelectorAll('.definition-content-wrapper').forEach(wrapper => {
+      if (wrapper.getAttribute('data-def-id') === defId) {
+        wrapper.style.display = '';
+      } else {
+        wrapper.style.display = 'none';
+      }
+    });
+    
+    // Update arrow navigation
+    updateArrowNavigation();
+  }
+
+  // Update arrow navigation state
+  function updateArrowNavigation() {
+    const currentIndex = window.currentDefinitionIndex;
+    const totalDefinitions = window.allDefinitions.length;
+    
+    const prevArrow = document.querySelector('.prev-arrow');
+    const nextArrow = document.querySelector('.next-arrow');
+    const counter = document.querySelector('.definition-counter');
+    
+    if (prevArrow) prevArrow.disabled = currentIndex === 0;
+    if (nextArrow) nextArrow.disabled = currentIndex === totalDefinitions - 1;
+    if (counter) counter.textContent = `${currentIndex + 1} of ${totalDefinitions}`;
+  }
+
+  // Navigate between definitions with arrows
+  window.navigateDefinition = function(direction) {
+    const currentIndex = window.currentDefinitionIndex;
+    const totalDefinitions = window.allDefinitions.length;
+    const newIndex = currentIndex + direction;
+    
+    if (newIndex >= 0 && newIndex < totalDefinitions) {
+      window.currentDefinitionIndex = newIndex;
+      const targetDef = window.allDefinitions[newIndex];
+      switchToDefinition(targetDef.id);
+    }
+  };
+
 // Share functionality
-window.shareTerm = function(term, definition, usage) {
-  console.log('shareTerm called with:', { term, definition, usage });
+window.shareCurrentTerm = function() {
+  if (window.currentTermData) {
+    shareTerm(window.currentTermData.term, window.currentTermData.definitions);
+  }
+};
+
+window.shareTerm = function(term, definitions) {
+  console.log('shareTerm called with:', { term, definitions });
   
   // Create the URL for the specific term page
   const termMappings = {
@@ -172,6 +292,9 @@ window.shareTerm = function(term, definition, usage) {
   }
   
   const termUrl = `${window.location.origin}/pages/${termFilename}.html`;
+  
+  // Use primary definition or first definition for sharing
+  const primaryDef = definitions.find(d => d.isPrimary) || definitions[0];
   const shareText = `Check out "${term}" from Floundermode Dictionary: ${termUrl}`;
   
   console.log('Generated share text:', shareText);
@@ -311,9 +434,13 @@ window.showToast = function(message, type = 'success') {
   function populateWotd() {
     const wotd = getWotd();
     const speechBubble = document.querySelector(".speech-bubble");
+    
+    // Get the primary definition or first definition
+    const primaryDef = wotd.definitions.find(d => d.isPrimary) || wotd.definitions[0];
+    
     speechBubble.innerHTML = `
       <div style="text-align: center; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; margin-bottom: .5rem; font-size: 1.2rem;">WORD OF THE DAY</div>
-      <span class="wotd-term">${wotd.term}</span><br/>${wotd.definition}
+      <span class="wotd-term">${wotd.term}</span><br/>${primaryDef.definition}
     `;
   }
 }

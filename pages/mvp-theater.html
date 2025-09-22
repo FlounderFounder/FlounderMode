@@ -31,19 +31,30 @@
     <main class="main-content">
       <div class="term-page">
         <h1 class="term-title">MVP Theater</h1>
-        <div class="modal-definition-section">
-          <h3 class="modal-section-title">DEFINITION</h3>
-          <div class="modal-content-block definition-block">
-            <div class="modal-accent-bar definition-accent"></div>
-            <div class="modal-text-content">When a team pretends to validate a product by building the tiniest thing possible, but it still takes six months.</div>
-          </div>
-        </div>
-
-        <div class="modal-usage-section">
-          <h3 class="modal-section-title">USAGE EXAMPLE</h3>
-          <div class="modal-content-block usage-block">
-            <div class="modal-accent-bar usage-accent"></div>
-            <div class="modal-text-content">"Our MVP was just a Figma prototype but took longer than building the whole app."</div>
+        
+        <div class="definitions-container">
+          <h2 class="definitions-title">DEFINITIONS</h2>
+          
+          <div class="definition-item">
+            <div class="definition-header">
+              <span class="definition-number">Definition 1</span>
+              <span class="definition-votes">41 votes</span>
+            </div>
+            <div class="modal-definition-section">
+              <h3 class="modal-section-title">DEFINITION</h3>
+              <div class="modal-content-block definition-block">
+                <div class="modal-accent-bar definition-accent"></div>
+                <div class="modal-text-content">When a team pretends to validate a product by building the tiniest thing possible, but it still takes six months.</div>
+                <div class="definition-meta">— Carter Wynn</div>
+              </div>
+            </div>
+            <div class="modal-usage-section">
+              <h3 class="modal-section-title">USAGE EXAMPLE</h3>
+              <div class="modal-content-block usage-block">
+                <div class="modal-accent-bar usage-accent"></div>
+                <div class="modal-text-content">"Our MVP was just a Figma prototype but took longer than building the whole app."</div>
+              </div>
+            </div>
           </div>
         </div>
         
@@ -57,10 +68,24 @@
         </div>
         
         <div class="term-actions">
-          <button onclick="shareTerm('MVP Theater', 'When a team pretends to validate a product by building the tiniest thing possible, but it still takes six months.', 'Our MVP was just a Figma prototype but took longer than building the whole app.')" class="share-button">
+          <button onclick="shareMvpTheater()" class="share-button">
             📤 Share This Term
           </button>
         </div>
+        
+        <script>
+          function shareMvpTheater() {
+            const definitions = [{
+              id: 'def-1',
+              definition: "When a team pretends to validate a product by building the tiniest thing possible, but it still takes six months.",
+              usage: "Our MVP was just a Figma prototype but took longer than building the whole app.",
+              author: "Carter Wynn",
+              isPrimary: true,
+              votes: 41
+            }];
+            shareTerm('MVP Theater', definitions);
+          }
+        </script>
       </div>
     </main>
 

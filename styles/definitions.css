@@ -1,0 +1,242 @@
+/* Multiple Definitions Navigation Styles */
+
+.definitions-navigation {
+  margin-bottom: 1.5rem;
+}
+
+.definition-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.definition-arrows {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1.5rem;
+  padding: 0.5rem 0;
+}
+
+.definition-arrow {
+  padding: 0.5rem 1rem;
+  border: 2px solid #000;
+  background: #fff;
+  color: #000;
+  font-family: "Roboto Mono", monospace;
+  font-size: 0.8rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-radius: 4px;
+  box-shadow: 2px 2px 0 #000;
+}
+
+.definition-arrow:hover:not(:disabled) {
+  background: #ffe680;
+  transform: translateY(-1px);
+  box-shadow: 3px 3px 0 #000;
+}
+
+.definition-arrow:disabled {
+  background: #f0f0f0;
+  color: #999;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: 1px 1px 0 #000;
+}
+
+.definition-counter {
+  font-family: "Roboto Mono", monospace;
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: #666;
+}
+
+.definition-tab {
+  padding: 0.5rem 1rem;
+  border: 2px solid #000;
+  background: #fff;
+  color: #000;
+  font-family: "Roboto Mono", monospace;
+  font-size: 0.9rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-radius: 4px;
+  box-shadow: 2px 2px 0 #000;
+}
+
+.definition-tab:hover {
+  background: #ffe680;
+  transform: translateY(-1px);
+  box-shadow: 3px 3px 0 #000;
+}
+
+.definition-tab.active {
+  background: #000;
+  color: #fff;
+  box-shadow: 3px 3px 0 #000;
+}
+
+.definition-tab:active {
+  transform: translateY(0);
+  box-shadow: 1px 1px 0 #000;
+}
+
+.definition-meta {
+  font-size: 0.8rem;
+  color: #666;
+  font-style: italic;
+  margin-top: 0.5rem;
+  text-align: right;
+}
+
+/* Dark mode styles for definition navigation */
+body.dark-mode .definition-tab {
+  background: #444;
+  color: #f5f5f5;
+  border: 2px solid #666;
+  box-shadow: 2px 2px 0 #666;
+}
+
+body.dark-mode .definition-tab:hover {
+  background: #555;
+  box-shadow: 3px 3px 0 #666;
+}
+
+body.dark-mode .definition-tab.active {
+  background: #666;
+  color: #fff;
+  box-shadow: 3px 3px 0 #666;
+}
+
+body.dark-mode .definition-meta {
+  color: #ccc;
+}
+
+/* Dark mode styles for arrow navigation */
+body.dark-mode .definition-arrow {
+  background: #444;
+  color: #f5f5f5;
+  border: 2px solid #666;
+  box-shadow: 2px 2px 0 #666;
+}
+
+body.dark-mode .definition-arrow:hover:not(:disabled) {
+  background: #555;
+  box-shadow: 3px 3px 0 #666;
+}
+
+body.dark-mode .definition-arrow:disabled {
+  background: #333;
+  color: #666;
+  border: 2px solid #555;
+  box-shadow: 1px 1px 0 #555;
+}
+
+body.dark-mode .definition-counter {
+  color: #ccc;
+}
+
+/* HTML Page Styles for Multiple Definitions */
+.definitions-container {
+  margin-bottom: 3rem;
+  padding-bottom: 2rem;
+  border-bottom: 3px solid #000;
+}
+
+.definitions-title {
+  font-family: "Roboto Mono", monospace;
+  font-size: 1.2rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 1.5rem;
+  color: #333;
+  border-bottom: 2px solid #000;
+  padding-bottom: 0.5rem;
+}
+
+.definition-item {
+  margin-bottom: 3rem;
+  padding: 2rem;
+  border: 3px solid #000;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 6px 6px 0 #000;
+  position: relative;
+}
+
+.definition-item:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  bottom: -1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 4px;
+  background: #000;
+  border-radius: 2px;
+}
+
+.definition-item:not(:last-child) {
+  margin-bottom: 4rem;
+}
+
+.definition-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px dashed #ccc;
+}
+
+.definition-number {
+  font-family: "Roboto Mono", monospace;
+  font-weight: bold;
+  font-size: 1rem;
+  color: #333;
+}
+
+.definition-votes {
+  font-family: "Roboto Mono", monospace;
+  font-size: 0.9rem;
+  color: #666;
+  background: #f0f0f0;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+/* Dark mode styles for HTML pages */
+body.dark-mode .definitions-container {
+  border-bottom: 3px solid #666;
+}
+
+body.dark-mode .definition-item {
+  background: #333;
+  border: 3px solid #666;
+  box-shadow: 6px 6px 0 #666;
+}
+
+body.dark-mode .definition-item:not(:last-child)::after {
+  background: #666;
+}
+
+body.dark-mode .definition-header {
+  border-bottom: 1px dashed #555;
+}
+
+body.dark-mode .definition-number {
+  color: #f5f5f5;
+}
+
+body.dark-mode .definition-votes {
+  color: #ccc;
+  background: #444;
+  border: 1px solid #666;
+}

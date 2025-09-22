@@ -1,7 +1,25 @@
 {
   "term": "Founder Gut",
-  "definition": "An internal signal that replaces research, ethics, and customer feedback with a low-grade serotonin burst and a vague sense of destiny.",
-  "usage": "We were going to A/B test the landing page but my Founder Gut said ship it in Comic Sans.",
+  "definitions": [
+    {
+      "id": "def-1",
+      "definition": "An internal signal that replaces research, ethics, and customer feedback with a low-grade serotonin burst and a vague sense of destiny.",
+      "usage": "We were going to A/B test the landing page but my Founder Gut said ship it in Comic Sans.",
+      "author": "Carter Wynn",
+      "date": "2024-01-15",
+      "isPrimary": true,
+      "votes": 42
+    },
+    {
+      "id": "def-2",
+      "definition": "The entrepreneurial equivalent of 'trust me bro' but with more conviction and less data.",
+      "usage": "My Founder Gut says we should pivot to blockchain. No, I haven't talked to any users.",
+      "author": "Anonymous Contributor",
+      "date": "2024-01-20",
+      "isPrimary": false,
+      "votes": 28
+    }
+  ],
   "related": [
     "Instinct",
     "Decision Making",

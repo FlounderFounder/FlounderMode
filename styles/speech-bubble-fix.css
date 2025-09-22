@@ -1,0 +1,6 @@
+/* Fix for stray black line in speech bubble tail */
+.speech-bubble::before {
+  border-top: 72px solid #000 !important;
+  bottom: -72px !important;
+}
+

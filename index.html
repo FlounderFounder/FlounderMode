@@ -15,6 +15,8 @@
     <link rel="stylesheet" href="/styles/main.css">
     <link rel="stylesheet" href="/styles/easy-mode.css">
     <link rel="stylesheet" href="/styles/voting-ui.css">
+    <link rel="stylesheet" href="/styles/definitions.css">
+    <link rel="stylesheet" href="/styles/speech-bubble-fix.css">
   </head>
   <body>
     <header class="main-header">
@@ -83,7 +85,7 @@
           <div class="progress-bar">
             <div class="progress-fill" id="progressFill"></div>
           </div>
-          <div class="progress-text">Step <span id="currentStepText">1</span> of 4</div>
+          <div class="progress-text">Step <span id="currentStepText">1</span> of 5</div>
         </div>
 
         <form id="easyModeForm" class="easy-mode-form">
@@ -95,20 +97,27 @@
           </div>
 
           <div class="form-step" data-step="2">
+            <h3>Who's contributing?</h3>
+            <p>Enter your name or username for attribution (optional).</p>
+            <input type="text" id="authorName" name="authorName" placeholder="e.g., Carter Wynn" maxlength="50">
+            <div class="char-counter"><span id="authorCounter">0</span>/50</div>
+          </div>
+
+          <div class="form-step" data-step="3">
             <h3>Define it</h3>
             <p>Write a clear, concise definition. What does this term mean?</p>
             <textarea id="termDefinition" name="termDefinition" placeholder="e.g., That fading stare that sets in during your fourth video call of the day." maxlength="200" required></textarea>
             <div class="char-counter"><span id="definitionCounter">0</span>/200</div>
           </div>
 
-          <div class="form-step" data-step="3">
+          <div class="form-step" data-step="4">
             <h3>Give an example</h3>
             <p>Show how this term would be used in a sentence or context.</p>
             <textarea id="termUsage" name="termUsage" placeholder="e.g., By hour three I had full-blown Zoom Gloom." maxlength="150" required></textarea>
             <div class="char-counter"><span id="usageCounter">0</span>/150</div>
           </div>
 
-          <div class="form-step" data-step="4">
+          <div class="form-step" data-step="5">
             <h3>Add related tags (optional)</h3>
             <p>Choose up to 4 tags that relate to your term. You can select from suggestions or add your own.</p>
             <div class="tag-input-container">
@@ -132,7 +141,7 @@
               <span class="btn-arrow">→</span>
             </button>
             <button type="submit" class="nav-btn submit-btn" style="display: none;">
-              <span class="btn-text">Create Pull Request</span>
+              <span class="btn-text">Submit Contribution</span>
               <span class="btn-arrow">✓</span>
             </button>
           </div>

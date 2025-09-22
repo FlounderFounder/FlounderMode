@@ -31,19 +31,30 @@
     <main class="main-content">
       <div class="term-page">
         <h1 class="term-title">A META investment</h1>
-        <div class="modal-definition-section">
-          <h3 class="modal-section-title">DEFINITION</h3>
-          <div class="modal-content-block definition-block">
-            <div class="modal-accent-bar definition-accent"></div>
-            <div class="modal-text-content">It's like real money but it's not.</div>
-          </div>
-        </div>
-
-        <div class="modal-usage-section">
-          <h3 class="modal-section-title">USAGE EXAMPLE</h3>
-          <div class="modal-content-block usage-block">
-            <div class="modal-accent-bar usage-accent"></div>
-            <div class="modal-text-content">"Remember that guy that promised us the angel funding? Turns out it was a <b>META investment.</b>"</div>
+        
+        <div class="definitions-container">
+          <h2 class="definitions-title">DEFINITIONS</h2>
+          
+          <div class="definition-item">
+            <div class="definition-header">
+              <span class="definition-number">Definition 1</span>
+              <span class="definition-votes">35 votes</span>
+            </div>
+            <div class="modal-definition-section">
+              <h3 class="modal-section-title">DEFINITION</h3>
+              <div class="modal-content-block definition-block">
+                <div class="modal-accent-bar definition-accent"></div>
+                <div class="modal-text-content">It's like real money but it's not.</div>
+                <div class="definition-meta">— Carter Wynn</div>
+              </div>
+            </div>
+            <div class="modal-usage-section">
+              <h3 class="modal-section-title">USAGE EXAMPLE</h3>
+              <div class="modal-content-block usage-block">
+                <div class="modal-accent-bar usage-accent"></div>
+                <div class="modal-text-content">"Remember that guy that promised us the angel funding? Turns out it was a <b>META investment.</b>"</div>
+              </div>
+            </div>
           </div>
         </div>
         
@@ -55,10 +66,24 @@
         </div>
         
         <div class="term-actions">
-          <button onclick="shareTerm('A META investment', 'It\'s like real money but it\'s not.', 'Remember that guy that promised us the angel funding? Turns out it was a <b>META investment.</b>')" class="share-button">
+          <button onclick="shareMetaInvestment()" class="share-button">
             📤 Share This Term
           </button>
         </div>
+        
+        <script>
+          function shareMetaInvestment() {
+            const definitions = [{
+              id: 'def-1',
+              definition: "It's like real money but it's not.",
+              usage: "Remember that guy that promised us the angel funding? Turns out it was a META investment.",
+              author: "Carter Wynn",
+              isPrimary: true,
+              votes: 35
+            }];
+            shareTerm('A META investment', definitions);
+          }
+        </script>
       </div>
     </main>
 
