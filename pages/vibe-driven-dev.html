@@ -91,8 +91,31 @@
             shareTerm('Vibe-Driven Dev', definitions);
           }
           
-          // ===== VOTING SYSTEM FOR HTML PAGES =====
+          // ===== SUPABASE VOTING SYSTEM FOR HTML PAGES =====
           let userVotes = new Map();
+          let allVotes = {};
+          const USE_SUPABASE = true;
+          
+          // Initialize Supabase voting
+          async function initSupabaseVoting() {
+            if (USE_SUPABASE && window.supabaseVoting) {
+              try {
+                allVotes = await window.supabaseVoting.loadVoteData();
+                console.log('Loaded vote data:', allVotes);
+                
+                // Update all vote counts on the page
+                updateAllVoteCounts();
+                
+                // Subscribe to real-time changes
+                window.supabaseVoting.subscribeToChanges((updatedVotes) => {
+                  allVotes = updatedVotes;
+                  updateAllVoteCounts();
+                });
+              } catch (error) {
+                console.error('Failed to initialize Supabase voting:', error);
+              }
+            }
+          }
           
           // Load user votes from localStorage
           function loadUserVotes() {
@@ -118,36 +141,83 @@
             }
           }
           
+          // Update all vote counts on the page
+          function updateAllVoteCounts() {
+            document.querySelectorAll('.vote-count').forEach(voteCount => {
+              const definitionId = voteCount.closest('.definition-item').id;
+              const votes = allVotes[definitionId] || { netScore: 0 };
+              voteCount.textContent = votes.netScore;
+            });
+          }
+          
+          // Update vote count optimistically
+          function updateVoteCountOptimistically(definitionId, voteChange) {
+            const voteCount = document.querySelector(`#${definitionId} .vote-count`);
+            if (voteCount) {
+              const currentCount = parseInt(voteCount.textContent) || 0;
+              voteCount.textContent = currentCount + voteChange;
+              
+              // Add animation class
+              voteCount.classList.add('vote-updated');
+              setTimeout(() => {
+                voteCount.classList.remove('vote-updated');
+              }, 300);
+            }
+          }
+          
           // Submit a vote for a definition
-          window.submitVote = function(definitionId, voteType) {
+          window.submitVote = async function(definitionId, voteType) {
             console.log('Voting:', definitionId, voteType);
             
-            // Check if user already voted on this definition
             const existingVote = userVotes.get(definitionId);
             
+            let voteChange = 0;
             if (existingVote === voteType) {
-              // User is trying to vote the same way again - remove the vote
               userVotes.delete(definitionId);
-              updateDefinitionVotes(definitionId, voteType, 'remove');
+              voteChange = voteType === 'up' ? -1 : 1;
             } else {
-              // User is voting (or changing their vote)
               userVotes.set(definitionId, voteType);
-              updateDefinitionVotes(definitionId, voteType, existingVote ? 'change' : 'add');
+              if (existingVote) {
+                voteChange = voteType === 'up' ? 2 : -2;
+              } else {
+                voteChange = voteType === 'up' ? 1 : -1;
+              }
             }
             
-            // Save to localStorage
+            updateVoteCountOptimistically(definitionId, voteChange);
+            updateVoteButtons(definitionId);
+            
             saveUserVotes();
             
-            // Update the UI
-            updateVoteButtons(definitionId);
+            if (USE_SUPABASE && window.supabaseVoting) {
+              const result = await window.supabaseVoting.submitVote(definitionId, voteType);
+              if (result) {
+                allVotes = result;
+                updateVoteButtons(definitionId);
+              } else {
+                // Revert optimistic update on failure
+                updateVoteCountOptimistically(definitionId, -voteChange);
+                if (existingVote === voteType) {
+                  userVotes.set(definitionId, voteType);
+                } else {
+                  userVotes.delete(definitionId);
+                }
+                saveUserVotes();
+                updateVoteButtons(definitionId);
+              }
+            } else {
+              // Fallback to local counting
+              if (!allVotes[definitionId]) {
+                allVotes[definitionId] = { upvotes: 0, downvotes: 0, netScore: 0 };
+              }
+              allVotes[definitionId].netScore += voteChange;
+              if (voteType === 'up') {
+                allVotes[definitionId].upvotes += (voteChange > 0 ? 1 : -1);
+              } else {
+                allVotes[definitionId].downvotes += (voteChange < 0 ? 1 : -1);
+              }
+            }
           };
-          
-          // Update the vote counts for a definition
-          function updateDefinitionVotes(definitionId, voteType, action) {
-            // For HTML pages, we'll track votes in a simple way
-            // In a real app, this would sync with a backend
-            console.log('Updating votes:', definitionId, voteType, action);
-          }
           
           // Update the vote button UI
           function updateVoteButtons(definitionId) {
@@ -225,8 +295,12 @@
           };
 
           // Initialize voting on page load
-          document.addEventListener('DOMContentLoaded', function() {
+          document.addEventListener('DOMContentLoaded', async function() {
             loadUserVotes();
+            
+            // Initialize Supabase voting
+            await initSupabaseVoting();
+            
             // Update all vote buttons with current state
             document.querySelectorAll('[data-def-id]').forEach(button => {
               const defId = button.getAttribute('data-def-id');
@@ -237,8 +311,12 @@
       </div>
     </main>
 
+    <!-- Supabase -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    
     <!-- JavaScript Files -->
     <script src="../scripts/simple-profanity-filter.js"></script>
+    <script src="../scripts/supabase-voting.js"></script>
     <script src="../scripts/main.js"></script>
     
     <script>
