@@ -839,8 +839,8 @@ function showPrPreview(termData) {
   // Update the GitHub button to use the automated URL
   const githubBtn = document.querySelector('.pr-btn.primary');
   if (githubBtn) {
-    githubBtn.onclick = () => openGitHubWithContent(termData);
-    githubBtn.innerHTML = '🚀 Create PR Automatically →';
+    githubBtn.onclick = () => window.open("https://github.com/FlounderFounder/default_website", "_blank");
+    githubBtn.innerHTML = 'Open GitHub →';
   }
   
   // Show the modal
