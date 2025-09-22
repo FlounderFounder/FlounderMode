@@ -2,6 +2,7 @@
 
 // Global variables
 let flounderTerms = [];
+let userVotes = new Map(); // Track user votes per definition
 
 // Main initialization function
 async function init() {
@@ -37,10 +38,21 @@ async function init() {
           author: 'Carter Wynn',
           date: '2024-01-15',
           isPrimary: true,
-          votes: 0
+          upvotes: 0,
+          downvotes: 0,
+          netScore: 0
         }];
         delete term.definition;
         delete term.usage;
+      }
+      
+      // Ensure all definitions have voting properties
+      if (term.definitions) {
+        term.definitions.forEach(def => {
+          if (def.upvotes === undefined) def.upvotes = 0;
+          if (def.downvotes === undefined) def.downvotes = 0;
+          if (def.netScore === undefined) def.netScore = def.upvotes - def.downvotes;
+        });
       }
       
       flounderTerms.push(term);
@@ -154,62 +166,62 @@ async function init() {
   // Generate HTML for multiple definitions
   function generateDefinitionsHtml(definitions) {
     if (definitions.length === 1) {
-      // Single definition - use original format
+      // Single definition - Urban Dictionary style
       const def = definitions[0];
       return `
-        <div class="modal-definition-section">
-          <h3 class="modal-section-title">DEFINITION</h3>
-          <div class="modal-content-block definition-block">
-            <div class="modal-accent-bar definition-accent"></div>
-            <div class="modal-text-content">${def.definition}</div>
-            ${def.author ? `<div class="definition-meta">— ${def.author}</div>` : ''}
-          </div>
-        </div>
-
-        <div class="modal-usage-section">
-          <h3 class="modal-section-title">USAGE EXAMPLE</h3>
-          <div class="modal-content-block usage-block">
-            <div class="modal-accent-bar usage-accent"></div>
-            <div class="modal-text-content">"${def.usage}"</div>
+        <div class="definitions-container">
+          <h2 class="definitions-title">DEFINITIONS</h2>
+          <div class="definitions-list">
+            <div class="definition-item" id="${def.id}">
+              <div class="definition-content">
+                <div class="definition-text">${def.definition}</div>
+                <div class="definition-example">"${def.usage}"</div>
+                ${def.author ? `<div class="definition-meta">— ${def.author}</div>` : ''}
+              </div>
+              <div class="definition-votes">
+                <button class="vote-btn vote-up" onclick="submitVote('${def.id}', 'up')" data-def-id="${def.id}">
+                  ▲
+                </button>
+                <div class="vote-count">${def.netScore}</div>
+                <button class="vote-btn vote-down" onclick="submitVote('${def.id}', 'down')" data-def-id="${def.id}">
+                  ▼
+                </button>
+                <button class="share-btn" onclick="shareDefinition('${def.id}')" data-def-id="${def.id}" title="Share this definition">
+                  📤
+                </button>
+              </div>
+            </div>
           </div>
         </div>`;
     } else {
-      // Multiple definitions - show navigation
-      const primaryDef = definitions.find(d => d.isPrimary) || definitions[0];
-      const otherDefs = definitions.filter(d => d.id !== primaryDef.id);
-      
+      // Multiple definitions - Urban Dictionary style
       return `
-        ${definitions.map((def, index) => `
-          <div class="definition-content-wrapper" data-def-id="${def.id}" style="${index === 0 ? '' : 'display: none;'}">
-            <div class="modal-definition-section">
-              <div class="modal-content-block definition-block">
-                <div class="modal-accent-bar definition-accent"></div>
-                <div class="modal-text-content">${def.definition}</div>
-                ${def.author ? `<div class="definition-meta">— ${def.author}</div>` : ''}
+        <div class="definitions-container">
+          <h2 class="definitions-title">DEFINITIONS</h2>
+          <div class="definitions-list">
+            ${definitions.map((def, index) => `
+              <div class="definition-item" id="${def.id}">
+                <div class="definition-content">
+                  <div class="definition-text">${def.definition}</div>
+                  <div class="definition-example">"${def.usage}"</div>
+                  ${def.author ? `<div class="definition-meta">— ${def.author}</div>` : ''}
+                </div>
+                <div class="definition-votes">
+                  <button class="vote-btn vote-up" onclick="submitVote('${def.id}', 'up')" data-def-id="${def.id}">
+                    ▲
+                  </button>
+                  <div class="vote-count">${def.netScore}</div>
+                  <button class="vote-btn vote-down" onclick="submitVote('${def.id}', 'down')" data-def-id="${def.id}">
+                    ▼
+                  </button>
+                  <button class="share-btn" onclick="shareDefinition('${def.id}')" data-def-id="${def.id}" title="Share this definition">
+                    📤
+                  </button>
+                </div>
               </div>
-            </div>
-
-            <div class="modal-usage-section">
-              <h3 class="modal-section-title">USAGE EXAMPLE</h3>
-              <div class="modal-content-block usage-block">
-                <div class="modal-accent-bar usage-accent"></div>
-                <div class="modal-text-content">"${def.usage}"</div>
-              </div>
-            </div>
+            `).join('')}
           </div>
-        `).join('')}
-
-        ${definitions.length > 1 ? `
-        <div class="definition-arrows">
-          <button class="definition-arrow prev-arrow" onclick="navigateDefinition(-1)" disabled>
-            ← Previous
-          </button>
-          <span class="definition-counter">1 of ${definitions.length}</span>
-          <button class="definition-arrow next-arrow" onclick="navigateDefinition(1)">
-            Next →
-          </button>
-        </div>
-        ` : ''}`;
+        </div>`;
     }
   }
 
@@ -412,6 +424,9 @@ window.showToast = function(message, type = 'success') {
   // Initialize components
   populateCarousel();
   populateWotd();
+  
+  // Load user votes from localStorage
+  loadUserVotes();
   
   // Fish starts hidden - users can tap thought bubble to show
 
@@ -631,3 +646,174 @@ document.addEventListener("DOMContentLoaded", function() {
   init();
   initDarkMode();
 });
+
+// ===== VOTING SYSTEM =====
+
+// Load user votes from localStorage
+function loadUserVotes() {
+  try {
+    const savedVotes = localStorage.getItem('flounderVotes');
+    if (savedVotes) {
+      const votesData = JSON.parse(savedVotes);
+      userVotes = new Map(Object.entries(votesData));
+    }
+  } catch (error) {
+    console.warn('Failed to load user votes:', error);
+    userVotes = new Map();
+  }
+}
+
+// Save user votes to localStorage
+function saveUserVotes() {
+  try {
+    const votesData = Object.fromEntries(userVotes);
+    localStorage.setItem('flounderVotes', JSON.stringify(votesData));
+  } catch (error) {
+    console.warn('Failed to save user votes:', error);
+  }
+}
+
+// Submit a vote for a definition
+window.submitVote = function(definitionId, voteType) {
+  console.log('Voting:', definitionId, voteType);
+  
+  // Check if user already voted on this definition
+  const existingVote = userVotes.get(definitionId);
+  
+  if (existingVote === voteType) {
+    // User is trying to vote the same way again - remove the vote
+    userVotes.delete(definitionId);
+    updateDefinitionVotes(definitionId, voteType, 'remove');
+  } else {
+    // User is voting (or changing their vote)
+    userVotes.set(definitionId, voteType);
+    updateDefinitionVotes(definitionId, voteType, existingVote ? 'change' : 'add');
+  }
+  
+  // Save to localStorage
+  saveUserVotes();
+  
+  // Update the UI
+  updateVoteButtons(definitionId);
+};
+
+// Update the vote counts for a definition
+function updateDefinitionVotes(definitionId, voteType, action) {
+  // Find the definition in our data
+  for (const term of flounderTerms) {
+    if (term.definitions) {
+      const def = term.definitions.find(d => d.id === definitionId);
+      if (def) {
+        if (action === 'add') {
+          if (voteType === 'up') {
+            def.upvotes++;
+          } else {
+            def.downvotes++;
+          }
+        } else if (action === 'remove') {
+          if (voteType === 'up') {
+            def.upvotes = Math.max(0, def.upvotes - 1);
+          } else {
+            def.downvotes = Math.max(0, def.downvotes - 1);
+          }
+        } else if (action === 'change') {
+          // User is changing their vote
+          if (voteType === 'up') {
+            def.upvotes++;
+            def.downvotes = Math.max(0, def.downvotes - 1);
+          } else {
+            def.downvotes++;
+            def.upvotes = Math.max(0, def.upvotes - 1);
+          }
+        }
+        
+        // Update net score
+        def.netScore = def.upvotes - def.downvotes;
+        break;
+      }
+    }
+  }
+}
+
+// Update the vote button UI
+function updateVoteButtons(definitionId) {
+  const upButton = document.querySelector(`button[data-def-id="${definitionId}"].vote-up`);
+  const downButton = document.querySelector(`button[data-def-id="${definitionId}"].vote-down`);
+  const voteCount = document.querySelector(`button[data-def-id="${definitionId}"].vote-up`).parentElement.querySelector('.vote-count');
+  
+  if (upButton && downButton && voteCount) {
+    const userVote = userVotes.get(definitionId);
+    
+    // Reset all button states
+    upButton.classList.remove('voted');
+    downButton.classList.remove('voted');
+    
+    // Apply voted state
+    if (userVote === 'up') {
+      upButton.classList.add('voted');
+    } else if (userVote === 'down') {
+      downButton.classList.add('voted');
+    }
+    
+    // Update vote count
+    const def = findDefinitionById(definitionId);
+    if (def) {
+      voteCount.textContent = def.netScore;
+    }
+  }
+}
+
+// Helper function to find a definition by ID
+function findDefinitionById(definitionId) {
+  for (const term of flounderTerms) {
+    if (term.definitions) {
+      const def = term.definitions.find(d => d.id === definitionId);
+      if (def) return def;
+    }
+  }
+  return null;
+}
+
+// Share definition function
+function shareDefinition(definitionId) {
+  const definition = findDefinitionById(definitionId);
+  if (!definition) return;
+
+  // Find the term that contains this definition
+  let termName = '';
+  for (const term of flounderTerms) {
+    if (term.definitions && term.definitions.find(d => d.id === definitionId)) {
+      termName = term.name;
+      break;
+    }
+  }
+
+  const shareText = `${termName}: ${definition.definition}\n\n"${definition.usage}"\n\n— ${definition.author || 'Anonymous'}\n\nFrom Floundermode Dictionary`;
+  
+  if (navigator.share) {
+    navigator.share({
+      title: `${termName} - Floundermode Dictionary`,
+      text: shareText,
+      url: window.location.href
+    }).catch(err => console.log('Error sharing:', err));
+  } else {
+    // Fallback: copy to clipboard
+    navigator.clipboard.writeText(shareText).then(() => {
+      // Show a brief success message
+      const shareBtn = document.querySelector(`[data-def-id="${definitionId}"]`);
+      const originalText = shareBtn.innerHTML;
+      shareBtn.innerHTML = '✓';
+      shareBtn.style.background = '#22c55e';
+      shareBtn.style.color = 'white';
+      
+      setTimeout(() => {
+        shareBtn.innerHTML = originalText;
+        shareBtn.style.background = '';
+        shareBtn.style.color = '';
+      }, 1000);
+    }).catch(err => {
+      console.log('Error copying to clipboard:', err);
+      alert('Share text copied to clipboard!');
+    });
+  }
+}

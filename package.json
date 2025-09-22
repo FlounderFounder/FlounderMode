@@ -3,21 +3,10 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "node scripts/test-airtable.js",
-    "test:api": "node scripts/test-api-setup.js",
-    "test:deployed": "node scripts/test-deployed-api.js",
-    "test:service": "node scripts/test-airtable-service.js",
-    "test:frontend": "node scripts/test-frontend-integration.js",
-    "test:tables": "node scripts/test-tables-direct.js",
-    "list:bases": "node scripts/list-bases.js",
-    "migrate": "node scripts/migrate-to-airtable.js",
-    "validate": "node scripts/validate-terms.js",
     "generate-html": "node scripts/generate-html.js",
+    "generate-pages": "node generate-pages.js",
     "dev": "python3 -m http.server 8000",
-    "dev:vercel": "vercel dev",
-    "deploy": "vercel --prod",
-    "build": "echo 'No build step required for static site'",
-    "start": "vercel dev"
+    "build": "echo 'No build step required for static site'"
   },
   "repository": {
     "type": "git",
@@ -32,10 +21,6 @@
   "homepage": "https://github.com/FlounderFounder/default_website#readme",
   "description": "",
   "dependencies": {
-    "bad-words": "^4.0.0",
-    "dotenv": "^17.2.1"
-  },
-  "devDependencies": {
-    "vercel": "^33.0.1"
+    "bad-words": "^4.0.0"
   }
 }

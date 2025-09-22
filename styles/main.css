@@ -347,7 +347,7 @@ body {
   padding: 2rem;
   overflow-y: auto;
   flex: 1;
-  background: linear-gradient(135deg, rgba(147, 208, 255, 0.1) 0%, rgba(255, 255, 255, 0.1) 100%);
+  background: transparent;
   color: #1a1a1a;
 }
 
@@ -364,10 +364,9 @@ body {
 }
 
 .term-modal .term-content .definition-content {
-  padding: 1rem;
-  background: rgba(147, 208, 255, 0.15);
+  padding: .5rem;
+  background: transparent;
   border-radius: 8px;
-  border-left: 4px solid #2563eb;
 }
 
 .term-modal .term-content .usage-content {
@@ -816,7 +815,7 @@ body.dark-mode .term-modal .window-bar {
 }
 
 body.dark-mode .term-modal .term-content {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(147, 208, 255, 0.1) 100%);
+  background: transparent;
   color: #fff;
 }
 
@@ -832,7 +831,7 @@ body.dark-mode .term-modal .term-content p:not(.definition-content):not(.usage-c
 
 body.dark-mode .term-modal .term-content .definition-content {
   padding: 1rem;
-  background: rgba(59, 130, 246, 0.2);
+  background: transparent;
   border-radius: 8px;
   border-left: 4px solid #3b82f6;
 }
@@ -1023,7 +1022,7 @@ body.dark-mode .toast-notification {
 }
 
 .term-definition p {
-  background: rgba(147, 208, 255, 0.15);
+  background: transparent;
   border-left-color: #2563eb;
 }
 

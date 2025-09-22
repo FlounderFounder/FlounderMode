@@ -14,6 +14,7 @@
     <!-- CSS Files -->
     <link rel="stylesheet" href="../styles/main.css">
     <link rel="stylesheet" href="../styles/easy-mode.css">
+    <link rel="stylesheet" href="../styles/voting-ui.css">
   </head>
   <body>
     <header class="main-header">
@@ -34,25 +35,25 @@
         
         <div class="definitions-container">
           <h2 class="definitions-title">DEFINITIONS</h2>
-          
-          <div class="definition-item" id="def-1">
-            <div class="definition-header">
-              <span class="definition-number">Definition 1</span>
-              <span class="definition-votes">35 votes</span>
-            </div>
-            <div class="modal-definition-section">
-              <h3 class="modal-section-title">DEFINITION</h3>
-              <div class="modal-content-block definition-block">
-                <div class="modal-accent-bar definition-accent"></div>
-                <div class="modal-text-content">It's like real money but it's not.</div>
+          <div class="definitions-list">
+            
+            <div class="definition-item" id="def-1">
+              <div class="definition-content">
+                <div class="definition-text">It's like real money but it's not.</div>
+                <div class="definition-example">"Remember that guy that promised us the angel funding? Turns out it was a META investment."</div>
                 <div class="definition-meta">— Carter Wynn</div>
               </div>
-            </div>
-            <div class="modal-usage-section">
-              <h3 class="modal-section-title">USAGE EXAMPLE</h3>
-              <div class="modal-content-block usage-block">
-                <div class="modal-accent-bar usage-accent"></div>
-                <div class="modal-text-content">"Remember that guy that promised us the angel funding? Turns out it was a <b>META investment.</b>"</div>
+              <div class="definition-votes">
+                <button class="vote-btn vote-up" onclick="submitVote('def-1', 'up')" data-def-id="def-1">
+                  ▲
+                </button>
+                <div class="vote-count">0</div>
+                <button class="vote-btn vote-down" onclick="submitVote('def-1', 'down')" data-def-id="def-1">
+                  ▼
+                </button>
+                <button class="share-btn" onclick="shareDefinition('def-1')" data-def-id="def-1" title="Share this definition">
+                  📤
+                </button>
               </div>
             </div>
           </div>
@@ -73,16 +74,163 @@
         
         <script>
           function shareMetaInvestment() {
-            const definitions = [{
-              id: 'def-1',
-              definition: "It's like real money but it's not.",
-              usage: "Remember that guy that promised us the angel funding? Turns out it was a META investment.",
-              author: "Carter Wynn",
-              isPrimary: true,
-              votes: 35
-            }];
+            const definitions = [
+          {
+                    "id": "def-1",
+                    "definition": "It's like real money but it's not.",
+                    "usage": "Remember that guy that promised us the angel funding? Turns out it was a META investment.",
+                    "author": "Carter Wynn",
+                    "isPrimary": true,
+                    "upvotes": 0,
+                    "downvotes": 0,
+                    "netScore": 0
+          }
+];
             shareTerm('A META investment', definitions);
           }
+          
+          // ===== VOTING SYSTEM FOR HTML PAGES =====
+          let userVotes = new Map();
+          
+          // Load user votes from localStorage
+          function loadUserVotes() {
+            try {
+              const savedVotes = localStorage.getItem('flounderVotes');
+              if (savedVotes) {
+                const votesData = JSON.parse(savedVotes);
+                userVotes = new Map(Object.entries(votesData));
+              }
+            } catch (error) {
+              console.warn('Failed to load user votes:', error);
+              userVotes = new Map();
+            }
+          }
+          
+          // Save user votes to localStorage
+          function saveUserVotes() {
+            try {
+              const votesData = Object.fromEntries(userVotes);
+              localStorage.setItem('flounderVotes', JSON.stringify(votesData));
+            } catch (error) {
+              console.warn('Failed to save user votes:', error);
+            }
+          }
+          
+          // Submit a vote for a definition
+          window.submitVote = function(definitionId, voteType) {
+            console.log('Voting:', definitionId, voteType);
+            
+            // Check if user already voted on this definition
+            const existingVote = userVotes.get(definitionId);
+            
+            if (existingVote === voteType) {
+              // User is trying to vote the same way again - remove the vote
+              userVotes.delete(definitionId);
+              updateDefinitionVotes(definitionId, voteType, 'remove');
+            } else {
+              // User is voting (or changing their vote)
+              userVotes.set(definitionId, voteType);
+              updateDefinitionVotes(definitionId, voteType, existingVote ? 'change' : 'add');
+            }
+            
+            // Save to localStorage
+            saveUserVotes();
+            
+            // Update the UI
+            updateVoteButtons(definitionId);
+          };
+          
+          // Update the vote counts for a definition
+          function updateDefinitionVotes(definitionId, voteType, action) {
+            // For HTML pages, we'll track votes in a simple way
+            // In a real app, this would sync with a backend
+            console.log('Updating votes:', definitionId, voteType, action);
+          }
+          
+          // Update the vote button UI
+          function updateVoteButtons(definitionId) {
+            const upButton = document.querySelector(`button[data-def-id="${definitionId}"].vote-up`);
+            const downButton = document.querySelector(`button[data-def-id="${definitionId}"].vote-down`);
+            const voteCount = document.querySelector(`button[data-def-id="${definitionId}"].vote-up`).parentElement.querySelector('.vote-count');
+            
+            if (upButton && downButton && voteCount) {
+              const userVote = userVotes.get(definitionId);
+              
+              // Reset all button states
+              upButton.classList.remove('voted');
+              downButton.classList.remove('voted');
+              
+              // Apply voted state
+              if (userVote === 'up') {
+                upButton.classList.add('voted');
+              } else if (userVote === 'down') {
+                downButton.classList.add('voted');
+              }
+              
+              // Update vote count (simple local count for demo)
+              const upVotes = Array.from(userVotes.values()).filter(v => v === 'up').length;
+              const downVotes = Array.from(userVotes.values()).filter(v => v === 'down').length;
+              const netScore = upVotes - downVotes;
+              voteCount.textContent = netScore;
+            }
+          }
+          
+          // Share definition function
+          window.shareDefinition = function(definitionId) {
+            const definitions = [
+          {
+                    "id": "def-1",
+                    "definition": "It's like real money but it's not.",
+                    "usage": "Remember that guy that promised us the angel funding? Turns out it was a META investment.",
+                    "author": "Carter Wynn",
+                    "isPrimary": true,
+                    "upvotes": 0,
+                    "downvotes": 0,
+                    "netScore": 0
+          }
+];
+            const definition = definitions.find(d => d.id === definitionId);
+            if (!definition) return;
+
+            const shareText = `A META investment: ${definition.definition}\n\n"${definition.usage}"\n\n— ${definition.author || 'Anonymous'}\n\nFrom Floundermode Dictionary`;
+            
+            if (navigator.share) {
+              navigator.share({
+                title: `A META investment - Floundermode Dictionary`,
+                text: shareText,
+                url: window.location.href
+              }).catch(err => console.log('Error sharing:', err));
+            } else {
+              // Fallback: copy to clipboard
+              navigator.clipboard.writeText(shareText).then(() => {
+                // Show a brief success message
+                const shareBtn = document.querySelector(`[data-def-id="${definitionId}"]`);
+                const originalText = shareBtn.innerHTML;
+                shareBtn.innerHTML = '✓';
+                shareBtn.style.background = '#22c55e';
+                shareBtn.style.color = 'white';
+                
+                setTimeout(() => {
+                  shareBtn.innerHTML = originalText;
+                  shareBtn.style.background = '';
+                  shareBtn.style.color = '';
+                }, 1000);
+              }).catch(err => {
+                console.log('Error copying to clipboard:', err);
+                alert('Share text copied to clipboard!');
+              });
+            }
+          };
+
+          // Initialize voting on page load
+          document.addEventListener('DOMContentLoaded', function() {
+            loadUserVotes();
+            // Update all vote buttons with current state
+            document.querySelectorAll('[data-def-id]').forEach(button => {
+              const defId = button.getAttribute('data-def-id');
+              updateVoteButtons(defId);
+            });
+          });
         </script>
       </div>
     </main>
