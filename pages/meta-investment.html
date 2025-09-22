@@ -98,6 +98,7 @@
           async function initSupabaseVoting() {
             if (USE_SUPABASE && window.supabaseVoting) {
               try {
+                console.log('Initializing Supabase voting...');
                 allVotes = await window.supabaseVoting.loadVoteData();
                 console.log('Loaded vote data:', allVotes);
                 
@@ -111,7 +112,15 @@
                 });
               } catch (error) {
                 console.error('Failed to initialize Supabase voting:', error);
+                // Fallback: try to load from localStorage or use default values
+                console.log('Using fallback vote data');
+                allVotes = {};
+                updateAllVoteCounts();
               }
+            } else {
+              console.log('Supabase voting not available, using fallback');
+              allVotes = {};
+              updateAllVoteCounts();
             }
           }
           
@@ -296,14 +305,17 @@
           document.addEventListener('DOMContentLoaded', async function() {
             loadUserVotes();
             
-            // Initialize Supabase voting
-            await initSupabaseVoting();
-            
-            // Update all vote buttons with current state
-            document.querySelectorAll('[data-def-id]').forEach(button => {
-              const defId = button.getAttribute('data-def-id');
-              updateVoteButtons(defId);
-            });
+            // Wait a bit to ensure all scripts are loaded
+            setTimeout(async () => {
+              // Initialize Supabase voting
+              await initSupabaseVoting();
+              
+              // Update all vote buttons with current state
+              document.querySelectorAll('[data-def-id]').forEach(button => {
+                const defId = button.getAttribute('data-def-id');
+                updateVoteButtons(defId);
+              });
+            }, 100);
           });
         </script>
       </div>
