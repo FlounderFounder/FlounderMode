@@ -190,7 +190,7 @@ function updateProgressBar() {
   const progressFill = document.getElementById("progressFill");
   const currentStepText = document.getElementById("currentStepText");
   
-  const progressWidth = (currentStep / 4) * 100;
+  const progressWidth = ((currentStep - 1) / 4) * 100;
   progressFill.style.width = progressWidth + '%';
   currentStepText.textContent = currentStep;
 }
@@ -692,6 +692,17 @@ function fallbackCopyToClipboard(text) {
   document.body.removeChild(textArea);
 }
 
+// Generate filename for the new term
+function generateTermFilename(termName) {
+  // Convert term name to kebab-case filename
+  return termName
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, '') // Remove special characters except spaces and hyphens
+    .replace(/\s+/g, '-') // Replace spaces with hyphens
+    .replace(/-+/g, '-') // Replace multiple hyphens with single hyphen
+    .replace(/^-|-$/g, ''); // Remove leading/trailing hyphens
+}
+
 // Generate JSON code for the new term
 function generateTermJson(termData) {
   // Create a properly formatted JSON object
@@ -711,9 +722,33 @@ function generatePrTitle(termData) {
   return `Add new term: ${termData.term}`;
 }
 
+// Generate GitHub URL for creating PR with pre-filled content
+function generateGitHubUrl(termData) {
+  const filename = generateTermFilename(termData.term);
+  const jsonContent = generateTermJson(termData);
+  const prTitle = generatePrTitle(termData);
+  const prDescription = generatePrDescription(termData);
+  
+  // GitHub's web interface URL for creating a new file
+  const baseUrl = 'https://github.com/FlounderFounder/default_website/new/main';
+  
+  // Encode the content for URL parameters
+  const encodedJsonContent = encodeURIComponent(jsonContent);
+  const encodedPrTitle = encodeURIComponent(prTitle);
+  const encodedPrDescription = encodeURIComponent(prDescription);
+  
+  // Create the URL with pre-filled content
+  const githubUrl = `${baseUrl}?filename=terms/${filename}.json&value=${encodedJsonContent}&message=${encodedPrTitle}&description=${encodedPrDescription}`;
+  
+  return githubUrl;
+}
+
 // Generate PR description
 function generatePrDescription(termData) {
+  const filename = generateTermFilename(termData.term);
   return `## Adding New Term: ${termData.term}
+
+**File:** \`terms/${filename}.json\`
 
 **Definition:** ${termData.definition}
 
@@ -723,13 +758,20 @@ function generatePrDescription(termData) {
 
 ---
 
-This pull request adds a new term to the Floundermode Dictionary. The term has been validated and follows the contribution guidelines.
+This pull request adds a new term to the Floundermode Dictionary by creating a new JSON file in the \`terms/\` directory. The term has been validated and follows the contribution guidelines.
+
+### Changes Made
+- ✅ Created new file: \`terms/${filename}.json\`
+- ✅ Generated HTML page: \`pages/${filename}.html\` (automated)
+- ✅ Added term to main.js termFiles array (automated)
+- ✅ Updated site to include the new term
 
 ### Checklist
 - [x] Term is unique and not already in the dictionary
 - [x] Definition is clear and concise
 - [x] Usage example demonstrates the term appropriately
-- [x] Related tags are relevant and helpful`;
+- [x] Related tags are relevant and helpful
+- [x] Filename follows kebab-case convention`;
 }
 
 // Show PR preview with generated content
@@ -738,11 +780,29 @@ function showPrPreview(termData) {
   const prTitle = generatePrTitle(termData);
   const prDescription = generatePrDescription(termData);
   const jsonCode = generateTermJson(termData);
+  const filename = generateTermFilename(termData.term);
+  const githubUrl = generateGitHubUrl(termData);
   
   // Populate the modal content
   document.getElementById('prTitle').textContent = prTitle;
   document.getElementById('prDescription').textContent = prDescription;
-  document.getElementById('codeChanges').textContent = jsonCode;
+  
+  // Update the code block to show file creation
+  const codeChangesEl = document.getElementById('codeChanges');
+  codeChangesEl.textContent = jsonCode;
+  
+  // Update the code header to show the filename
+  const codeLabelEl = document.querySelector('.code-label');
+  if (codeLabelEl) {
+    codeLabelEl.textContent = `New file: terms/${filename}.json`;
+  }
+  
+  // Update the GitHub button to use the automated URL
+  const githubBtn = document.querySelector('.pr-btn.primary');
+  if (githubBtn) {
+    githubBtn.onclick = () => window.open(githubUrl, '_blank');
+    githubBtn.innerHTML = '🚀 Create PR Automatically →';
+  }
   
   // Show the modal
   openPrPreviewModal();
