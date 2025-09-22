@@ -1,0 +1,10 @@
+{
+  "term": "Dashboard Fatigue",
+  "definition": "The emotional exhaustion from being shown yet another metrics dashboard no one understands or uses.",
+  "usage": "The team built a dashboard for the dashboard... we just nodded and moved on.",
+  "related": [
+    "Analytics",
+    "Overengineering",
+    "Product Theater"
+  ]
+}

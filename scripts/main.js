@@ -13,9 +13,25 @@ async function init() {
   const modalContent = document.getElementById("modalContent");
   const wotdContainer = document.querySelector(".wotd-container");
 
-  // Fetch terms data
-  const fetchResult = await fetch("/terms/terms.json");
-  flounderTerms = await fetchResult.json();
+  // Fetch terms data from individual JSON files
+  const termFiles = [
+    'mvp-theater.json',
+    'dashboard-fatigue.json', 
+    'founder-gut.json',
+    'vibe-driven-dev.json',
+    'meta-investment.json'
+  ];
+  
+  flounderTerms = [];
+  for (const file of termFiles) {
+    try {
+      const response = await fetch(`/terms/${file}`);
+      const term = await response.json();
+      flounderTerms.push(term);
+    } catch (error) {
+      console.error(`Failed to load term from ${file}:`, error);
+    }
+  }
 
   // Search functionality
   searchInput.addEventListener("input", () => {
@@ -69,21 +85,180 @@ async function init() {
             <strong>Related to:</strong> ${relatedTerms}
           </p>`;
 
+    // Check if this is a contributing modal (no "View Full Page" needed)
+    const isContributingModal = term.term === "Contributing to Floundermode";
+    
+    // Create filename for individual page (only for actual terms)
+    let termFilename = '';
+    if (!isContributingModal) {
+      // Handle special cases with custom mappings
+      const termMappings = {
+        'A META investment': 'meta-investment',
+        'Vibe-Driven Dev': 'vibe-driven-dev'
+      };
+      
+      if (termMappings[term.term]) {
+        termFilename = termMappings[term.term];
+      } else {
+        termFilename = term.term.toLowerCase()
+          .replace(/[^a-z0-9\s]/g, '')
+          .replace(/\s+/g, '-');
+      }
+    }
+    
+    const viewFullPageButton = !isContributingModal ? `
+      <div style="margin-top: 1.5rem; display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap;">
+        <a href="/pages/${termFilename}.html" class="term-page-link">
+          View Full Page →
+        </a>
+        <button class="share-button" data-term="${term.term}" data-definition="${term.definition}" data-usage="${term.usage}">
+          📤 Share
+        </button>
+      </div>` : '';
+    
     const newContent = `
-      <p>
+      <p class="definition-content">
         <strong>Definition:</strong> ${term.definition}
         </p>
 
-          <p><strong>Example:</strong> ${term.usage}</p>
+          <p class="usage-content"><strong>Example:</strong> ${term.usage}</p>
 
-          ${relatedSection}`;
+          ${relatedSection}
+          
+          ${viewFullPageButton}`;
 
     modalContent.innerHTML = newContent;
     termModal.classList.remove("hide");
     termModal.classList.add("show");
+    
+    // Add event listener for share button
+    const shareButton = modalContent.querySelector('.share-button');
+    if (shareButton) {
+      shareButton.addEventListener('click', function() {
+        const term = this.getAttribute('data-term');
+        const definition = this.getAttribute('data-definition');
+        const usage = this.getAttribute('data-usage');
+        shareTerm(term, definition, usage);
+      });
+    }
   }
 
-  // Expose functions to global scope
+// Share functionality
+window.shareTerm = function(term, definition, usage) {
+  console.log('shareTerm called with:', { term, definition, usage });
+  
+  // Create the URL for the specific term page
+  const termMappings = {
+    'A META investment': 'meta-investment'
+  };
+  
+  let termFilename = '';
+  if (termMappings[term]) {
+    termFilename = termMappings[term];
+  } else {
+    termFilename = term.toLowerCase()
+      .replace(/[^a-z0-9\s]/g, '')
+      .replace(/\s+/g, '-');
+  }
+  
+  const termUrl = `${window.location.origin}/pages/${termFilename}.html`;
+  const shareText = `Check out "${term}" from Floundermode Dictionary: ${termUrl}`;
+  
+  console.log('Generated share text:', shareText);
+
+  // Always use clipboard for now to debug
+  fallbackShare(shareText);
+};
+
+window.fallbackShare = function(text) {
+  console.log('fallbackShare called with:', text);
+  
+  // Try the modern clipboard API first
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    console.log('Using modern clipboard API');
+    navigator.clipboard.writeText(text).then(() => {
+      console.log('Clipboard write successful');
+      showToast('Copied to clipboard!');
+    }).catch(err => {
+      console.log('Clipboard API failed:', err);
+      // Try fallback method
+      tryFallbackCopy(text);
+    });
+  } else {
+    console.log('Clipboard API not available, using fallback');
+    tryFallbackCopy(text);
+  }
+};
+
+function tryFallbackCopy(text) {
+  try {
+    console.log('Trying fallback copy method');
+    const textArea = document.createElement('textarea');
+    textArea.value = text;
+    textArea.style.position = 'fixed';
+    textArea.style.left = '-999999px';
+    textArea.style.top = '-999999px';
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    
+    const successful = document.execCommand('copy');
+    document.body.removeChild(textArea);
+    
+    if (successful) {
+      console.log('Fallback copy successful');
+      showToast('Copied to clipboard!');
+    } else {
+      console.log('Fallback copy failed');
+      showToast('Unable to copy. Please try again.', 'error');
+    }
+  } catch (err) {
+    console.log('Fallback copy error:', err);
+    showToast('Unable to copy. Please try again.', 'error');
+  }
+}
+
+window.showToast = function(message, type = 'success') {
+  console.log('showToast called with:', message, type);
+  
+  // Remove any existing toast
+  const existingToast = document.querySelector('.toast-notification');
+  if (existingToast) {
+    existingToast.remove();
+  }
+  
+  // Create new toast
+  const toast = document.createElement('div');
+  toast.className = 'toast-notification';
+  
+  const icon = type === 'success' ? '✅' : '❌';
+  toast.innerHTML = `
+    <span class="toast-icon">${icon}</span>
+    <span>${message}</span>
+  `;
+  
+  document.body.appendChild(toast);
+  console.log('Toast element created and added to DOM');
+  
+  // Trigger animation
+  setTimeout(() => {
+    toast.classList.add('show');
+    console.log('Toast show class added');
+  }, 10);
+  
+  // Auto-hide after 3 seconds
+  setTimeout(() => {
+    toast.classList.remove('show');
+    setTimeout(() => {
+      if (toast.parentNode) {
+        toast.parentNode.removeChild(toast);
+        console.log('Toast removed from DOM');
+      }
+    }, 400);
+  }, 3000);
+};
+
+// Expose functions to global scope
   window.openModal = openModal;
 
   // Initialize components
@@ -164,23 +339,20 @@ window.showAbout = function () {
 };
 
 window.showContributing = function () {
-  const contributingModal = {
-    term: "Contributing to Floundermode",
-    definition:
-      "Help expand the dictionary by submitting new terms, definitions, and examples. All contributions are reviewed for accuracy and relevance.",
-    usage:
-      "Check the CONTRIBUTING.md file in the repository for detailed guidelines on how to add new terms and improve existing definitions.",
-    related: [],
-  };
+  const modalTitle = document.getElementById("modalTitle");
+  const modalContent = document.getElementById("modalContent");
+  const termModal = document.getElementById("termModal");
   
-  // Use openModal but then customize the content to add buttons
-  window.openModal(contributingModal);
+  modalTitle.textContent = "Contributing to Floundermode";
   
-  // Add the contribution buttons after modal opens
-  setTimeout(() => {
-    const modalContent = document.getElementById("modalContent");
-    modalContent.innerHTML += `
-      <div style="margin-top: 1.5rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+  modalContent.innerHTML = `
+    <div style="text-align: center; padding: 1rem 0;">
+      <h3 style="margin-bottom: 1.5rem; font-family: 'Bebas Neue', sans-serif; font-size: 1.5rem; letter-spacing: 1px;">How to Contribute</h3>
+      <p style="margin-bottom: 2rem; line-height: 1.7;">
+        Help expand the Floundermode Dictionary by submitting new terms, definitions, and examples. 
+        All contributions are reviewed for accuracy and relevance.
+      </p>
+      <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center;">
         <button onclick="window.open('https://github.com/FlounderFounder/default_website', '_blank')" 
                 class="contribute-button github-button">
           GitHub
@@ -190,8 +362,11 @@ window.showContributing = function () {
           Easy Mode
         </button>
       </div>
-    `;
-  }, 100);
+    </div>
+  `;
+  
+  termModal.classList.remove("hide");
+  termModal.classList.add("show");
 };
 
 window.toggleWotd = function () {
@@ -240,6 +415,17 @@ window.toggleDarkMode = function () {
   const darkModeButton = document.querySelector('.dark-mode-toggle');
   const carterImg = document.querySelector('.wotd-container img');
   const isDarkMode = document.body.classList.contains('dark-mode');
+  
+  // Check if we're on an individual term page (no wotd-container)
+  if (!wotdContainer) {
+    // Simple toggle for individual pages
+    document.body.classList.toggle('dark-mode');
+    const buttonText = document.body.classList.contains('dark-mode') ? '☀️ Light' : '🌙 Dark';
+    if (darkModeButton) {
+      darkModeButton.textContent = buttonText;
+    }
+    return;
+  }
   
   // Disable button during animation
   darkModeButton.disabled = true;

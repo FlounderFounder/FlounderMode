@@ -1,0 +1,10 @@
+{
+  "term": "MVP Theater",
+  "definition": "When a team pretends to validate a product by building the tiniest thing possible, but it still takes six months.",
+  "usage": "Our MVP was just a Figma prototype but took longer than building the whole app.",
+  "related": [
+    "Lean",
+    "Pretend Agile",
+    "Stakeholder Pressure"
+  ]
+}

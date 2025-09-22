@@ -66,6 +66,7 @@ body {
   transition: transform 0.2s ease, background-color 0.2s ease;
   text-transform: uppercase;
   font-family: "Roboto Mono", monospace;
+  border-radius: 12px;
 }
 
 .nav-button:hover {
@@ -201,6 +202,8 @@ body {
   box-shadow: 3px 3px 0 #000;
   cursor: pointer;
   transition: transform 0.2s ease, background-color 0.2s ease;
+  border-radius: 12px;
+  font-family: "Roboto Mono", monospace;
 }
 
 .random-button:hover {
@@ -260,6 +263,8 @@ body {
   box-shadow: 3px 3px 0 #000;
   cursor: pointer;
   transition: transform 0.2s ease, background-color 0.2s ease;
+  border-radius: 12px;
+  font-family: "Roboto Mono", monospace;
 }
 
 .carousel button:hover {
@@ -278,58 +283,107 @@ body {
   top: 50%;
   left: 50%;
   width: 90vw;
-  max-width: 500px;
+  max-width: 600px;
   max-height: 90vh;
-  background: white;
-  border: 2px solid black;
-  box-shadow: 6px 6px 0 #000;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  border: 3px solid #000;
+  border-radius: 16px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), 6px 6px 0 #000;
   z-index: 1000;
   display: flex;
   flex-direction: column;
   opacity: 0;
-  transform: translate(-50%, -50%) scale(0.95);
+  transform: translate(-50%, -50%) scale(0.9);
   pointer-events: none;
-  transition: opacity 0.3s ease, transform 0.3s ease, background-color 0.8s ease, color 0.8s ease;
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  color: #1a1a1a;
 }
 
 .term-modal .window-bar {
-  background: #222;
+  background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
   color: #fff;
-  padding: 0.5rem 1rem;
+  padding: 1rem 1.5rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
   flex-shrink: 0;
+  border-radius: 13px 13px 0 0;
+  border-bottom: 2px solid #000;
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 1.4rem;
+  letter-spacing: 1px;
 }
 
 .term-modal .window-button {
-  background: #ff4d4d;
-  color: #000;
-  border: 1px solid #000;
-  width: 20px;
-  height: 20px;
+  background: linear-gradient(135deg, #ff4757 0%, #ff3742 100%);
+  color: #fff;
+  border: 2px solid #000;
+  width: 28px;
+  height: 28px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: bold;
   cursor: pointer;
-  transition: background-color 0.2s ease, transform 0.2s ease;
+  border-radius: 50%;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .term-modal .window-button:hover {
-  background-color: #ff1a1a;
-  transform: scale(1.1);
+  background: linear-gradient(135deg, #ff3742 0%, #ff2f3a 100%);
+  transform: scale(1.15) rotate(5deg);
+  box-shadow: 0 6px 12px rgba(255, 71, 87, 0.4);
 }
 
 .term-modal .window-button:active {
-  transform: scale(0.95);
-  background-color: #cc0000;
+  transform: scale(0.95) rotate(0deg);
+  background: linear-gradient(135deg, #ff2f3a 0%, #ff1a1a 100%);
 }
 
 .term-modal .term-content {
-  padding: 1rem 1.25rem;
+  padding: 2rem;
   overflow-y: auto;
+  flex: 1;
+  background: linear-gradient(135deg, rgba(147, 208, 255, 0.1) 0%, rgba(255, 255, 255, 0.1) 100%);
+  color: #1a1a1a;
+}
+
+.term-modal .term-content p {
+  margin-bottom: 1.5rem;
+  line-height: 1.7;
+  font-size: 1.1rem;
+}
+
+.term-modal .term-content p:not(.definition-content):not(.usage-content) {
+  padding: 0;
+  background: none;
+  border: none;
+}
+
+.term-modal .term-content .definition-content {
+  padding: 1rem;
+  background: rgba(147, 208, 255, 0.15);
+  border-radius: 8px;
+  border-left: 4px solid #2563eb;
+}
+
+.term-modal .term-content .usage-content {
+  padding: 1rem;
+  background: rgba(34, 197, 94, 0.1);
+  border-radius: 8px;
+  border-left: 4px solid #22c55e;
+}
+
+.term-modal .term-content strong {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 1.2rem;
+  letter-spacing: 1px;
+  color: #1a1a1a;
+  display: block;
+  margin-bottom: 0.5rem;
 }
 
 /* Badge Styles */
@@ -340,25 +394,28 @@ body {
   max-width: 100%;
   word-wrap: break-word;
   white-space: normal;
-  background: #6366f1;
+  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
   color: white;
-  padding: 0.2rem 0.6rem;
-  font-size: 0.75rem;
-  font-weight: bold;
+  padding: 0.4rem 0.8rem;
+  font-size: 0.8rem;
+  font-weight: 600;
   border: 2px solid #000;
-  box-shadow: 2px 2px 0 #000;
+  border-radius: 20px;
+  box-shadow: 0 4px 8px rgba(99, 102, 241, 0.3), 2px 2px 0 #000;
   text-transform: uppercase;
-  transition: background-color 0.2s ease, transform 0.2s ease;
+  letter-spacing: 0.5px;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .badge:hover {
-  background: #4f46e5;
-  transform: scale(1.05);
+  background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%);
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 6px 12px rgba(99, 102, 241, 0.4), 3px 3px 0 #000;
 }
 
 .badge:active {
-  transform: scale(0.98);
-  background: #3730a3;
+  transform: translateY(0) scale(0.98);
+  background: linear-gradient(135deg, #3730a3 0%, #312e81 100%);
 }
 
 /* Contribute Button Styles */
@@ -376,6 +433,7 @@ body {
   transition: transform 0.2s ease, background-color 0.2s ease;
   text-transform: uppercase;
   font-family: "Roboto Mono", monospace;
+  border-radius: 12px;
 }
 
 .contribute-button:hover {
@@ -670,6 +728,379 @@ body.carter-running {
 
 .term-modal.hide {
   opacity: 0;
-  transform: translate(-50%, -50%) scale(0.95);
+  transform: translate(-50%, -50%) scale(0.9);
   pointer-events: none;
+}
+
+/* Modal backdrop overlay */
+.term-modal::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+
+/* Dark mode styles for modals */
+body.dark-mode .term-modal {
+  background: rgba(26, 26, 26, 0.95);
+  color: #fff;
+}
+
+body.dark-mode .term-modal .window-bar {
+  background: linear-gradient(135deg, #1a1a1a 0%, #2c2c2c 100%);
+  color: #fff;
+  border-bottom-color: #fff;
+}
+
+body.dark-mode .term-modal .term-content {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(147, 208, 255, 0.1) 100%);
+  color: #fff;
+}
+
+body.dark-mode .term-modal .term-content strong {
+  color: #fff;
+}
+
+body.dark-mode .term-modal .term-content p:not(.definition-content):not(.usage-content) {
+  background: none;
+  border: none;
+  color: #fff;
+}
+
+body.dark-mode .term-modal .term-content .definition-content {
+  padding: 1rem;
+  background: rgba(59, 130, 246, 0.2);
+  border-radius: 8px;
+  border-left: 4px solid #3b82f6;
+}
+
+body.dark-mode .term-modal .term-content .usage-content {
+  padding: 1rem;
+  background: rgba(34, 197, 94, 0.2);
+  border-radius: 8px;
+  border-left: 4px solid #22c55e;
+}
+
+/* Toast notification styling */
+.toast-notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  color: white;
+  padding: 1rem 1.5rem;
+  border-radius: 12px;
+  border: 2px solid #000;
+  box-shadow: 0 8px 16px rgba(34, 197, 94, 0.3), 3px 3px 0 #000;
+  font-family: "Roboto Mono", monospace;
+  font-weight: 600;
+  font-size: 0.9rem;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  z-index: 10000;
+  transform: translateX(100%);
+  opacity: 0;
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.toast-notification.show {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+.toast-notification .toast-icon {
+  font-size: 1.2rem;
+}
+
+/* Dark mode toast */
+body.dark-mode .toast-notification {
+  border: 2px solid #fff;
+  box-shadow: 0 8px 16px rgba(34, 197, 94, 0.3), 3px 3px 0 #fff;
+}
+
+/* Mobile responsive toast */
+@media (max-width: 768px) {
+  .toast-notification {
+    top: 10px;
+    right: 10px;
+    left: 10px;
+    transform: translateY(-100%);
+  }
+  
+  .toast-notification.show {
+    transform: translateY(0);
+  }
+}
+
+/* Share button styling */
+.share-button {
+  display: inline-block !important;
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%) !important;
+  color: #fff !important;
+  padding: 0.8rem 1.5rem !important;
+  border-radius: 12px !important;
+  text-decoration: none !important;
+  font-weight: 600 !important;
+  font-family: "Roboto Mono", monospace !important;
+  font-size: 1rem !important;
+  letter-spacing: 1px !important;
+  border: 2px solid #000 !important;
+  box-shadow: 0 6px 12px rgba(139, 92, 246, 0.3), 3px 3px 0 #000 !important;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+  text-transform: uppercase !important;
+  cursor: pointer !important;
+}
+
+.share-button:hover {
+  background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%) !important;
+  transform: translateY(-3px) scale(1.05) !important;
+  box-shadow: 0 8px 16px rgba(139, 92, 246, 0.4), 4px 4px 0 #000 !important;
+}
+
+.share-button:active {
+  transform: translateY(-1px) scale(1.02) !important;
+  box-shadow: 0 4px 8px rgba(139, 92, 246, 0.3), 2px 2px 0 #000 !important;
+}
+
+/* Term page link styling in modals */
+.term-page-link {
+  display: inline-block !important;
+  background: linear-gradient(135deg, #000 0%, #333 100%) !important;
+  color: #fff !important;
+  padding: 0.8rem 1.5rem !important;
+  border-radius: 12px !important;
+  text-decoration: none !important;
+  font-weight: 600 !important;
+  font-family: "Bebas Neue", sans-serif !important;
+  font-size: 1rem !important;
+  letter-spacing: 1px !important;
+  border: 2px solid #000 !important;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3), 3px 3px 0 #000 !important;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+  text-transform: uppercase !important;
+}
+
+.term-page-link:hover {
+  background: linear-gradient(135deg, #333 0%, #555 100%) !important;
+  transform: translateY(-3px) scale(1.05) !important;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4), 4px 4px 0 #000 !important;
+}
+
+.term-page-link:active {
+  transform: translateY(-1px) scale(1.02) !important;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3), 2px 2px 0 #000 !important;
+}
+
+/* Individual Term Page Styles */
+.term-page {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+}
+
+.term-title {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  margin: 0 0 2rem 0;
+  letter-spacing: 2px;
+  color: #1a1a1a;
+  text-align: center;
+  border-bottom: 3px solid #000;
+  padding-bottom: 1rem;
+}
+
+.term-definition,
+.term-usage,
+.term-related {
+  margin-bottom: 2rem;
+}
+
+.term-definition h2,
+.term-usage h2,
+.term-related h2 {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 1.5rem;
+  margin: 0 0 1rem 0;
+  letter-spacing: 1px;
+  color: #333;
+}
+
+.term-definition p,
+.term-usage p {
+  font-size: 1.1rem;
+  line-height: 1.7;
+  margin: 0;
+  padding: 1rem;
+  border-radius: 8px;
+  border-left: 4px solid #93d0ff;
+}
+
+.term-definition p {
+  background: rgba(147, 208, 255, 0.15);
+  border-left-color: #2563eb;
+}
+
+.term-usage p {
+  background: rgba(34, 197, 94, 0.1);
+  border-left-color: #22c55e;
+}
+
+.related-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.related-tag {
+  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border: 2px solid #000;
+  box-shadow: 0 4px 8px rgba(99, 102, 241, 0.3), 2px 2px 0 #000;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.related-tag:hover {
+  background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%);
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 6px 12px rgba(99, 102, 241, 0.4), 3px 3px 0 #000;
+}
+
+.related-tag:active {
+  transform: translateY(0) scale(0.98);
+  background: linear-gradient(135deg, #3730a3 0%, #312e81 100%);
+}
+
+/* Term actions styling for individual pages */
+.term-actions {
+  margin-top: 2rem;
+  text-align: center;
+  padding-top: 1.5rem;
+  border-top: 2px solid #eee;
+}
+
+.term-actions .share-button {
+  display: inline-block;
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  color: #fff;
+  padding: 0.8rem 1.5rem;
+  border-radius: 12px;
+  text-decoration: none;
+  font-weight: 600;
+  font-family: "Roboto Mono", monospace;
+  font-size: 1rem;
+  letter-spacing: 1px;
+  border: 2px solid #000;
+  box-shadow: 0 6px 12px rgba(139, 92, 246, 0.3), 3px 3px 0 #000;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.term-actions .share-button:hover {
+  background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 8px 16px rgba(139, 92, 246, 0.4), 4px 4px 0 #000;
+}
+
+.term-actions .share-button:active {
+  transform: translateY(-1px) scale(1.02);
+  box-shadow: 0 4px 8px rgba(139, 92, 246, 0.3), 2px 2px 0 #000;
+}
+
+/* Dark mode styles for term pages */
+body.dark-mode .term-page {
+  background: rgba(26, 26, 26, 0.9);
+  color: #fff;
+}
+
+body.dark-mode .term-title {
+  color: #fff;
+  border-bottom-color: #fff;
+}
+
+body.dark-mode .term-definition h2,
+body.dark-mode .term-usage h2,
+body.dark-mode .term-related h2 {
+  color: #fff;
+}
+
+body.dark-mode .term-definition p,
+body.dark-mode .term-usage p {
+  background: rgba(255, 255, 255, 0.1);
+  border-left-color: #fff;
+  color: #fff;
+}
+
+body.dark-mode .term-definition p {
+  background: rgba(59, 130, 246, 0.2);
+  border-left-color: #3b82f6;
+}
+
+body.dark-mode .term-usage p {
+  background: rgba(34, 197, 94, 0.2);
+  border-left-color: #22c55e;
+}
+
+body.dark-mode .related-tag {
+  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+  color: white;
+  border: 2px solid #fff;
+  box-shadow: 0 4px 8px rgba(99, 102, 241, 0.3), 2px 2px 0 #fff;
+}
+
+body.dark-mode .term-actions {
+  border-top-color: #444;
+}
+
+body.dark-mode .term-actions .share-button {
+  border: 2px solid #fff;
+  box-shadow: 0 6px 12px rgba(139, 92, 246, 0.3), 3px 3px 0 #fff;
+}
+
+body.dark-mode .term-actions .share-button:hover {
+  box-shadow: 0 8px 16px rgba(139, 92, 246, 0.4), 4px 4px 0 #fff;
+}
+
+body.dark-mode .term-actions .share-button:active {
+  box-shadow: 0 4px 8px rgba(139, 92, 246, 0.3), 2px 2px 0 #fff;
+}
+
+/* Mobile responsiveness for term pages */
+@media (max-width: 768px) {
+  .term-page {
+    margin: 1rem;
+    padding: 1.5rem;
+  }
+  
+  .term-title {
+    font-size: 2rem;
+  }
+  
+  .term-definition p,
+  .term-usage p {
+    font-size: 1rem;
+    padding: 0.8rem;
+  }
 }

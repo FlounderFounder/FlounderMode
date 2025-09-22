@@ -1,0 +1,10 @@
+{
+  "term": "Vibe-Driven Dev",
+  "definition": "A product methodology where feelings override all measurable success criteria.",
+  "usage": "We don't test features — we ship on vibes.",
+  "related": [
+    "Design Philosophy",
+    "Non-Metric",
+    "Product Culture"
+  ]
+}
