@@ -3,6 +3,8 @@
 // Global variables
 let flounderTerms = [];
 let userVotes = new Map(); // Track user votes per definition
+let allVotes = {}; // Store all vote counts from Supabase
+const USE_SUPABASE = true; // Set to false to use localStorage fallback
 
 // Main initialization function
 async function init() {
@@ -49,9 +51,16 @@ async function init() {
       // Ensure all definitions have voting properties
       if (term.definitions) {
         term.definitions.forEach(def => {
-          if (def.upvotes === undefined) def.upvotes = 0;
-          if (def.downvotes === undefined) def.downvotes = 0;
-          if (def.netScore === undefined) def.netScore = def.upvotes - def.downvotes;
+          // Handle legacy 'votes' field from JSON files
+          if (def.votes !== undefined && def.upvotes === undefined) {
+            def.upvotes = def.votes;
+            def.downvotes = 0;
+            def.netScore = def.votes;
+          } else {
+            if (def.upvotes === undefined) def.upvotes = 0;
+            if (def.downvotes === undefined) def.downvotes = 0;
+            if (def.netScore === undefined) def.netScore = def.upvotes - def.downvotes;
+          }
         });
       }
       
@@ -165,9 +174,20 @@ async function init() {
 
   // Generate HTML for multiple definitions
   function generateDefinitionsHtml(definitions) {
-    if (definitions.length === 1) {
+    // Sort definitions by netScore from backend (highest first), then by upvotes as tiebreaker
+    const sortedDefinitions = [...definitions].sort((a, b) => {
+      const aVotes = allVotes[a.id] || { netScore: 0, upvotes: 0 };
+      const bVotes = allVotes[b.id] || { netScore: 0, upvotes: 0 };
+      
+      if (bVotes.netScore !== aVotes.netScore) {
+        return bVotes.netScore - aVotes.netScore;
+      }
+      return bVotes.upvotes - aVotes.upvotes;
+    });
+
+    if (sortedDefinitions.length === 1) {
       // Single definition - Urban Dictionary style
-      const def = definitions[0];
+      const def = sortedDefinitions[0];
       return `
         <div class="definitions-container">
           <h2 class="definitions-title">DEFINITIONS</h2>
@@ -182,7 +202,7 @@ async function init() {
                 <button class="vote-btn vote-up" onclick="submitVote('${def.id}', 'up')" data-def-id="${def.id}">
                   ▲
                 </button>
-                <div class="vote-count">${def.netScore}</div>
+                <div class="vote-count">${allVotes[def.id]?.netScore || 0}</div>
                 <button class="vote-btn vote-down" onclick="submitVote('${def.id}', 'down')" data-def-id="${def.id}">
                   ▼
                 </button>
@@ -199,7 +219,7 @@ async function init() {
         <div class="definitions-container">
           <h2 class="definitions-title">DEFINITIONS</h2>
           <div class="definitions-list">
-            ${definitions.map((def, index) => `
+            ${sortedDefinitions.map((def, index) => `
               <div class="definition-item" id="${def.id}">
                 <div class="definition-content">
                   <div class="definition-text">${def.definition}</div>
@@ -210,7 +230,7 @@ async function init() {
                   <button class="vote-btn vote-up" onclick="submitVote('${def.id}', 'up')" data-def-id="${def.id}">
                     ▲
                   </button>
-                  <div class="vote-count">${def.netScore}</div>
+                  <div class="vote-count">${allVotes[def.id]?.netScore || 0}</div>
                   <button class="vote-btn vote-down" onclick="submitVote('${def.id}', 'down')" data-def-id="${def.id}">
                     ▼
                   </button>
@@ -425,8 +445,21 @@ window.showToast = function(message, type = 'success') {
   populateCarousel();
   populateWotd();
   
-  // Load user votes from localStorage
-  loadUserVotes();
+  // Load vote data from Supabase or localStorage
+  if (USE_SUPABASE && window.supabaseVoting) {
+    allVotes = await window.supabaseVoting.loadVoteData();
+    // Subscribe to real-time changes
+    window.supabaseVoting.subscribeToChanges((newVotes) => {
+      allVotes = newVotes;
+      // Update UI for all visible definitions
+      document.querySelectorAll('[data-def-id]').forEach(button => {
+        const defId = button.getAttribute('data-def-id');
+        updateVoteButtons(defId);
+      });
+    });
+  } else {
+    await loadVoteData();
+  }
   
   // Fish starts hidden - users can tap thought bubble to show
 
@@ -647,9 +680,38 @@ document.addEventListener("DOMContentLoaded", function() {
   initDarkMode();
 });
 
+// ===== LOCALSTORAGE FALLBACK FUNCTIONS =====
+
+// Load vote data from localStorage (fallback when Supabase is unavailable)
+async function loadVoteData() {
+  try {
+    const savedVotes = localStorage.getItem('flounderVotes');
+    if (savedVotes) {
+      const votesData = JSON.parse(savedVotes);
+      // Convert localStorage format to match Supabase format
+      allVotes = {};
+      Object.entries(votesData).forEach(([defId, voteType]) => {
+        if (!allVotes[defId]) {
+          allVotes[defId] = { upvotes: 0, downvotes: 0, netScore: 0 };
+        }
+        if (voteType === 'up') {
+          allVotes[defId].upvotes++;
+          allVotes[defId].netScore++;
+        } else if (voteType === 'down') {
+          allVotes[defId].downvotes++;
+          allVotes[defId].netScore--;
+        }
+      });
+    }
+  } catch (error) {
+    console.warn('Failed to load vote data from localStorage:', error);
+    allVotes = {};
+  }
+}
+
 // ===== VOTING SYSTEM =====
 
-// Load user votes from localStorage
+// Load user votes from localStorage (for UI state only)
 function loadUserVotes() {
   try {
     const savedVotes = localStorage.getItem('flounderVotes');
@@ -674,7 +736,7 @@ function saveUserVotes() {
 }
 
 // Submit a vote for a definition
-window.submitVote = function(definitionId, voteType) {
+window.submitVote = async function(definitionId, voteType) {
   console.log('Voting:', definitionId, voteType);
   
   // Check if user already voted on this definition
@@ -683,57 +745,36 @@ window.submitVote = function(definitionId, voteType) {
   if (existingVote === voteType) {
     // User is trying to vote the same way again - remove the vote
     userVotes.delete(definitionId);
-    updateDefinitionVotes(definitionId, voteType, 'remove');
   } else {
     // User is voting (or changing their vote)
     userVotes.set(definitionId, voteType);
-    updateDefinitionVotes(definitionId, voteType, existingVote ? 'change' : 'add');
   }
   
-  // Save to localStorage
+  // Save to localStorage for UI state
   saveUserVotes();
   
-  // Update the UI
-  updateVoteButtons(definitionId);
+  // Submit to Supabase or fallback to localStorage
+  if (USE_SUPABASE && window.supabaseVoting) {
+    const result = await window.supabaseVoting.submitVote(definitionId, voteType);
+    if (result) {
+      allVotes = result;
+      updateVoteButtons(definitionId);
+    } else {
+      // Fallback: revert the vote if Supabase failed
+      if (existingVote === voteType) {
+        userVotes.set(definitionId, voteType);
+      } else {
+        userVotes.delete(definitionId);
+      }
+      saveUserVotes();
+      updateVoteButtons(definitionId);
+    }
+  } else {
+    // Use localStorage fallback - just update UI
+    updateVoteButtons(definitionId);
+  }
 };
 
-// Update the vote counts for a definition
-function updateDefinitionVotes(definitionId, voteType, action) {
-  // Find the definition in our data
-  for (const term of flounderTerms) {
-    if (term.definitions) {
-      const def = term.definitions.find(d => d.id === definitionId);
-      if (def) {
-        if (action === 'add') {
-          if (voteType === 'up') {
-            def.upvotes++;
-          } else {
-            def.downvotes++;
-          }
-        } else if (action === 'remove') {
-          if (voteType === 'up') {
-            def.upvotes = Math.max(0, def.upvotes - 1);
-          } else {
-            def.downvotes = Math.max(0, def.downvotes - 1);
-          }
-        } else if (action === 'change') {
-          // User is changing their vote
-          if (voteType === 'up') {
-            def.upvotes++;
-            def.downvotes = Math.max(0, def.downvotes - 1);
-          } else {
-            def.downvotes++;
-            def.upvotes = Math.max(0, def.upvotes - 1);
-          }
-        }
-        
-        // Update net score
-        def.netScore = def.upvotes - def.downvotes;
-        break;
-      }
-    }
-  }
-}
 
 // Update the vote button UI
 function updateVoteButtons(definitionId) {
@@ -755,38 +796,35 @@ function updateVoteButtons(definitionId) {
       downButton.classList.add('voted');
     }
     
-    // Update vote count
-    const def = findDefinitionById(definitionId);
-    if (def) {
-      voteCount.textContent = def.netScore;
+    // Update vote count from backend data
+    const voteData = allVotes[definitionId];
+    if (voteData) {
+      voteCount.textContent = voteData.netScore;
+    } else {
+      voteCount.textContent = '0';
     }
   }
 }
 
-// Helper function to find a definition by ID
-function findDefinitionById(definitionId) {
-  for (const term of flounderTerms) {
-    if (term.definitions) {
-      const def = term.definitions.find(d => d.id === definitionId);
-      if (def) return def;
-    }
-  }
-  return null;
-}
 
 // Share definition function
 function shareDefinition(definitionId) {
-  const definition = findDefinitionById(definitionId);
-  if (!definition) return;
-
-  // Find the term that contains this definition
+  // Find the definition in our data
+  let definition = null;
   let termName = '';
+  
   for (const term of flounderTerms) {
-    if (term.definitions && term.definitions.find(d => d.id === definitionId)) {
-      termName = term.name;
-      break;
+    if (term.definitions) {
+      const def = term.definitions.find(d => d.id === definitionId);
+      if (def) {
+        definition = def;
+        termName = term.term;
+        break;
+      }
     }
   }
+  
+  if (!definition) return;
 
   const shareText = `${termName}: ${definition.definition}\n\n"${definition.usage}"\n\n— ${definition.author || 'Anonymous'}\n\nFrom Floundermode Dictionary`;
   

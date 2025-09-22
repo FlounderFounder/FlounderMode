@@ -15,7 +15,7 @@ const definitionTemplate = `
                 <button class="vote-btn vote-up" onclick="submitVote('{{DEF_ID}}', 'up')" data-def-id="{{DEF_ID}}">
                   ▲
                 </button>
-                <div class="vote-count">0</div>
+                <div class="vote-count">{{NET_SCORE}}</div>
                 <button class="vote-btn vote-down" onclick="submitVote('{{DEF_ID}}', 'down')" data-def-id="{{DEF_ID}}">
                   ▼
                 </button>
@@ -119,26 +119,51 @@ const template = fs.readFileSync(templatePath, 'utf8');
 
 // Generate pages
 Object.entries(terms).forEach(([slug, termData]) => {
+  // Process definitions to handle legacy 'votes' field and ensure voting properties
+  const processedDefinitions = termData.definitions.map(def => {
+    const processedDef = { ...def };
+    // Handle legacy 'votes' field from JSON files
+    if (def.votes !== undefined && def.upvotes === undefined) {
+      processedDef.upvotes = def.votes;
+      processedDef.downvotes = 0;
+      processedDef.netScore = def.votes;
+    } else {
+      if (def.upvotes === undefined) processedDef.upvotes = 0;
+      if (def.downvotes === undefined) processedDef.downvotes = 0;
+      if (def.netScore === undefined) processedDef.netScore = def.upvotes - def.downvotes;
+    }
+    return processedDef;
+  });
+
+  // Sort definitions by netScore (highest first), then by upvotes as tiebreaker
+  const sortedDefinitions = [...processedDefinitions].sort((a, b) => {
+    if (b.netScore !== a.netScore) {
+      return b.netScore - a.netScore;
+    }
+    return b.upvotes - a.upvotes;
+  });
+
   // Generate definitions HTML
-  const definitionsHtml = termData.definitions.map(def => {
+  const definitionsHtml = sortedDefinitions.map(def => {
     return definitionTemplate
       .replace(/{{DEF_ID}}/g, def.id)
       .replace(/{{DEF_NUMBER}}/g, def.number)
       .replace(/{{DEFINITION_TEXT}}/g, def.definition)
       .replace(/{{USAGE_TEXT}}/g, def.usage)
-      .replace(/{{AUTHOR}}/g, def.author);
+      .replace(/{{AUTHOR}}/g, def.author)
+      .replace(/{{NET_SCORE}}/g, def.netScore || 0);
   }).join('\n');
 
   // Generate definitions data for JavaScript
-  const definitionsData = JSON.stringify(termData.definitions.map(def => ({
+  const definitionsData = JSON.stringify(sortedDefinitions.map(def => ({
     id: def.id,
     definition: def.definition,
     usage: def.usage,
     author: def.author,
     isPrimary: def.id === 'def-1',
-    upvotes: 0,
-    downvotes: 0,
-    netScore: 0
+    upvotes: def.upvotes || 0,
+    downvotes: def.downvotes || 0,
+    netScore: def.netScore || 0
   })), null, 12);
 
   // Generate final HTML
