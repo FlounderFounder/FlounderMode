@@ -725,24 +725,63 @@ function generatePrTitle(termData) {
 // Generate GitHub URL for creating PR with pre-filled content
 function generateGitHubUrl(termData) {
   const filename = generateTermFilename(termData.term);
-  const jsonContent = generateTermJson(termData);
-  const prTitle = generatePrTitle(termData);
-  const prDescription = generatePrDescription(termData);
   
   // GitHub's web interface URL for creating a new file
   const baseUrl = 'https://github.com/FlounderFounder/default_website/new/main';
   
-  // Encode the content for URL parameters
-  const encodedJsonContent = encodeURIComponent(jsonContent);
-  const encodedPrTitle = encodeURIComponent(prTitle);
-  const encodedPrDescription = encodeURIComponent(prDescription);
-  
-  // Create the URL with pre-filled content
-  const githubUrl = `${baseUrl}?filename=terms/${filename}.json&value=${encodedJsonContent}&message=${encodedPrTitle}&description=${encodedPrDescription}`;
+  // Create the URL with the filename pre-filled
+  const githubUrl = `${baseUrl}?filename=terms/${filename}.json`;
   
   return githubUrl;
 }
 
+// Enhanced function to handle GitHub PR creation with clipboard
+async function openGitHubWithContent(termData) {
+  const filename = generateTermFilename(termData.term);
+  const jsonContent = generateTermJson(termData);
+  const prTitle = generatePrTitle(termData);
+  const prDescription = generatePrDescription(termData);
+  
+  // Try to copy content to clipboard
+  try {
+    await navigator.clipboard.writeText(jsonContent);
+    
+    // Show a temporary alert with instructions
+    showCustomAlert(
+      "Content Copied! 📋", 
+      `The JSON content has been copied to your clipboard.\n\n` +
+      `Next steps:\n` +
+      `1. GitHub will open in a new tab\n` +
+      `2. Paste the content (Ctrl+V / Cmd+V)\n` +
+      `3. Use this filename: terms/${filename}.json\n` +
+      `4. Use this commit message: ${prTitle}\n` +
+      `5. Add this description: ${prDescription.substring(0, 100)}...`
+    );
+    
+    // Open GitHub after a short delay
+    setTimeout(() => {
+      const githubUrl = generateGitHubUrl(termData);
+      window.open(githubUrl, '_blank');
+    }, 2000);
+    
+  } catch (error) {
+    console.error('Clipboard copy failed:', error);
+    
+    // Fallback: show content in modal and open GitHub
+    showCustomAlert(
+      "Manual Copy Required 📝", 
+      `Please copy this content manually:\n\n` +
+      `Filename: terms/${filename}.json\n\n` +
+      `Content:\n${jsonContent}\n\n` +
+      `Commit Message: ${prTitle}\n\n` +
+      `Description: ${prDescription.substring(0, 200)}...`
+    );
+    
+    // Open GitHub
+    const githubUrl = generateGitHubUrl(termData);
+    window.open(githubUrl, '_blank');
+  }
+}
 // Generate PR description
 function generatePrDescription(termData) {
   const filename = generateTermFilename(termData.term);
@@ -800,7 +839,7 @@ function showPrPreview(termData) {
   // Update the GitHub button to use the automated URL
   const githubBtn = document.querySelector('.pr-btn.primary');
   if (githubBtn) {
-    githubBtn.onclick = () => window.open(githubUrl, '_blank');
+    githubBtn.onclick = () => openGitHubWithContent(termData);
     githubBtn.innerHTML = '🚀 Create PR Automatically →';
   }
   
