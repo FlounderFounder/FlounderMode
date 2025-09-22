@@ -832,8 +832,10 @@ function showPrPreview(termData) {
   
   // Update the code header to show the filename
   const codeLabelEl = document.querySelector('.code-label');
+    console.log("Code label element:", codeLabelEl);
   if (codeLabelEl) {
     codeLabelEl.textContent = `New file: terms/${filename}.json`;
+    console.log("Setting filename:", filename);
   }
   
   // Update the GitHub button to use the automated URL
