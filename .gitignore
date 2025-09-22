@@ -12,3 +12,9 @@ test-profanity.html
 
 # Unused library files
 scripts/bad-words.js
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+.vercel
