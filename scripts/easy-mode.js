@@ -831,7 +831,7 @@ function showPrPreview(termData) {
   codeChangesEl.textContent = jsonCode;
   
   // Update the code header to show the filename
-  const codeLabelEl = document.querySelector('.code-label');
+  const codeLabelEl = document.querySelector('#codeChanges').parentElement.querySelector('.code-label');
     console.log("Code label element:", codeLabelEl);
   if (codeLabelEl) {
     codeLabelEl.textContent = `New file: terms/${filename}.json`;
