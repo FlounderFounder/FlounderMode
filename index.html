@@ -186,10 +186,10 @@
         </div>
 
         <div class="pr-section">
-          <h4>💻 Code Changes</h4>
+          <h4>💻 New Term File</h4>
           <div class="code-block">
             <div class="code-header">
-              <span class="code-label">Add this to terms/terms.json</span>
+              <span class="code-label">New file: terms/[filename].json</span>
               <button class="copy-btn" onclick="copyToClipboard('codeChanges')">📋 Copy</button>
             </div>
             <pre id="codeChanges"></pre>
@@ -197,15 +197,34 @@
         </div>
 
         <div class="pr-section">
-          <h4>🚀 Next Steps</h4>
+          <h4>🚀 Automated Workflow</h4>
           <div class="next-steps">
-            <ol>
-              <li>Go to <a href="https://github.com/FlounderFounder/default_website" target="_blank">GitHub Repository</a></li>
-              <li>Fork the repository (if you haven't already)</li>
-              <li>Edit the <code>terms/terms.json</code> file</li>
-              <li>Add the JSON code above to the file</li>
-              <li>Create a pull request with the title and description above</li>
-            </ol>
+            <div class="automated-workflow">
+              <h5>✨ One-Click Contribution</h5>
+              <p>Click the <strong>"Create PR Automatically"</strong> button below to:</p>
+              <ol>
+                <li>🚀 Open GitHub with your term pre-filled</li>
+                <li>📝 Create the JSON file automatically</li>
+                <li>📋 Fill in the PR title and description</li>
+                <li>✅ Submit the pull request</li>
+              </ol>
+              
+              <div class="automation-benefits">
+                <h5>🤖 GitHub Actions will then automatically:</h5>
+                <ul>
+                  <li>Generate an HTML page in <code>pages/</code> directory</li>
+                  <li>Add the filename to <code>scripts/main.js</code></li>
+                  <li>Validate the JSON format</li>
+                  <li>Check for duplicates</li>
+                  <li>Provide feedback on the PR</li>
+                </ul>
+              </div>
+              
+              <div class="manual-alternative">
+                <h5>📋 Manual Alternative</h5>
+                <p>If you prefer to do it manually, copy the content above and follow the traditional GitHub workflow.</p>
+              </div>
+            </div>
           </div>
         </div>
 
