@@ -117,15 +117,25 @@ async function init() {
       </div>` : '';
     
     const newContent = `
-      <p class="definition-content">
-        <strong>Definition:</strong> ${term.definition}
-        </p>
+      <div class="modal-definition-section">
+        <h3 class="modal-section-title">DEFINITION</h3>
+        <div class="modal-content-block definition-block">
+          <div class="modal-accent-bar definition-accent"></div>
+          <div class="modal-text-content">${term.definition}</div>
+        </div>
+      </div>
 
-          <p class="usage-content"><strong>Example:</strong> ${term.usage}</p>
+      <div class="modal-usage-section">
+        <h3 class="modal-section-title">USAGE EXAMPLE</h3>
+        <div class="modal-content-block usage-block">
+          <div class="modal-accent-bar usage-accent"></div>
+          <div class="modal-text-content">"${term.usage}"</div>
+        </div>
+      </div>
 
-          ${relatedSection}
-          
-          ${viewFullPageButton}`;
+      ${relatedSection}
+      
+      ${viewFullPageButton}`;
 
     modalContent.innerHTML = newContent;
     termModal.classList.remove("hide");
