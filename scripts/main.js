@@ -270,12 +270,16 @@ async function init() {
 // Share functionality
 window.shareCurrentTerm = function() {
   if (window.currentTermData) {
-    shareTerm(window.currentTermData.term, window.currentTermData.definitions);
+    // Find the currently visible definition
+    const visibleWrapper = document.querySelector('.definition-content-wrapper:not([style*="display: none"])');
+    const currentDefinitionId = visibleWrapper ? visibleWrapper.getAttribute('data-def-id') : null;
+    
+    shareTerm(window.currentTermData.term, window.currentTermData.definitions, currentDefinitionId);
   }
 };
 
-window.shareTerm = function(term, definitions) {
-  console.log('shareTerm called with:', { term, definitions });
+window.shareTerm = function(term, definitions, definitionId = null) {
+  console.log('shareTerm called with:', { term, definitions, definitionId });
   
   // Create the URL for the specific term page
   const termMappings = {
@@ -291,10 +295,21 @@ window.shareTerm = function(term, definitions) {
       .replace(/\s+/g, '-');
   }
   
-  const termUrl = `${window.location.origin}/pages/${termFilename}.html`;
+  // Build URL with optional definition anchor
+  let termUrl = `${window.location.origin}/pages/${termFilename}.html`;
+  if (definitionId) {
+    termUrl += `#${definitionId}`;
+  }
   
-  // Use primary definition or first definition for sharing
-  const primaryDef = definitions.find(d => d.isPrimary) || definitions[0];
+  // Use specific definition if provided, otherwise primary or first definition
+  let targetDef;
+  if (definitionId) {
+    targetDef = definitions.find(d => d.id === definitionId);
+  }
+  if (!targetDef) {
+    targetDef = definitions.find(d => d.isPrimary) || definitions[0];
+  }
+  
   const shareText = `Check out "${term}" from Floundermode Dictionary: ${termUrl}`;
   
   console.log('Generated share text:', shareText);

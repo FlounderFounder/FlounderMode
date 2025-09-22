@@ -35,7 +35,7 @@
         <div class="definitions-container">
           <h2 class="definitions-title">DEFINITIONS</h2>
           
-          <div class="definition-item">
+          <div class="definition-item" id="def-1">
             <div class="definition-header">
               <span class="definition-number">Definition 1</span>
               <span class="definition-votes">35 votes</span>
@@ -90,5 +90,35 @@
     <!-- JavaScript Files -->
     <script src="../scripts/simple-profanity-filter.js"></script>
     <script src="../scripts/main.js"></script>
+    
+    <script>
+      // Handle deep linking to specific definitions
+      function handleDefinitionDeepLink() {
+        const hash = window.location.hash;
+        if (hash) {
+          const definitionId = hash.substring(1); // Remove the #
+          const targetElement = document.getElementById(definitionId);
+          if (targetElement) {
+            // Scroll to the definition
+            targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            
+            // Add a subtle highlight effect
+            targetElement.style.transition = 'box-shadow 0.3s ease';
+            targetElement.style.boxShadow = '0 0 20px rgba(0, 123, 255, 0.5)';
+            
+            // Remove highlight after 3 seconds
+            setTimeout(() => {
+              targetElement.style.boxShadow = '';
+            }, 3000);
+          }
+        }
+      }
+      
+      // Run on page load
+      document.addEventListener('DOMContentLoaded', handleDefinitionDeepLink);
+      
+      // Also run if hash changes (for single-page navigation)
+      window.addEventListener('hashchange', handleDefinitionDeepLink);
+    </script>
   </body>
 </html>
