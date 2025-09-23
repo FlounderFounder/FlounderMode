@@ -26,3 +26,16 @@ jobs:
         echo "Files in repository:"
         ls -la
         echo "✅ Node.js setup completed successfully"
+        
+    - name: List JSON files
+      run: |
+        echo "📄 JSON files in terms directory:"
+        ls -la terms/
+        echo ""
+        echo "📄 Contents of terms directory:"
+        for file in terms/*.json; do
+          if [ -f "$file" ]; then
+            echo "Found: $file"
+          fi
+        done
+        echo "✅ File listing completed"
