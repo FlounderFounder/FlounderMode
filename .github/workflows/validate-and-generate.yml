@@ -12,10 +12,17 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
       
-    - name: Simple test
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        
+    - name: Test Node.js
       run: |
         echo "🎉 GitHub Action is working!"
         echo "Current directory: $(pwd)"
+        echo "Node.js version: $(node --version)"
+        echo "NPM version: $(npm --version)"
         echo "Files in repository:"
         ls -la
-        echo "✅ Test completed successfully"
+        echo "✅ Node.js setup completed successfully"
