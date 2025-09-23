@@ -1,0 +1,8 @@
+{
+  "term": "Supabase Sync Test",
+  "definition": "This term was created to test if the GitHub Action successfully syncs new terms with Supabase database. If you can see this definition in your Supabase dashboard, the sync is working!",
+  "usage": "This is a test term to verify Supabase synchronization.",
+  "author": "GitHub Action",
+  "date": "2025-09-23",
+  "related": ["Testing", "Supabase", "Automation", "Sync"]
+}
