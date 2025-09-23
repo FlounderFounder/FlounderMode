@@ -4,6 +4,10 @@ on:
   push:
     branches: [ test-github-action ]
 
+permissions:
+  contents: write  # Allow writing to repository contents
+  # No other permissions granted
+
 jobs:
   simple-test:
     runs-on: ubuntu-latest
@@ -115,7 +119,8 @@ jobs:
           echo "ℹ️ No changes to commit"
         else
           echo "📝 Committing changes..."
-          git add .
+          # Only add specific directories/files that the action should modify
+          git add pages/ terms-manifest.json
           git commit -m "🤖 Auto-generate pages and update manifest
 
           - Generated HTML pages for all terms
