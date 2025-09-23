@@ -44,10 +44,32 @@ termFiles.forEach(file => {
   // Generate share function name
   const shareFunction = `share${termData.term.replace(/\s+/g, '')}`;
   
+  // Handle both simple format (definition) and complex format (definitions array)
+  let definitions;
+  if (termData.definitions) {
+    definitions = termData.definitions;
+  } else if (termData.definition) {
+    // Convert simple format to complex format
+    definitions = [{
+      id: 'def-1',
+      definition: termData.definition,
+      usage: termData.usage || '',
+      author: termData.author || 'Anonymous',
+      date: termData.date || new Date().toISOString().split('T')[0],
+      isPrimary: true,
+      upvotes: 0,
+      downvotes: 0,
+      netScore: 0
+    }];
+  } else {
+    console.error(`Term ${slug} has no definitions or definition field`);
+    return;
+  }
+  
   terms[slug] = {
     name: termData.term,
     shareFunction: shareFunction,
-    definitions: termData.definitions,
+    definitions: definitions,
     relatedTags: relatedTags
   };
 });
