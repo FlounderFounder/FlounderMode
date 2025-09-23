@@ -20,9 +20,6 @@ jobs:
       with:
         node-version: '18'
         
-    - name: Install dependencies
-      run: npm install
-      
     - name: Generate pages and update manifest
       run: node generate-pages.js
       
@@ -83,8 +80,13 @@ jobs:
         });
         EOF
         
-        npm install @supabase/supabase-js
-        node sync-definitions.js
+        # Only install Supabase client if credentials are available
+        if [ -n "$SUPABASE_URL" ] && [ -n "$SUPABASE_SERVICE_ROLE_KEY" ]; then
+          npm install @supabase/supabase-js
+          node sync-definitions.js
+        else
+          echo "Supabase credentials not found, skipping sync"
+        fi
         
     - name: Commit updated manifest
       run: |
