@@ -92,3 +92,14 @@ jobs:
         done
         echo "✅ All JSON files validated successfully"
         echo "🎉 Validation completed with enhanced format support!"
+        
+    - name: Generate HTML pages
+      run: |
+        echo "📄 Generating HTML pages..."
+        node generate-pages.js
+        echo ""
+        echo "📄 Checking generated files:"
+        ls -la pages/
+        echo ""
+        echo "📊 Generated $(ls pages/*.html | wc -l) HTML files"
+        echo "✅ Page generation completed successfully"
