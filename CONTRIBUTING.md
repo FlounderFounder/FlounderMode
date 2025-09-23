@@ -46,14 +46,13 @@ Each term should be a separate JSON file in the `terms/` directory with this str
 
 ## 🤖 Automated Workflow
 
-When you create a pull request with new term files, GitHub Actions will automatically:
+When you create a pull request with new term files, the system will automatically:
 
 1. ✅ **Validate JSON format** - Ensures all files are properly formatted
 2. ✅ **Check for duplicates** - Prevents duplicate terms
 3. ✅ **Generate HTML pages** - Creates individual HTML pages for all terms
 4. ✅ **Update terms manifest** - Automatically updates the terms-manifest.json file
 5. ✅ **Sync with Supabase** - Initializes new definitions in the voting database
-6. ✅ **Add PR comment** - Provides feedback on the validation
 
 ### Dynamic Term Loading
 
@@ -81,7 +80,6 @@ New definitions are automatically:
 - **Detected** when terms are loaded
 - **Initialized** in the Supabase votes table
 - **Ready for voting** immediately after deployment
-- **Synced** via GitHub Actions on every push
 
 ## 🛠️ Local Development
 
@@ -169,7 +167,7 @@ npm run generate-html
 2. **One-Click**: Click "Create PR Automatically" button
 3. **GitHub Opens**: Browser opens GitHub with everything pre-filled
 4. **Submit**: Click "Propose new file" on GitHub
-5. **Done**: GitHub Actions handles the rest automatically!
+5. **Done**: The system handles the rest automatically!
 
 ### Manual Workflow
 1. **Create/Fork**: Fork the repository or create a new branch
@@ -178,7 +176,7 @@ npm run generate-html
 4. **Generate HTML**: Run `npm run generate-html` locally (optional)
 5. **Commit**: Commit your changes with a descriptive message
 6. **PR**: Create a pull request
-7. **Review**: GitHub Actions will validate, generate HTML, and provide feedback
+7. **Review**: The system will validate, generate HTML, and provide feedback
 8. **Merge**: Once approved, your term will be live with both JSON and HTML files!
 
 ## 🐛 Troubleshooting
