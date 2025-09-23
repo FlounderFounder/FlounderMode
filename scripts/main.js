@@ -4,7 +4,7 @@
 let flounderTerms = [];
 let userVotes = new Map(); // Track user votes per definition
 let allVotes = {}; // Store all vote counts from Supabase
-const USE_SUPABASE = true; // Set to false to use localStorage fallback
+// USE_SUPABASE is declared in individual pages to avoid conflicts
 
 // Main initialization function
 async function init() {
@@ -708,6 +708,8 @@ window.toggleDarkMode = function () {
     darkModeButton.disabled = false;
   }, 2000);
 };
+
+console.log('toggleDarkMode function defined:', typeof window.toggleDarkMode);
 
 // Initialize dark mode from saved preference
 function initDarkMode() {
