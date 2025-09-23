@@ -50,10 +50,38 @@ jobs:
               try {
                 const data = JSON.parse(require('fs').readFileSync('$file', 'utf8'));
                 console.log('✅ $file is valid JSON');
-                if (!data.term || !data.definition) {
-                  console.log('❌ $file missing required fields (term, definition)');
+                
+                // Check for required fields
+                if (!data.term) {
+                  console.log('❌ $file missing required field: term');
                   process.exit(1);
                 }
+                
+                // Check for definition or definitions field
+                if (!data.definition && !data.definitions) {
+                  console.log('❌ $file missing required field: definition or definitions');
+                  process.exit(1);
+                }
+                
+                // If it has definitions array, validate it
+                if (data.definitions) {
+                  if (!Array.isArray(data.definitions)) {
+                    console.log('❌ $file definitions field must be an array');
+                    process.exit(1);
+                  }
+                  if (data.definitions.length === 0) {
+                    console.log('❌ $file definitions array cannot be empty');
+                    process.exit(1);
+                  }
+                  // Check each definition has required fields
+                  data.definitions.forEach((def, index) => {
+                    if (!def.definition) {
+                      console.log('❌ $file definition ' + index + ' missing definition field');
+                      process.exit(1);
+                    }
+                  });
+                }
+                
                 console.log('✅ $file has required fields');
               } catch (e) {
                 console.log('❌ $file has invalid JSON:', e.message);
