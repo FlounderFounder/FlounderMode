@@ -91,3 +91,4 @@ jobs:
           fi
         done
         echo "✅ All JSON files validated successfully"
+        echo "🎉 Validation completed with enhanced format support!"
