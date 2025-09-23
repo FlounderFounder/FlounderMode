@@ -93,36 +93,36 @@ jobs:
         echo "✅ All JSON files validated successfully"
         echo "🎉 Validation completed with enhanced format support!"
         
-      - name: Generate HTML pages
-        run: |
-          echo "📄 Generating HTML pages..."
-          node generate-pages.js
-          echo ""
-          echo "📄 Checking generated files:"
-          ls -la pages/
-          echo ""
-          echo "📊 Generated $(ls pages/*.html | wc -l) HTML files"
-          echo "✅ Page generation completed successfully"
-          
-      - name: Commit and push changes
-        run: |
-          echo "📝 Checking for changes to commit..."
-          git config --global user.name 'github-actions[bot]'
-          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          
-          # Check if there are any changes
-          if git diff --quiet && git diff --cached --quiet; then
-            echo "ℹ️ No changes to commit"
-          else
-            echo "📝 Committing changes..."
-            git add .
-            git commit -m "🤖 Auto-generate pages and update manifest
+    - name: Generate HTML pages
+      run: |
+        echo "📄 Generating HTML pages..."
+        node generate-pages.js
+        echo ""
+        echo "📄 Checking generated files:"
+        ls -la pages/
+        echo ""
+        echo "📊 Generated $(ls pages/*.html | wc -l) HTML files"
+        echo "✅ Page generation completed successfully"
+        
+    - name: Commit and push changes
+      run: |
+        echo "📝 Checking for changes to commit..."
+        git config --global user.name 'github-actions[bot]'
+        git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+        
+        # Check if there are any changes
+        if git diff --quiet && git diff --cached --quiet; then
+          echo "ℹ️ No changes to commit"
+        else
+          echo "📝 Committing changes..."
+          git add .
+          git commit -m "🤖 Auto-generate pages and update manifest
 
-            - Generated HTML pages for all terms
-            - Updated terms-manifest.json
-            - Generated $(ls pages/*.html | wc -l) HTML files"
-            
-            echo "🚀 Pushing changes..."
-            git push
-            echo "✅ Changes committed and pushed successfully"
-          fi
+          - Generated HTML pages for all terms
+          - Updated terms-manifest.json
+          - Generated $(ls pages/*.html | wc -l) HTML files"
+          
+          echo "🚀 Pushing changes..."
+          git push
+          echo "✅ Changes committed and pushed successfully"
+        fi
