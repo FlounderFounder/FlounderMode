@@ -39,3 +39,27 @@ jobs:
           fi
         done
         echo "✅ File listing completed"
+        
+    - name: Validate JSON files
+      run: |
+        echo "🔍 Validating JSON files..."
+        for file in terms/*.json; do
+          if [ -f "$file" ]; then
+            echo "Validating $file"
+            node -e "
+              try {
+                const data = JSON.parse(require('fs').readFileSync('$file', 'utf8'));
+                console.log('✅ $file is valid JSON');
+                if (!data.term || !data.definition) {
+                  console.log('❌ $file missing required fields (term, definition)');
+                  process.exit(1);
+                }
+                console.log('✅ $file has required fields');
+              } catch (e) {
+                console.log('❌ $file has invalid JSON:', e.message);
+                process.exit(1);
+              }
+            "
+          fi
+        done
+        echo "✅ All JSON files validated successfully"
