@@ -674,6 +674,11 @@ function initDarkMode() {
   }
 }
 
+// Make functions globally available for individual pages
+window.loadUserVotes = loadUserVotes;
+window.saveUserVotes = saveUserVotes;
+window.updateVoteButtons = updateVoteButtons;
+
 // Initialize the app when DOM is loaded
 document.addEventListener("DOMContentLoaded", function() {
   init();

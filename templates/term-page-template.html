@@ -60,8 +60,7 @@
           }
           
           // ===== SUPABASE VOTING SYSTEM FOR HTML PAGES =====
-          let userVotes = new Map();
-          let allVotes = {};
+          // Note: userVotes and allVotes are declared in main.js
           const USE_SUPABASE = true;
           
           // Initialize Supabase voting
@@ -94,30 +93,6 @@
             }
           }
           
-          // Load user votes from localStorage
-          function loadUserVotes() {
-            try {
-              const savedVotes = localStorage.getItem('flounderVotes');
-              if (savedVotes) {
-                const votesData = JSON.parse(savedVotes);
-                userVotes = new Map(Object.entries(votesData));
-              }
-            } catch (error) {
-              console.warn('Failed to load user votes:', error);
-              userVotes = new Map();
-            }
-          }
-          
-          // Save user votes to localStorage
-          function saveUserVotes() {
-            try {
-              const votesData = Object.fromEntries(userVotes);
-              localStorage.setItem('flounderVotes', JSON.stringify(votesData));
-            } catch (error) {
-              console.warn('Failed to save user votes:', error);
-            }
-          }
-          
           // Update all vote counts on the page
           function updateAllVoteCounts() {
             console.log('Updating all vote counts with data:', allVotes);
@@ -144,7 +119,7 @@
             }
           }
           
-          // Submit a vote for a definition
+          // Submit a vote for a definition (override the one in main.js for individual pages)
           window.submitVote = async function(definitionId, voteType) {
             console.log('Voting:', definitionId, voteType);
             
@@ -166,7 +141,10 @@
             updateVoteCountOptimistically(definitionId, voteChange);
             updateVoteButtons(definitionId);
             
-            saveUserVotes();
+            // Use the saveUserVotes function from main.js
+            if (window.saveUserVotes) {
+              window.saveUserVotes();
+            }
             
             if (USE_SUPABASE && window.supabaseVoting) {
               const result = await window.supabaseVoting.submitVote(definitionId, voteType);
@@ -181,7 +159,9 @@
                 } else {
                   userVotes.delete(definitionId);
                 }
-                saveUserVotes();
+                if (window.saveUserVotes) {
+                  window.saveUserVotes();
+                }
                 updateVoteButtons(definitionId);
               }
             } else {
@@ -264,7 +244,10 @@
 
           // Initialize voting on page load
           document.addEventListener('DOMContentLoaded', async function() {
-            loadUserVotes();
+            // Load user votes using the function from main.js
+            if (window.loadUserVotes) {
+              window.loadUserVotes();
+            }
             
             // Wait a bit to ensure all scripts are loaded
             setTimeout(async () => {
