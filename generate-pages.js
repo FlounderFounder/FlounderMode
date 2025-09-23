@@ -47,7 +47,14 @@ termFiles.forEach(file => {
   // Handle both simple format (definition) and complex format (definitions array)
   let definitions;
   if (termData.definitions) {
-    definitions = termData.definitions;
+    definitions = termData.definitions.map((def, index) => {
+      // Ensure unique IDs for existing definitions
+      if (def.id === 'def-1' || def.id === 'def-2') {
+        const termSlug = termData.term.toLowerCase().replace(/[^a-z0-9]/g, '-');
+        return { ...def, id: `${termSlug}-def-${index + 1}` };
+      }
+      return def;
+    });
   } else if (termData.definition) {
     // Convert simple format to complex format with unique ID
     const termSlug = termData.term.toLowerCase().replace(/[^a-z0-9]/g, '-');
@@ -95,7 +102,14 @@ Object.entries(terms).forEach(([slug, termData]) => {
   // Handle both simple format (definition) and complex format (definitions array)
   let definitions;
   if (termData.definitions) {
-    definitions = termData.definitions;
+    definitions = termData.definitions.map((def, index) => {
+      // Ensure unique IDs for existing definitions
+      if (def.id === 'def-1' || def.id === 'def-2') {
+        const termSlug = termData.term.toLowerCase().replace(/[^a-z0-9]/g, '-');
+        return { ...def, id: `${termSlug}-def-${index + 1}` };
+      }
+      return def;
+    });
   } else if (termData.definition) {
     // Convert simple format to complex format with unique ID
     const termSlug = termData.term.toLowerCase().replace(/[^a-z0-9]/g, '-');
