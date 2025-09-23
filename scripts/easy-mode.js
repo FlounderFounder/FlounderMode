@@ -788,7 +788,7 @@ ${JSON.stringify(newDefinition, null, 2)}`;
     const termObject = {
       term: termData.term,
       definitions: [{
-        id: 'def-1',
+        id: `${termData.term.toLowerCase().replace(/[^a-z0-9]/g, '-')}-def-1`,
         definition: termData.definition,
         usage: termData.usage,
         author: termData.author,

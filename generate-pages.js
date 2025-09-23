@@ -49,9 +49,10 @@ termFiles.forEach(file => {
   if (termData.definitions) {
     definitions = termData.definitions;
   } else if (termData.definition) {
-    // Convert simple format to complex format
+    // Convert simple format to complex format with unique ID
+    const termSlug = termData.term.toLowerCase().replace(/[^a-z0-9]/g, '-');
     definitions = [{
-      id: 'def-1',
+      id: `${termSlug}-def-1`,
       definition: termData.definition,
       usage: termData.usage || '',
       author: termData.author || 'Anonymous',
@@ -96,9 +97,10 @@ Object.entries(terms).forEach(([slug, termData]) => {
   if (termData.definitions) {
     definitions = termData.definitions;
   } else if (termData.definition) {
-    // Convert simple format to complex format
+    // Convert simple format to complex format with unique ID
+    const termSlug = termData.term.toLowerCase().replace(/[^a-z0-9]/g, '-');
     definitions = [{
-      id: 'def-1',
+      id: `${termSlug}-def-1`,
       definition: termData.definition,
       usage: termData.usage || '',
       author: termData.author || 'Anonymous',
@@ -154,7 +156,7 @@ Object.entries(terms).forEach(([slug, termData]) => {
     definition: def.definition,
     usage: def.usage,
     author: def.author,
-    isPrimary: def.id === 'def-1',
+    isPrimary: def.isPrimary || false,
     upvotes: def.upvotes || 0,
     downvotes: def.downvotes || 0,
     netScore: def.netScore || 0
