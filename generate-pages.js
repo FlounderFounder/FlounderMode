@@ -69,8 +69,30 @@ const template = fs.readFileSync(templatePath, 'utf8');
 
 // Generate pages
 Object.entries(terms).forEach(([slug, termData]) => {
+  // Handle both simple format (definition) and complex format (definitions array)
+  let definitions;
+  if (termData.definitions) {
+    definitions = termData.definitions;
+  } else if (termData.definition) {
+    // Convert simple format to complex format
+    definitions = [{
+      id: 'def-1',
+      definition: termData.definition,
+      usage: termData.usage || '',
+      author: termData.author || 'Anonymous',
+      date: termData.date || new Date().toISOString().split('T')[0],
+      isPrimary: true,
+      upvotes: 0,
+      downvotes: 0,
+      netScore: 0
+    }];
+  } else {
+    console.error(`Term ${slug} has no definitions or definition field`);
+    return;
+  }
+
   // Process definitions to handle legacy 'votes' field and ensure voting properties
-  const processedDefinitions = termData.definitions.map(def => {
+  const processedDefinitions = definitions.map(def => {
     const processedDef = { ...def };
     // Handle legacy 'votes' field from JSON files
     if (def.votes !== undefined && def.upvotes === undefined) {
