@@ -22,8 +22,10 @@ async function loadAllTerms() {
           
           // Handle backward compatibility - convert old format to new format
           if (term.definition && !term.definitions) {
+            // Generate unique ID based on term name and file
+            const termSlug = term.term.toLowerCase().replace(/[^a-z0-9]/g, '-');
             term.definitions = [{
-              id: 'def-1',
+              id: `${termSlug}-def-1`,
               definition: term.definition,
               usage: term.usage,
               author: 'Carter Wynn',
@@ -37,9 +39,9 @@ async function loadAllTerms() {
             delete term.usage;
           }
           
-          // Ensure all definitions have voting properties
+          // Ensure all definitions have voting properties and unique IDs
           if (term.definitions) {
-            term.definitions.forEach(def => {
+            term.definitions.forEach((def, index) => {
               // Handle legacy 'votes' field from JSON files
               if (def.votes !== undefined && def.upvotes === undefined) {
                 def.upvotes = def.votes;
@@ -49,6 +51,12 @@ async function loadAllTerms() {
                 if (def.upvotes === undefined) def.upvotes = 0;
                 if (def.downvotes === undefined) def.downvotes = 0;
                 if (def.netScore === undefined) def.netScore = def.upvotes - def.downvotes;
+              }
+              
+              // Ensure unique IDs - if multiple definitions have same ID, make them unique
+              if (def.id === 'def-1' || def.id === 'def-2') {
+                const termSlug = term.term.toLowerCase().replace(/[^a-z0-9]/g, '-');
+                def.id = `${termSlug}-def-${index + 1}`;
               }
             });
           }
@@ -833,7 +841,9 @@ function saveUserVotes() {
 
 // Submit a vote for a definition
 window.submitVote = async function(definitionId, voteType) {
-  console.log('Voting:', definitionId, voteType);
+  console.log('submitVote called:', definitionId, voteType);
+  console.log('USE_SUPABASE:', USE_SUPABASE);
+  console.log('window.supabaseVoting:', window.supabaseVoting);
   
   // Check if user already voted on this definition
   const existingVote = userVotes.get(definitionId);
@@ -856,6 +866,8 @@ window.submitVote = async function(definitionId, voteType) {
     }
   }
   
+  console.log('Vote change:', voteChange);
+  
   // Update UI immediately for instant feedback
   updateVoteCountOptimistically(definitionId, voteChange);
   updateVoteButtons(definitionId);
@@ -865,12 +877,15 @@ window.submitVote = async function(definitionId, voteType) {
   
   // Submit to Supabase or fallback to localStorage
   if (USE_SUPABASE && window.supabaseVoting) {
+    console.log('Submitting to Supabase...');
     const result = await window.supabaseVoting.submitVote(definitionId, voteType);
+    console.log('Supabase result:', result);
     if (result) {
       allVotes = result;
       // Update with real data from server
       updateVoteButtons(definitionId);
     } else {
+      console.log('Supabase failed, reverting optimistic change');
       // Fallback: revert the optimistic change if Supabase failed
       updateVoteCountOptimistically(definitionId, -voteChange);
       if (existingVote === voteType) {
@@ -882,6 +897,7 @@ window.submitVote = async function(definitionId, voteType) {
       updateVoteButtons(definitionId);
     }
   } else {
+    console.log('Using localStorage fallback');
     // Use localStorage fallback - update allVotes for consistency
     if (!allVotes[definitionId]) {
       allVotes[definitionId] = { upvotes: 0, downvotes: 0, netScore: 0 };
