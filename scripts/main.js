@@ -6,6 +6,92 @@ let userVotes = new Map(); // Track user votes per definition
 let allVotes = {}; // Store all vote counts from Supabase
 // USE_SUPABASE is declared in individual pages to avoid conflicts
 
+// Dynamic term loading function
+async function loadAllTerms() {
+  try {
+    // First, try to get the list of term files from a manifest or API
+    // For now, we'll use a fallback approach that tries to load common patterns
+    const possibleTerms = await discoverTermFiles();
+    const terms = [];
+    
+    for (const file of possibleTerms) {
+      try {
+        const response = await fetch(`/terms/${file}`);
+        if (response.ok) {
+          const term = await response.json();
+          
+          // Handle backward compatibility - convert old format to new format
+          if (term.definition && !term.definitions) {
+            term.definitions = [{
+              id: 'def-1',
+              definition: term.definition,
+              usage: term.usage,
+              author: 'Carter Wynn',
+              date: '2024-01-15',
+              isPrimary: true,
+              upvotes: 0,
+              downvotes: 0,
+              netScore: 0
+            }];
+            delete term.definition;
+            delete term.usage;
+          }
+          
+          // Ensure all definitions have voting properties
+          if (term.definitions) {
+            term.definitions.forEach(def => {
+              // Handle legacy 'votes' field from JSON files
+              if (def.votes !== undefined && def.upvotes === undefined) {
+                def.upvotes = def.votes;
+                def.downvotes = 0;
+                def.netScore = def.votes;
+              } else {
+                if (def.upvotes === undefined) def.upvotes = 0;
+                if (def.downvotes === undefined) def.downvotes = 0;
+                if (def.netScore === undefined) def.netScore = def.upvotes - def.downvotes;
+              }
+            });
+          }
+          
+          terms.push(term);
+        }
+      } catch (error) {
+        console.error(`Error loading ${file}:`, error);
+      }
+    }
+    
+    return terms;
+  } catch (error) {
+    console.error('Error loading terms:', error);
+    return [];
+  }
+}
+
+// Discover available term files
+async function discoverTermFiles() {
+  try {
+    // Try to load from the terms manifest first
+    const response = await fetch('/terms-manifest.json');
+    if (response.ok) {
+      const manifest = await response.json();
+      return manifest.terms || [];
+    }
+  } catch (error) {
+    console.log('Could not load terms manifest, falling back to hardcoded list');
+  }
+  
+  // Fallback to hardcoded list if manifest fails
+  const knownTerms = [
+    'mvp-theater.json',
+    'dashboard-fatigue.json', 
+    'founder-gut.json',
+    'vibe-driven-dev.json',
+    'meta-investment.json'
+  ];
+  
+  return knownTerms;
+}
+
 // Main initialization function
 async function init() {
   const searchInput = document.getElementById("searchInput");
@@ -16,59 +102,8 @@ async function init() {
   const modalContent = document.getElementById("modalContent");
   const wotdContainer = document.querySelector(".wotd-container");
 
-  // Fetch terms data from individual JSON files
-  const termFiles = [
-    'mvp-theater.json',
-    'dashboard-fatigue.json', 
-    'founder-gut.json',
-    'vibe-driven-dev.json',
-    'meta-investment.json'
-  ];
-  
-  flounderTerms = [];
-  for (const file of termFiles) {
-    try {
-      const response = await fetch(`/terms/${file}`);
-      const term = await response.json();
-      
-      // Handle backward compatibility - convert old format to new format
-      if (term.definition && !term.definitions) {
-        term.definitions = [{
-          id: 'def-1',
-          definition: term.definition,
-          usage: term.usage,
-          author: 'Carter Wynn',
-          date: '2024-01-15',
-          isPrimary: true,
-          upvotes: 0,
-          downvotes: 0,
-          netScore: 0
-        }];
-        delete term.definition;
-        delete term.usage;
-      }
-      
-      // Ensure all definitions have voting properties
-      if (term.definitions) {
-        term.definitions.forEach(def => {
-          // Handle legacy 'votes' field from JSON files
-          if (def.votes !== undefined && def.upvotes === undefined) {
-            def.upvotes = def.votes;
-            def.downvotes = 0;
-            def.netScore = def.votes;
-          } else {
-            if (def.upvotes === undefined) def.upvotes = 0;
-            if (def.downvotes === undefined) def.downvotes = 0;
-            if (def.netScore === undefined) def.netScore = def.upvotes - def.downvotes;
-          }
-        });
-      }
-      
-      flounderTerms.push(term);
-    } catch (error) {
-      console.error(`Failed to load term from ${file}:`, error);
-    }
-  }
+  // Fetch terms data from individual JSON files dynamically
+  flounderTerms = await loadAllTerms();
 
   // Search functionality
   searchInput.addEventListener("input", () => {
@@ -447,6 +482,9 @@ window.showToast = function(message, type = 'success') {
   
   // Load vote data from Supabase or localStorage
   if (USE_SUPABASE && window.supabaseVoting) {
+    // Initialize all definitions in Supabase first
+    await window.supabaseVoting.batchInitializeTerms(flounderTerms);
+    
     allVotes = await window.supabaseVoting.loadVoteData();
     // Subscribe to real-time changes
     window.supabaseVoting.subscribeToChanges((newVotes) => {

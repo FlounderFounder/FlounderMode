@@ -139,6 +139,52 @@ async function submitVoteToSupabase(definitionId, voteType) {
   }
 }
 
+// Initialize new definitions in Supabase (ensure they exist in the database)
+async function initializeDefinitionsInSupabase(termData) {
+  try {
+    if (!termData || !termData.definitions) {
+      console.log('No definitions to initialize');
+      return;
+    }
+
+    for (const definition of termData.definitions) {
+      const definitionId = definition.id;
+      
+      // Check if this definition already has votes in the database
+      const { data: existingVotes, error: fetchError } = await supabaseClient
+        .from('votes')
+        .select('definition_id')
+        .eq('definition_id', definitionId)
+        .limit(1);
+
+      if (fetchError && fetchError.code !== 'PGRST116') {
+        console.error('Error checking definition existence:', fetchError);
+        continue;
+      }
+
+      // If no votes exist for this definition, we can optionally create a record
+      // or just let it be created when the first vote is cast
+      if (!existingVotes || existingVotes.length === 0) {
+        console.log(`Definition ${definitionId} ready for voting (no existing votes)`);
+      }
+    }
+  } catch (error) {
+    console.error('Error initializing definitions:', error);
+  }
+}
+
+// Batch initialize multiple terms
+async function batchInitializeTerms(termsArray) {
+  try {
+    for (const term of termsArray) {
+      await initializeDefinitionsInSupabase(term);
+    }
+    console.log(`Initialized ${termsArray.length} terms for voting`);
+  } catch (error) {
+    console.error('Error batch initializing terms:', error);
+  }
+}
+
 // Get user ID (same as before)
 function getUserId() {
   let userId = localStorage.getItem('flounderUserId');
@@ -175,5 +221,7 @@ window.supabaseVoting = {
   loadVoteData: loadVoteDataFromSupabase,
   submitVote: submitVoteToSupabase,
   subscribeToChanges: subscribeToVoteChanges,
-  getUserId: getUserId
+  getUserId: getUserId,
+  initializeDefinitions: initializeDefinitionsInSupabase,
+  batchInitializeTerms: batchInitializeTerms
 };

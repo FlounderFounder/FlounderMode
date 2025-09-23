@@ -52,6 +52,17 @@ termFiles.forEach(file => {
   };
 });
 
+// Update the terms manifest
+const manifestPath = path.join(__dirname, 'terms-manifest.json');
+const manifest = {
+  terms: termFiles.sort(),
+  lastUpdated: new Date().toISOString(),
+  version: "1.0"
+};
+
+fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2));
+console.log('Updated terms-manifest.json');
+
 // Read template
 const templatePath = path.join(__dirname, 'templates', 'term-page-template.html');
 const template = fs.readFileSync(templatePath, 'utf8');

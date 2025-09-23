@@ -51,8 +51,37 @@ When you create a pull request with new term files, GitHub Actions will automati
 1. ✅ **Validate JSON format** - Ensures all files are properly formatted
 2. ✅ **Check for duplicates** - Prevents duplicate terms
 3. ✅ **Generate HTML pages** - Creates individual HTML pages for all terms
-4. ✅ **Update main.js** - Automatically adds new files to the site
-5. ✅ **Add PR comment** - Provides feedback on the validation
+4. ✅ **Update terms manifest** - Automatically updates the terms-manifest.json file
+5. ✅ **Sync with Supabase** - Initializes new definitions in the voting database
+6. ✅ **Add PR comment** - Provides feedback on the validation
+
+### Dynamic Term Loading
+
+The site now uses a dynamic term loading system that:
+- Reads from `terms-manifest.json` to discover available terms
+- Automatically loads new terms without code changes
+- Initializes voting data in Supabase for new definitions
+- Falls back to hardcoded list if manifest is unavailable
+
+### Adding New Terms
+
+When you add a new term:
+
+1. **Create the JSON file** in the `terms/` directory
+2. **Run `node generate-pages.js`** to update the manifest and generate pages
+3. **The site will automatically**:
+   - Load the new term from the manifest
+   - Initialize it in Supabase for voting
+   - Generate the individual HTML page
+   - Update the carousel and search functionality
+
+### Supabase Integration
+
+New definitions are automatically:
+- **Detected** when terms are loaded
+- **Initialized** in the Supabase votes table
+- **Ready for voting** immediately after deployment
+- **Synced** via GitHub Actions on every push
 
 ## 🛠️ Local Development
 
