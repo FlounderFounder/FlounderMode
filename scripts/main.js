@@ -476,6 +476,17 @@ window.showToast = function(message, type = 'success') {
 // Expose functions to global scope
   window.openModal = openModal;
 
+  // Carousel functionality
+  function populateCarousel() {
+    const shuffled = [...flounderTerms].sort(() => 0.5 - Math.random());
+    shuffled.forEach((term) => {
+      const btn = document.createElement("button");
+      btn.textContent = term.term;
+      btn.onclick = () => openModal(term);
+      carousel.appendChild(btn);
+    });
+  }
+
   // Initialize components
   populateCarousel();
   populateWotd();
@@ -500,17 +511,6 @@ window.showToast = function(message, type = 'success') {
   }
   
   // Fish starts hidden - users can tap thought bubble to show
-
-  // Carousel functionality
-  function populateCarousel() {
-    const shuffled = [...flounderTerms].sort(() => 0.5 - Math.random());
-    shuffled.forEach((term) => {
-      const btn = document.createElement("button");
-      btn.textContent = term.term;
-      btn.onclick = () => openModal(term);
-      carousel.appendChild(btn);
-    });
-  }
 
   // Word of the Day functionality
   function getWotd() {
