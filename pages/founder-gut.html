@@ -121,6 +121,113 @@
             shareTerm('Founder Gut', definitions);
           }
           
+          // Share term function for individual pages
+          window.shareTerm = function(term, definitions, definitionId = null) {
+            console.log('shareTerm called with:', { term, definitions, definitionId });
+            
+            // Build URL for the current page
+            let termUrl = window.location.href;
+            if (definitionId) {
+              termUrl += `#${definitionId}`;
+            }
+            
+            // Use specific definition if provided, otherwise primary or first definition
+            let targetDef;
+            if (definitionId) {
+              targetDef = definitions.find(d => d.id === definitionId);
+            }
+            if (!targetDef) {
+              targetDef = definitions.find(d => d.isPrimary) || definitions[0];
+            }
+            
+            const shareText = `Check out "${term}" from Floundermode Dictionary: ${termUrl}`;
+            
+            console.log('Generated share text:', shareText);
+
+            // Try native share first, then clipboard
+            if (navigator.share) {
+              navigator.share({
+                title: `${term} - Floundermode Dictionary`,
+                text: shareText,
+                url: termUrl
+              }).catch(err => {
+                console.log('Native share failed:', err);
+                fallbackShare(shareText);
+              });
+            } else {
+              fallbackShare(shareText);
+            }
+          };
+          
+          // Fallback share function
+          window.fallbackShare = function(text) {
+            console.log('fallbackShare called with:', text);
+            
+            // Try the modern clipboard API first
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+              console.log('Using modern clipboard API');
+              navigator.clipboard.writeText(text).then(() => {
+                console.log('Clipboard write successful');
+                showToast('Copied to clipboard!');
+              }).catch(err => {
+                console.log('Clipboard API failed:', err);
+                // Try fallback method
+                tryFallbackCopy(text);
+              });
+            } else {
+              console.log('Clipboard API not available, using fallback');
+              tryFallbackCopy(text);
+            }
+          };
+          
+          // Fallback copy function
+          function tryFallbackCopy(text) {
+            try {
+              const textArea = document.createElement('textarea');
+              textArea.value = text;
+              textArea.style.position = 'fixed';
+              textArea.style.left = '-999999px';
+              textArea.style.top = '-999999px';
+              document.body.appendChild(textArea);
+              textArea.focus();
+              textArea.select();
+              const successful = document.execCommand('copy');
+              document.body.removeChild(textArea);
+              
+              if (successful) {
+                showToast('Copied to clipboard!');
+              } else {
+                alert('Share text copied to clipboard!');
+              }
+            } catch (err) {
+              console.log('Fallback copy failed:', err);
+              alert('Share text copied to clipboard!');
+            }
+          }
+          
+          // Simple toast notification
+          function showToast(message) {
+            const toast = document.createElement('div');
+            toast.textContent = message;
+            toast.style.cssText = `
+              position: fixed;
+              top: 20px;
+              right: 20px;
+              background: #22c55e;
+              color: white;
+              padding: 12px 20px;
+              border-radius: 8px;
+              z-index: 10000;
+              font-family: inherit;
+              font-size: 14px;
+              box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            `;
+            document.body.appendChild(toast);
+            setTimeout(() => {
+              document.body.removeChild(toast);
+            }, 2000);
+          }
+          
           // ===== SUPABASE VOTING SYSTEM FOR HTML PAGES =====
           // Note: userVotes and allVotes are declared in main.js
           const USE_SUPABASE = true;

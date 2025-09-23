@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>Vibe-Driven Dev - Floundermode Dictionary</title>
+    <title>Feature Creep - Floundermode Dictionary</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/x-icon" href="../favicon.ico" />
     
@@ -31,7 +31,7 @@
 
     <main class="main-content">
       <div class="term-page">
-        <h1 class="term-title">Vibe-Driven Dev</h1>
+        <h1 class="term-title">Feature Creep</h1>
         
         <div class="definitions-container">
           <h2 class="definitions-title">DEFINITIONS</h2>
@@ -39,10 +39,10 @@
             
             <div class="definition-item" id="def-1">
               <div class="definition-content">
-                <div class="definition-text">A product methodology where feelings override all measurable success criteria.</div>
-                <div class="definition-example">"We don't test features — we ship on vibes."</div>
+                <div class="definition-text">The gradual expansion of a product's scope until it becomes a bloated mess that solves everyone's problems except the original one.</div>
+                <div class="definition-example">"We started building a todo app but now it's a full CRM with AI integration. Classic Feature Creep."</div>
               </div>
-              <div class="definition-author">by Carter Wynn 2024-01-15</div>
+              <div class="definition-author">by Template Contributor 2024-01-23</div>
               <div class="definition-votes">
                 <button class="vote-btn vote-up" onclick="submitVote('def-1', 'up')" data-def-id="def-1">
                   ▲
@@ -56,39 +56,70 @@
                 </button>
               </div>
             </div>
+
+            <div class="definition-item" id="def-2">
+              <div class="definition-content">
+                <div class="definition-text">When your MVP becomes a Frankenstein's monster of 'just one more feature' requests.</div>
+                <div class="definition-example">"The client asked for email notifications, so we added a social media platform. Feature Creep strikes again."</div>
+              </div>
+              <div class="definition-author">by Anonymous Contributor 2024-01-23</div>
+              <div class="definition-votes">
+                <button class="vote-btn vote-up" onclick="submitVote('def-2', 'up')" data-def-id="def-2">
+                  ▲
+                </button>
+                <div class="vote-count">0</div>
+                <button class="vote-btn vote-down" onclick="submitVote('def-2', 'down')" data-def-id="def-2">
+                  ▼
+                </button>
+                <button class="share-btn" onclick="shareDefinition('def-2')" data-def-id="def-2" title="Share this definition">
+                  📤
+                </button>
+              </div>
+            </div>
           </div>
         </div>
         
         <div class="term-related">
           <h2>Related Terms</h2>
           <div class="related-tags">
-            <span class="related-tag">Design Philosophy</span>
-            <span class="related-tag">Non-Metric</span>
-            <span class="related-tag">Product Culture</span>
+            <span class="related-tag">Scope Creep</span>
+            <span class="related-tag">Product Management</span>
+            <span class="related-tag">MVP</span>
+            <span class="related-tag">Project Management</span>
           </div>
         </div>
         
         <div class="term-actions">
-          <button onclick="shareVibe-DrivenDev()" class="share-button">
+          <button onclick="shareFeatureCreep()" class="share-button">
             📤 Share This Term
           </button>
         </div>
         
         <script>
-          function shareVibe-DrivenDev() {
+          function shareFeatureCreep() {
             const definitions = [
           {
                     "id": "def-1",
-                    "definition": "A product methodology where feelings override all measurable success criteria.",
-                    "usage": "We don't test features — we ship on vibes.",
-                    "author": "Carter Wynn",
+                    "definition": "The gradual expansion of a product's scope until it becomes a bloated mess that solves everyone's problems except the original one.",
+                    "usage": "We started building a todo app but now it's a full CRM with AI integration. Classic Feature Creep.",
+                    "author": "Template Contributor",
                     "isPrimary": true,
+                    "upvotes": 0,
+                    "downvotes": 0,
+                    "netScore": 0
+          },
+          {
+                    "id": "def-2",
+                    "definition": "When your MVP becomes a Frankenstein's monster of 'just one more feature' requests.",
+                    "usage": "The client asked for email notifications, so we added a social media platform. Feature Creep strikes again.",
+                    "author": "Anonymous Contributor",
+                    "isPrimary": false,
                     "upvotes": 0,
                     "downvotes": 0,
                     "netScore": 0
           }
 ];
-            shareTerm('Vibe-Driven Dev', definitions);
+            shareTerm('Feature Creep', definitions);
           }
           
           // Share term function for individual pages
@@ -350,10 +381,20 @@
             const definitions = [
           {
                     "id": "def-1",
-                    "definition": "A product methodology where feelings override all measurable success criteria.",
-                    "usage": "We don't test features — we ship on vibes.",
-                    "author": "Carter Wynn",
+                    "definition": "The gradual expansion of a product's scope until it becomes a bloated mess that solves everyone's problems except the original one.",
+                    "usage": "We started building a todo app but now it's a full CRM with AI integration. Classic Feature Creep.",
+                    "author": "Template Contributor",
                     "isPrimary": true,
+                    "upvotes": 0,
+                    "downvotes": 0,
+                    "netScore": 0
+          },
+          {
+                    "id": "def-2",
+                    "definition": "When your MVP becomes a Frankenstein's monster of 'just one more feature' requests.",
+                    "usage": "The client asked for email notifications, so we added a social media platform. Feature Creep strikes again.",
+                    "author": "Anonymous Contributor",
+                    "isPrimary": false,
                     "upvotes": 0,
                     "downvotes": 0,
                     "netScore": 0
@@ -362,11 +403,11 @@
             const definition = definitions.find(d => d.id === definitionId);
             if (!definition) return;
 
-            const shareText = `Vibe-Driven Dev: ${definition.definition}\n\n"${definition.usage}"\n\n— ${definition.author || 'Anonymous'}\n\nFrom Floundermode Dictionary`;
+            const shareText = `Feature Creep: ${definition.definition}\n\n"${definition.usage}"\n\n— ${definition.author || 'Anonymous'}\n\nFrom Floundermode Dictionary`;
             
             if (navigator.share) {
               navigator.share({
-                title: `Vibe-Driven Dev - Floundermode Dictionary`,
+                title: `Feature Creep - Floundermode Dictionary`,
                 text: shareText,
                 url: window.location.href
               }).catch(err => console.log('Error sharing:', err));

@@ -1,0 +1,29 @@
+{
+  "term": "Feature Creep",
+  "definitions": [
+    {
+      "id": "def-1",
+      "definition": "The gradual expansion of a product's scope until it becomes a bloated mess that solves everyone's problems except the original one.",
+      "usage": "We started building a todo app but now it's a full CRM with AI integration. Classic Feature Creep.",
+      "author": "Template Contributor",
+      "date": "2024-01-23",
+      "isPrimary": true,
+      "votes": 0
+    },
+    {
+      "id": "def-2", 
+      "definition": "When your MVP becomes a Frankenstein's monster of 'just one more feature' requests.",
+      "usage": "The client asked for email notifications, so we added a social media platform. Feature Creep strikes again.",
+      "author": "Anonymous Contributor",
+      "date": "2024-01-23",
+      "isPrimary": false,
+      "votes": 0
+    }
+  ],
+  "related": [
+    "Scope Creep",
+    "Product Management", 
+    "MVP",
+    "Project Management"
+  ]
+}
