@@ -165,9 +165,10 @@ jobs:
               if (termData.definitions) {
                 definitions = termData.definitions;
               } else if (termData.definition) {
-                // Convert simple format to complex format
+                // Convert simple format to complex format with unique ID
+                const termSlug = termData.term.toLowerCase().replace(/[^a-z0-9]/g, '-');
                 definitions = [{
-                  id: 'def-1',
+                  id: `${termSlug}-def-1`,
                   definition: termData.definition,
                   usage: termData.usage || '',
                   author: termData.author || 'Anonymous',
@@ -184,6 +185,12 @@ jobs:
               
               // Process each definition
               for (const def of definitions) {
+                // Generate unique ID if needed
+                let defId = def.id;
+                if (defId === 'def-1' || defId === 'def-2') {
+                  const termSlug = termData.term.toLowerCase().replace(/[^a-z0-9]/g, '-');
+                  defId = `${termSlug}-def-1`;
+                }
                 // Check if definition already exists
                 const { data: existingDef, error: fetchError } = await supabase
                   .from('definitions')
@@ -222,7 +229,7 @@ jobs:
                 if (insertError) {
                   console.log(`❌ Error inserting definition: ${insertError.message}`);
                 } else {
-                  console.log(`✅ Added new definition for ${termData.term}`);
+                  console.log(`✅ Added new definition for ${termData.term} with ID: ${defId}`);
                 }
               }
             }
