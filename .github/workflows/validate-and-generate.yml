@@ -1,71 +1,21 @@
-name: Validate Terms and Generate Pages
+name: Simple Test Action
 
 on:
   push:
-    branches: [ main, test-github-action ]
-    paths:
-      - 'terms/*.json'
-      - 'templates/*.html'
-  pull_request:
-    branches: [ main ]
-    paths:
-      - 'terms/*.json'
-      - 'templates/*.html'
+    branches: [ test-github-action ]
 
 jobs:
-  validate-and-generate:
+  simple-test:
     runs-on: ubuntu-latest
     
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
       
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18'
-        
-    - name: Validate JSON files
+    - name: Simple test
       run: |
-        echo "Validating JSON files..."
-        for file in terms/*.json; do
-          if [ -f "$file" ]; then
-            echo "Validating $file"
-            node -e "
-              try {
-                const data = JSON.parse(require('fs').readFileSync('$file', 'utf8'));
-                console.log('✅ $file is valid JSON');
-                if (!data.term || !data.definition) {
-                  console.log('❌ $file missing required fields');
-                  process.exit(1);
-                }
-              } catch (e) {
-                console.log('❌ $file has invalid JSON:', e.message);
-                process.exit(1);
-              }
-            "
-          fi
-        done
-        
-    - name: Generate HTML pages
-      run: |
-        echo "Generating HTML pages..."
-        node generate-pages.js
-        
-    - name: Check for generated files
-      run: |
-        echo "Checking generated files..."
-        ls -la pages/
-        echo "Generated $(ls pages/*.html | wc -l) HTML files"
-        
-    - name: Commit generated files
-      run: |
-        git config --local user.email "action@github.com"
-        git config --local user.name "GitHub Action"
-        git add pages/ terms-manifest.json
-        if git diff --staged --quiet; then
-          echo "No changes to commit"
-        else
-          git commit -m "Auto-generate pages via GitHub Action"
-          git push
-        fi
+        echo "🎉 GitHub Action is working!"
+        echo "Current directory: $(pwd)"
+        echo "Files in repository:"
+        ls -la
+        echo "✅ Test completed successfully"
