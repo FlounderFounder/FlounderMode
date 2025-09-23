@@ -15,7 +15,7 @@ const definitionTemplate = `
                 <button class="vote-btn vote-up" onclick="submitVote('{{DEF_ID}}', 'up')" data-def-id="{{DEF_ID}}">
                   ▲
                 </button>
-                <div class="vote-count">{{NET_SCORE}}</div>
+                <div class="vote-count">0</div>
                 <button class="vote-btn vote-down" onclick="submitVote('{{DEF_ID}}', 'down')" data-def-id="{{DEF_ID}}">
                   ▼
                 </button>
@@ -90,8 +90,7 @@ Object.entries(terms).forEach(([slug, termData]) => {
       .replace(/{{DEFINITION_TEXT}}/g, def.definition)
       .replace(/{{USAGE_TEXT}}/g, def.usage)
       .replace(/{{AUTHOR}}/g, def.author)
-      .replace(/{{DATE}}/g, def.date || 'Unknown Date')
-      .replace(/{{NET_SCORE}}/g, def.netScore || 0);
+      .replace(/{{DATE}}/g, def.date || 'Unknown Date');
   }).join('\n');
 
   // Generate definitions data for JavaScript

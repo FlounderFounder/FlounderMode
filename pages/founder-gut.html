@@ -182,9 +182,11 @@
           
           // Update all vote counts on the page
           function updateAllVoteCounts() {
+            console.log('Updating all vote counts with data:', allVotes);
             document.querySelectorAll('.vote-count').forEach(voteCount => {
               const definitionId = voteCount.closest('.definition-item').id;
               const votes = allVotes[definitionId] || { netScore: 0 };
+              console.log(`Updating ${definitionId}: ${votes.netScore}`);
               voteCount.textContent = votes.netScore;
             });
           }
