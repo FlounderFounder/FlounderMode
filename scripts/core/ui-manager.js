@@ -345,7 +345,7 @@ function populateWotd() {
   const primaryDef = wotd.definitions.find(d => d.isPrimary) || wotd.definitions[0];
   
   speechBubble.innerHTML = `
-    <div style="text-align: center; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; margin-bottom: .5rem; font-size: 1.2rem;">WORD OF THE DAY</div>
+    <div class="wotd-title">WORD OF THE DAY</div>
     <span class="wotd-term">${wotd.term}</span><br/>${primaryDef.definition}
   `;
 }

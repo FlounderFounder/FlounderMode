@@ -49,6 +49,17 @@
   box-shadow: 1px 1px 0 #000;
 }
 
+/* WOTD Title - Static font size */
+.wotd-title {
+  text-align: center;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 0.5rem;
+  font-size: 1.2rem !important; /* Static size, not responsive */
+  line-height: 1.2;
+}
+
 /* Speech Bubble & WOTD Styles */
 .speech-bubble {
   position: absolute;
