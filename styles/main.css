@@ -17,6 +17,11 @@ body {
   transition: background-color 0.8s ease, color 0.8s ease;
 }
 
+/* Ensure all elements respect viewport width */
+* {
+  max-width: 100%;
+}
+
 /* Search Styles */
 .search-container {
   max-width: 800px;
@@ -27,10 +32,23 @@ body {
   gap: 0.5rem;
 }
 
+@media (max-width: 768px) {
+  .search-container {
+    margin: 0 auto 1rem auto;
+    padding: 0 0.5rem;
+  }
+}
+
 .search-wrapper {
   position: relative;
   flex: 1 1 60%;
   min-width: 200px;
+}
+
+@media (max-width: 480px) {
+  .search-wrapper {
+    min-width: 150px;
+  }
 }
 
 .search-input {
@@ -41,6 +59,13 @@ body {
   border: 2px solid #000;
   box-shadow: 3px 3px 0 #000;
   transition: background-color 0.8s ease, color 0.8s ease, border-color 0.8s ease;
+}
+
+@media (max-width: 768px) {
+  .search-input {
+    padding: 0.6rem 0.8rem;
+    font-size: 0.9rem;
+  }
 }
 
 .search-input:focus {
@@ -62,6 +87,13 @@ body {
   transition: transform 0.2s ease, background-color 0.2s ease;
   border-radius: 12px;
   font-family: "Roboto Mono", monospace;
+}
+
+@media (max-width: 768px) {
+  .random-button {
+    padding: 0.6rem 0.8rem;
+    font-size: 0.9rem;
+  }
 }
 
 .random-button:hover {
@@ -177,48 +209,68 @@ body.dark-mode .autocomplete-item:hover {
 .term-page {
   max-width: 800px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 1rem;
   background: rgba(255, 255, 255, 0.9);
-  border-radius: 12px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   backdrop-filter: blur(10px);
 }
 
 .term-title {
   font-family: "Bebas Neue", sans-serif;
-  font-size: clamp(2rem, 5vw, 3.5rem);
-  margin: 0 0 2rem 0;
+  font-size: clamp(2.5rem, 6vw, 4rem);
+  margin: 0 0 1rem 0;
   letter-spacing: 2px;
-  color: #1a1a1a;
+  color: #000;
   text-align: center;
-  border-bottom: 3px solid #000;
-  padding-bottom: 1rem;
+  border-bottom: 2px solid #000;
+  padding-bottom: 0.5rem;
 }
 
 .term-definition,
 .term-usage,
 .term-related {
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
 }
 
 .term-definition h2,
 .term-usage h2,
 .term-related h2 {
   font-family: "Bebas Neue", sans-serif;
-  font-size: 1.5rem;
-  margin: 0 0 1rem 0;
+  font-size: 1.1rem;
+  margin: 0 0 0.5rem 0;
   letter-spacing: 1px;
   color: #333;
 }
 
 .term-definition p,
 .term-usage p {
-  font-size: 1.1rem;
-  line-height: 1.7;
+  font-size: 0.95rem;
+  line-height: 1.4;
   margin: 0;
-  padding: 1rem;
-  border-radius: 8px;
-  border-left: 4px solid #93d0ff;
+  padding: 0.6rem;
+  border-radius: 6px;
+  border-left: 3px solid #93d0ff;
+}
+
+/* Emphasis styling for terms within definitions */
+.term-definition p strong,
+.term-usage p strong {
+  font-weight: bold;
+  color: #2563eb;
+  background: rgba(37, 99, 235, 0.1);
+  padding: 0.1rem 0.2rem;
+  border-radius: 3px;
+}
+
+/* Special emphasis for the main term */
+.term-definition p .term-emphasis {
+  font-weight: bold;
+  color: #1d4ed8;
+  background: rgba(29, 78, 216, 0.15);
+  padding: 0.15rem 0.3rem;
+  border-radius: 4px;
+  font-size: 1.05em;
 }
 
 .term-definition p {
@@ -227,26 +279,26 @@ body.dark-mode .autocomplete-item:hover {
 }
 
 .term-usage p {
-  background: rgba(34, 197, 94, 0.1);
+  background: rgba(34, 197, 94, 0.08);
   border-left-color: #22c55e;
 }
 
 .related-tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-top: 1rem;
+  gap: 0.3rem;
+  margin-top: 0.5rem;
 }
 
 .related-tag {
   background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
   color: white;
-  padding: 0.5rem 1rem;
-  border-radius: 20px;
-  font-size: 0.9rem;
+  padding: 0.3rem 0.8rem;
+  border-radius: 16px;
+  font-size: 0.8rem;
   font-weight: 600;
   border: 2px solid #000;
-  box-shadow: 0 4px 8px rgba(99, 102, 241, 0.3), 2px 2px 0 #000;
+  box-shadow: 0 2px 4px rgba(99, 102, 241, 0.3), 1px 1px 0 #000;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -265,39 +317,39 @@ body.dark-mode .autocomplete-item:hover {
 
 /* Term actions styling for individual pages */
 .term-actions {
-  margin-top: 2rem;
+  margin-top: 1rem;
   text-align: center;
-  padding-top: 1.5rem;
-  border-top: 2px solid #eee;
+  padding-top: 0.8rem;
+  border-top: 1px solid #eee;
 }
 
 .term-actions .share-button {
   display: inline-block;
-  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
-  color: #fff;
-  padding: 0.8rem 1.5rem;
-  border-radius: 12px;
+  background: transparent;
+  color: #8b5cf6;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
   text-decoration: none;
   font-weight: 600;
   font-family: "Roboto Mono", monospace;
-  font-size: 1rem;
+  font-size: 0.9rem;
   letter-spacing: 1px;
-  border: 2px solid #000;
-  box-shadow: 0 6px 12px rgba(139, 92, 246, 0.3), 3px 3px 0 #000;
+  border: 2px solid #8b5cf6;
+  box-shadow: none;
   transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
   text-transform: uppercase;
   cursor: pointer;
 }
 
 .term-actions .share-button:hover {
-  background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+  background: rgba(139, 92, 246, 0.1);
   transform: translateY(-3px) scale(1.05);
-  box-shadow: 0 8px 16px rgba(139, 92, 246, 0.4), 4px 4px 0 #000;
+  box-shadow: 0 8px 16px rgba(139, 92, 246, 0.2);
 }
 
 .term-actions .share-button:active {
   transform: translateY(-1px) scale(1.02);
-  box-shadow: 0 4px 8px rgba(139, 92, 246, 0.3), 2px 2px 0 #000;
+  box-shadow: 0 4px 8px rgba(139, 92, 246, 0.2);
 }
 
 /* Dark mode styles for term pages */
@@ -346,33 +398,74 @@ body.dark-mode .term-actions {
 }
 
 body.dark-mode .term-actions .share-button {
-  border: 2px solid #fff;
-  box-shadow: 0 6px 12px rgba(139, 92, 246, 0.3), 3px 3px 0 #fff;
+  border: 2px solid #8b5cf6;
+  color: #8b5cf6;
+  box-shadow: none;
 }
 
 body.dark-mode .term-actions .share-button:hover {
-  box-shadow: 0 8px 16px rgba(139, 92, 246, 0.4), 4px 4px 0 #fff;
+  background: rgba(139, 92, 246, 0.2);
+  box-shadow: 0 8px 16px rgba(139, 92, 246, 0.3);
 }
 
 body.dark-mode .term-actions .share-button:active {
-  box-shadow: 0 4px 8px rgba(139, 92, 246, 0.3), 2px 2px 0 #fff;
+  box-shadow: 0 4px 8px rgba(139, 92, 246, 0.2);
+}
+
+/* Dark mode emphasis styling */
+body.dark-mode .term-definition p strong,
+body.dark-mode .term-usage p strong {
+  color: #60a5fa;
+  background: rgba(96, 165, 250, 0.2);
+}
+
+body.dark-mode .term-definition p .term-emphasis,
+body.dark-mode .term-usage p .term-emphasis {
+  color: #3b82f6;
+  background: rgba(59, 130, 246, 0.25);
 }
 
 /* Mobile responsiveness for term pages */
 @media (max-width: 768px) {
   .term-page {
-    margin: 1rem;
-    padding: 1.5rem;
+    margin: 0.3rem;
+    padding: 0.8rem;
   }
   
   .term-title {
-    font-size: 2rem;
+    font-size: clamp(2rem, 8vw, 3rem);
+    margin-bottom: 0.8rem;
+    padding-bottom: 0.3rem;
   }
   
   .term-definition p,
   .term-usage p {
+    font-size: 0.85rem;
+    padding: 0.4rem;
+    margin-bottom: 0.8rem;
+  }
+  
+  .term-definition,
+  .term-usage,
+  .term-related {
+    margin-bottom: 0.8rem;
+  }
+  
+  .term-definition h2,
+  .term-usage h2,
+  .term-related h2 {
     font-size: 1rem;
-    padding: 0.8rem;
+    margin-bottom: 0.3rem;
+  }
+  
+  .term-actions {
+    margin-top: 0.8rem;
+    padding-top: 0.6rem;
+  }
+  
+  .related-tag {
+    padding: 0.25rem 0.6rem;
+    font-size: 0.7rem;
   }
 }
 

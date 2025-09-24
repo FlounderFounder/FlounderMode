@@ -118,7 +118,15 @@ function openModal(term) {
   // Generate definitions HTML
   const definitionsHtml = generateDefinitionsHtml(term.definitions);
   
+  // Add prominent term name within the content (Urban Dictionary style)
+  const termNameDisplay = `
+    <div class="modal-term-name">
+      <h2 class="term-name-title">${term.term}</h2>
+    </div>
+  `;
+  
   const newContent = `
+    ${termNameDisplay}
     ${definitionsHtml}
     ${relatedSection}
     ${viewFullPageButton}`;

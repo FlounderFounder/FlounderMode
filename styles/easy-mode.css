@@ -87,6 +87,12 @@
   margin-bottom: 2rem;
 }
 
+@media (max-width: 600px) {
+  .progress-container {
+    margin-bottom: 1rem;
+  }
+}
+
 .progress-bar {
   width: 100%;
   height: 20px;
@@ -143,6 +149,18 @@
   transition: color 0.8s ease;
 }
 
+@media (max-width: 600px) {
+  .form-step h3 {
+    font-size: 1.2rem;
+    margin-bottom: 0.3rem;
+  }
+  
+  .form-step p {
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+  }
+}
+
 /* Form Inputs */
 .easy-mode-form input,
 .easy-mode-form textarea {
@@ -156,6 +174,14 @@
   transition: box-shadow 0.2s ease, background-color 0.8s ease, color 0.8s ease, border-color 0.8s ease;
 }
 
+@media (max-width: 600px) {
+  .easy-mode-form input,
+  .easy-mode-form textarea {
+    padding: 0.6rem;
+    font-size: 0.9rem;
+  }
+}
+
 .easy-mode-form input:focus,
 .easy-mode-form textarea:focus {
   outline: none;
@@ -164,6 +190,12 @@
 
 .easy-mode-form textarea {
   min-height: 100px;
+}
+
+@media (max-width: 600px) {
+  .easy-mode-form textarea {
+    min-height: 80px;
+  }
 }
 
 /* Character Counter */
@@ -565,20 +597,27 @@
   }
   
   .easy-mode-content {
-    padding: 1rem;
+    padding: 0.8rem;
+  }
+  
+  .easy-mode-modal .window-bar {
+    padding: 0.8rem 1rem;
+    font-size: 1.5rem;
   }
   
   .form-navigation {
     flex-direction: row;
     justify-content: space-between;
     gap: 0.5rem;
+    margin-top: 1rem;
+    padding-top: 1rem;
   }
   
   .nav-btn {
     min-width: auto;
-    width: 50px;
-    height: 50px;
-    padding: 0.5rem;
+    width: 45px;
+    height: 45px;
+    padding: 0.4rem;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -608,8 +647,16 @@
   }
   
   .alert-content {
-    padding: 1rem;
-    font-size: 0.9rem;
+    padding: 0.8rem;
+    font-size: 0.85rem;
+  }
+  
+  .alert-header {
+    padding: 0.6rem 0.8rem;
+  }
+  
+  .alert-actions {
+    padding: 0.8rem;
   }
 }
 
