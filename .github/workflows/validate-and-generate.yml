@@ -1,0 +1,274 @@
+name: Validate, Generate, and Sync
+
+on:
+  push:
+    branches: [ main, test-github-action ]
+    paths:
+      - 'terms/**'
+      - 'terms-manifest.json'
+
+permissions:
+  contents: write  # Allow writing to repository contents
+  # No other permissions granted
+
+jobs:
+  simple-test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        
+    - name: Test Node.js
+      run: |
+        echo "🎉 GitHub Action is working!"
+        echo "Current directory: $(pwd)"
+        echo "Node.js version: $(node --version)"
+        echo "NPM version: $(npm --version)"
+        echo "Files in repository:"
+        ls -la
+        echo "✅ Node.js setup completed successfully"
+        
+    - name: List JSON files
+      run: |
+        echo "📄 JSON files in terms directory:"
+        ls -la terms/
+        echo ""
+        echo "📄 Contents of terms directory:"
+        for file in terms/*.json; do
+          if [ -f "$file" ]; then
+            echo "Found: $file"
+          fi
+        done
+        echo "✅ File listing completed"
+        
+    - name: Validate JSON files
+      run: |
+        echo "🔍 Validating JSON files..."
+        for file in terms/*.json; do
+          if [ -f "$file" ]; then
+            echo "Validating $file"
+            node -e "
+              try {
+                const data = JSON.parse(require('fs').readFileSync('$file', 'utf8'));
+                console.log('✅ $file is valid JSON');
+                
+                // Check for required fields
+                if (!data.term) {
+                  console.log('❌ $file missing required field: term');
+                  process.exit(1);
+                }
+                
+                // Check for definition or definitions field
+                if (!data.definition && !data.definitions) {
+                  console.log('❌ $file missing required field: definition or definitions');
+                  process.exit(1);
+                }
+                
+                // If it has definitions array, validate it
+                if (data.definitions) {
+                  if (!Array.isArray(data.definitions)) {
+                    console.log('❌ $file definitions field must be an array');
+                    process.exit(1);
+                  }
+                  if (data.definitions.length === 0) {
+                    console.log('❌ $file definitions array cannot be empty');
+                    process.exit(1);
+                  }
+                  // Check each definition has required fields
+                  data.definitions.forEach((def, index) => {
+                    if (!def.definition) {
+                      console.log('❌ $file definition ' + index + ' missing definition field');
+                      process.exit(1);
+                    }
+                  });
+                }
+                
+                console.log('✅ $file has required fields');
+              } catch (e) {
+                console.log('❌ $file has invalid JSON:', e.message);
+                process.exit(1);
+              }
+            "
+          fi
+        done
+        echo "✅ All JSON files validated successfully"
+        echo "🎉 Validation completed with enhanced format support!"
+        
+    - name: Generate HTML pages
+      run: |
+        echo "📄 Generating HTML pages..."
+        node generate-pages.js
+        echo ""
+        echo "📄 Checking generated files:"
+        ls -la pages/
+        echo ""
+        echo "📊 Generated $(ls pages/*.html | wc -l) HTML files"
+        echo "✅ Page generation completed successfully"
+        
+    - name: Sync with Supabase
+      run: |
+        echo "🔄 Syncing with Supabase..."
+        
+        # Check if Supabase credentials are available
+        if [ -z "$SUPABASE_URL" ] || [ -z "$SUPABASE_SERVICE_ROLE_KEY" ]; then
+          echo "⚠️ Supabase credentials not provided, skipping sync"
+          echo "ℹ️ To enable Supabase sync, add SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY secrets"
+          exit 0
+        fi
+        
+        # Install Supabase client
+        echo "📦 Installing Supabase client..."
+        npm install @supabase/supabase-js
+        
+        # Create sync script
+        cat > sync-supabase.js << 'EOF'
+        const { createClient } = require('@supabase/supabase-js');
+        const fs = require('fs');
+        const path = require('path');
+        
+        // Initialize Supabase client
+        const supabaseUrl = process.env.SUPABASE_URL;
+        const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+        
+        if (!supabaseUrl || !supabaseKey) {
+          console.log('❌ Supabase credentials not provided');
+          process.exit(1);
+        }
+        
+        const supabase = createClient(supabaseUrl, supabaseKey);
+        
+        async function syncDefinitions() {
+          try {
+            console.log('🔄 Starting Supabase sync...');
+            
+            // Read terms manifest
+            const manifestPath = path.join(__dirname, 'terms-manifest.json');
+            const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+            
+            console.log(`📄 Found ${manifest.terms.length} terms to sync`);
+            
+            // Process each term
+            for (const termFile of manifest.terms) {
+              const termPath = path.join(__dirname, 'terms', termFile);
+              const termData = JSON.parse(fs.readFileSync(termPath, 'utf8'));
+              
+              console.log(`🔄 Syncing term: ${termData.term}`);
+              
+              // Handle both simple format (definition) and complex format (definitions array)
+              let definitions;
+              if (termData.definitions) {
+                definitions = termData.definitions;
+              } else if (termData.definition) {
+                // Convert simple format to complex format with unique ID
+                const termSlug = termData.term.toLowerCase().replace(/[^a-z0-9]/g, '-');
+                definitions = [{
+                  id: `${termSlug}-def-1`,
+                  definition: termData.definition,
+                  usage: termData.usage || '',
+                  author: termData.author || 'Anonymous',
+                  date: termData.date || new Date().toISOString().split('T')[0],
+                  isPrimary: true,
+                  upvotes: 0,
+                  downvotes: 0,
+                  netScore: 0
+                }];
+              } else {
+                console.log(`⚠️ Skipping ${termData.term} - no definitions found`);
+                continue;
+              }
+              
+              // Process each definition
+              for (const def of definitions) {
+                // Generate unique ID if needed
+                let defId = def.id;
+                if (defId === 'def-1' || defId === 'def-2') {
+                  const termSlug = termData.term.toLowerCase().replace(/[^a-z0-9]/g, '-');
+                  defId = `${termSlug}-def-1`;
+                }
+                // Check if definition already exists
+                const { data: existingDef, error: fetchError } = await supabase
+                  .from('definitions')
+                  .select('*')
+                  .eq('term', termData.term)
+                  .eq('definition', def.definition)
+                  .single();
+                
+                if (fetchError && fetchError.code !== 'PGRST116') {
+                  console.log(`❌ Error checking definition: ${fetchError.message}`);
+                  continue;
+                }
+                
+                if (existingDef) {
+                  console.log(`✅ Definition already exists for ${termData.term}`);
+                  continue;
+                }
+                
+                // Insert new definition
+                const { data: newDef, error: insertError } = await supabase
+                  .from('definitions')
+                  .insert({
+                    term: termData.term,
+                    definition: def.definition,
+                    usage: def.usage || '',
+                    author: def.author || 'Anonymous',
+                    date: def.date || new Date().toISOString().split('T')[0],
+                    is_primary: def.isPrimary || false,
+                    upvotes: def.upvotes || 0,
+                    downvotes: def.downvotes || 0,
+                    net_score: def.netScore || 0
+                  })
+                  .select()
+                  .single();
+                
+                if (insertError) {
+                  console.log(`❌ Error inserting definition: ${insertError.message}`);
+                } else {
+                  console.log(`✅ Added new definition for ${termData.term} with ID: ${defId}`);
+                }
+              }
+            }
+            
+            console.log('✅ Supabase sync completed successfully');
+            
+          } catch (error) {
+            console.log(`❌ Supabase sync failed: ${error.message}`);
+            process.exit(1);
+          }
+        }
+        
+        syncDefinitions();
+        EOF
+        
+        # Run the sync script
+        node sync-supabase.js
+        echo "✅ Supabase sync completed"
+        
+    - name: Commit and push changes
+      run: |
+        echo "📝 Checking for changes to commit..."
+        git config --global user.name 'github-actions[bot]'
+        git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+        
+        # Check if there are any changes
+        if git diff --quiet && git diff --cached --quiet; then
+          echo "ℹ️ No changes to commit"
+        else
+          echo "📝 Committing changes..."
+          # Only add specific directories/files that the action should modify
+          git add pages/ terms-manifest.json
+          git commit -m "🤖 Auto-generate pages and update manifest
+
+          - Generated HTML pages for all terms
+          - Updated terms-manifest.json
+          - Generated $(ls pages/*.html | wc -l) HTML files"
+          
+          echo "🚀 Pushing changes..."
+          git push
+          echo "✅ Changes committed and pushed successfully"
+        fi

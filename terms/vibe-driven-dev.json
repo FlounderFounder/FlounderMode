@@ -1,0 +1,19 @@
+{
+  "term": "Vibe-Driven Dev",
+  "definitions": [
+    {
+      "id": "def-1",
+      "definition": "A product methodology where feelings override all measurable success criteria.",
+      "usage": "We don't test features — we ship on vibes.",
+      "author": "Carter Wynn",
+      "date": "2024-01-15",
+      "isPrimary": true,
+      "votes": 0
+    }
+  ],
+  "related": [
+    "Design Philosophy",
+    "Non-Metric",
+    "Product Culture"
+  ]
+}

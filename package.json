@@ -1,0 +1,27 @@
+{
+  "name": "default_website",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "generate-html": "node scripts/generate-html.js",
+    "generate-pages": "node generate-pages.js",
+    "dev": "python3 -m http.server 8000",
+    "build": "echo 'No build step required for static site'"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/FlounderFounder/default_website.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/FlounderFounder/default_website/issues"
+  },
+  "homepage": "https://github.com/FlounderFounder/default_website#readme",
+  "description": "",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.57.4",
+    "bad-words": "^4.0.0"
+  }
+}

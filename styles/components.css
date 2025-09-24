@@ -1,0 +1,93 @@
+/* Badges and Button Components */
+
+/* Badge Styles */
+.badge {
+  display: inline-block;
+  margin: 0.25rem 0.5rem 0.25rem 0;
+  vertical-align: top;
+  max-width: 100%;
+  word-wrap: break-word;
+  white-space: normal;
+  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+  color: white;
+  padding: 0.4rem 0.8rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  border: 2px solid #000;
+  border-radius: 20px;
+  box-shadow: 0 4px 8px rgba(99, 102, 241, 0.3), 2px 2px 0 #000;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.badge:hover {
+  background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%);
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 6px 12px rgba(99, 102, 241, 0.4), 3px 3px 0 #000;
+}
+
+.badge:active {
+  transform: translateY(0) scale(0.98);
+  background: linear-gradient(135deg, #3730a3 0%, #312e81 100%);
+}
+
+/* Contribute Button Styles */
+.contribute-button {
+  flex: 1;
+  min-width: 120px;
+  padding: 0.75rem 1rem;
+  font-size: 0.9rem;
+  font-weight: bold;
+  border: 2px solid #000;
+  background: #10b981;
+  color: white;
+  box-shadow: 2px 2px 0 #000;
+  cursor: pointer;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+  text-transform: uppercase;
+  font-family: "Roboto Mono", monospace;
+  border-radius: 12px;
+}
+
+.contribute-button:hover {
+  background: #059669;
+  transform: translateY(-1px);
+}
+
+.contribute-button:active {
+  transform: translateY(0);
+  box-shadow: 1px 1px 0 #000;
+}
+
+.github-button {
+  background: #4CAF50 !important;
+  color: white;
+}
+
+.github-button:hover {
+  background-color: #45a049 !important;
+  transform: translateY(-1px);
+}
+
+.github-button:active {
+  background-color: #3d8b40 !important;
+  transform: translateY(0);
+  box-shadow: 1px 1px 0 #000;
+}
+
+.easy-mode-button {
+  background: #f44336 !important;
+  color: white;
+}
+
+.easy-mode-button:hover {
+  background-color: #da190b !important;
+  transform: translateY(-1px);
+}
+
+.easy-mode-button:active {
+  background-color: #c41506 !important;
+  transform: translateY(0);
+  box-shadow: 1px 1px 0 #000;
+}

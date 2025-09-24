@@ -1,0 +1,6 @@
+{
+  "term": "GitHub Action Test",
+  "definition": "Testing the GitHub Actions workflow with Supabase sync integration. This should now sync with the database automatically!",
+  "usage": "This term was created to test our GitHub Actions workflow.",
+  "related": ["Testing", "Automation", "CI/CD"]
+}

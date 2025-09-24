@@ -1,0 +1,20 @@
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Package files
+package-lock.json
+
+# Test files
+test-profanity.html
+
+# Unused library files
+scripts/bad-words.js
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+.vercel

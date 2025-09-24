@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Floundermode Dictionary</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap" rel="stylesheet">
+    
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="/styles/main.css">
+    <link rel="stylesheet" href="/styles/easy-mode.css">
+    <link rel="stylesheet" href="/styles/voting-ui.css">
+    <link rel="stylesheet" href="/styles/definitions.css">
+    <link rel="stylesheet" href="/styles/speech-bubble-fix.css">
+    <link rel="stylesheet" href="/styles/toast.css">
+    <link rel="stylesheet" href="/styles/share.css">
+    <link rel="stylesheet" href="/styles/components.css">
+    <link rel="stylesheet" href="/styles/modal.css">
+    <link rel="stylesheet" href="/styles/navigation.css">
+    <link rel="stylesheet" href="/styles/carousel.css">
+    
+  </head>
+  <body>
+    <header class="main-header">
+      <div class="header-content">
+        <h1 class="page-title">Floundermode Dictionary</h1>
+                    <nav class="header-nav">
+              <button class="nav-button" onclick="showAbout()">About</button>
+              <button class="nav-button" onclick="showContributing()">
+                Contribute
+              </button>
+              <button class="nav-button dark-mode-toggle" onclick="toggleDarkMode()">
+                🌙 Dark
+              </button>
+            </nav>
+      </div>
+    </header>
+
+    <main class="main-content">
+    <div class="search-container">
+      <div class="search-wrapper">
+        <input
+          type="text"
+          class="search-input"
+          id="searchInput"
+          placeholder="Search a term..."
+        />
+        <div class="autocomplete-list hidden" id="autocompleteList"></div>
+      </div>
+        <button class="random-button" onclick="selectRandomTerm()">
+          Random
+        </button>
+    </div>
+
+    <div class="carousel" id="carousel"></div>
+    </main>
+
+              <div class="wotd-container hide" onclick="toggleWotd()">
+            <img src="/assets/carter-wynn.png" />
+      <div class="speech-bubble">
+        <strong>The word of the day:</strong>
+        The word definition would go here. If it's long it might not fit. It's
+        important that this text wraps.
+      </div>
+    </div>
+
+    <!-- Thought bubble that toggles fish visibility -->
+    <div class="thought-bubble" onclick="showWotd()">
+      💭 Word of the day
+    </div>
+
+    <div class="term-modal hide" id="termModal">
+      <div class="window-bar">
+        <span id="modalTitle"></span>
+        <button class="window-button" onclick="closeModal()">✕</button>
+      </div>
+      <div class="term-content" id="modalContent"></div>
+    </div>
+
+    <div class="easy-mode-modal hide" id="easyModeModal">
+      <div class="window-bar">
+        <span>Easy Mode - Add New Term</span>
+        <button class="window-button" onclick="closeEasyModeModal()">✕</button>
+      </div>
+      <div class="easy-mode-content">
+        <div class="progress-container">
+          <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+          </div>
+          <div class="progress-text">Step <span id="currentStepText">1</span> of 5</div>
+        </div>
+
+        <form id="easyModeForm" class="easy-mode-form">
+          <div class="form-step active" data-step="1">
+            <h3>What's the term?</h3>
+            <p>Enter the name of the concept or phrase you want to define.</p>
+            <input type="text" id="termName" name="termName" placeholder="e.g., Zoom Gloom" maxlength="50" required>
+            <div class="char-counter"><span id="termCounter">0</span>/50</div>
+          </div>
+
+          <div class="form-step" data-step="2">
+            <h3>Who's contributing?</h3>
+            <p>Enter your name or username for attribution (optional).</p>
+            <input type="text" id="authorName" name="authorName" placeholder="e.g., Carter Wynn" maxlength="50">
+            <div class="char-counter"><span id="authorCounter">0</span>/50</div>
+          </div>
+
+          <div class="form-step" data-step="3">
+            <h3>Define it</h3>
+            <p>Write a clear, concise definition. What does this term mean?</p>
+            <textarea id="termDefinition" name="termDefinition" placeholder="e.g., That fading stare that sets in during your fourth video call of the day." maxlength="200" required></textarea>
+            <div class="char-counter"><span id="definitionCounter">0</span>/200</div>
+          </div>
+
+          <div class="form-step" data-step="4">
+            <h3>Give an example</h3>
+            <p>Show how this term would be used in a sentence or context.</p>
+            <textarea id="termUsage" name="termUsage" placeholder="e.g., By hour three I had full-blown Zoom Gloom." maxlength="150" required></textarea>
+            <div class="char-counter"><span id="usageCounter">0</span>/150</div>
+          </div>
+
+          <div class="form-step" data-step="5">
+            <h3>Add related tags (optional)</h3>
+            <p>Choose up to 4 tags that relate to your term. You can select from suggestions or add your own.</p>
+            <div class="tag-input-container">
+              <div class="tag-input-wrapper">
+                <input type="text" id="tagInput" placeholder="Type a tag and press Enter" maxlength="30">
+                <button type="button" class="tag-enter-btn" onclick="addTagFromInput()" title="Add tag">⏎</button>
+              </div>
+              <div class="tag-suggestions" id="tagSuggestions"></div>
+            </div>
+            <div class="selected-tags" id="selectedTags"></div>
+            <div class="tag-limit">Tags: <span id="tagCount">0</span>/4</div>
+          </div>
+
+          <div class="form-navigation">
+            <button type="button" class="nav-btn prev-btn" onclick="previousStep()" style="display: none;">
+              <span class="btn-text">Previous</span>
+              <span class="btn-arrow">←</span>
+            </button>
+            <button type="button" class="nav-btn next-btn" onclick="nextStep()">
+              <span class="btn-text">Next</span>
+              <span class="btn-arrow">→</span>
+            </button>
+            <button type="submit" class="nav-btn submit-btn" style="display: none;">
+              <span class="btn-text">Submit Contribution</span>
+              <span class="btn-arrow">✓</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="custom-alert" id="customAlert">
+      <div class="alert-header">
+        <span id="alertTitle">Validation Error</span>
+      </div>
+      <div class="alert-content" id="alertContent">
+        Please enter a term name.
+      </div>
+      <div class="alert-actions">
+        <button class="alert-btn" onclick="closeCustomAlert()">OK</button>
+      </div>
+    </div>
+
+    <div class="pr-preview-modal hide" id="prPreviewModal">
+      <div class="window-bar">
+        <span>Pull Request Preview</span>
+        <button class="window-button" onclick="closePrPreviewModal()">✕</button>
+      </div>
+      <div class="pr-preview-content">
+        <div class="pr-header">
+          <h3>🎉 Your term is ready for submission!</h3>
+          <p>Copy the information below to create a pull request on GitHub.</p>
+        </div>
+        
+        <div class="pr-section">
+          <h4>📝 Pull Request Title</h4>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-label">Copy this title</span>
+              <button class="copy-btn" onclick="copyToClipboard('prTitle')">📋 Copy</button>
+            </div>
+            <code id="prTitle"></code>
+          </div>
+        </div>
+
+        <div class="pr-section">
+          <h4>📄 Pull Request Description</h4>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-label">Copy this description</span>
+              <button class="copy-btn" onclick="copyToClipboard('prDescription')">📋 Copy</button>
+            </div>
+            <pre id="prDescription"></pre>
+          </div>
+        </div>
+
+        <div class="pr-section">
+          <h4>💻 New Term File</h4>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-label">New file: terms/[filename].json</span>
+              <button class="copy-btn" onclick="copyToClipboard('codeChanges')">📋 Copy</button>
+            </div>
+            <pre id="codeChanges"></pre>
+          </div>
+        </div>
+
+        <div class="pr-section">
+          <h4>🚀 Automated Workflow</h4>
+          <div class="next-steps">
+            <div class="automated-workflow">
+              <h5>📋 Manual Contribution</h5>
+              <p>Click the <strong>"Open GitHub"</strong> button below to:</p>
+              <ol>
+                <li>🚀 Open GitHub repository</li>
+                <li>📝 Create a new file in the terms/ directory</li>
+                <li>📋 Copy the JSON content above into the file</li>
+                <li>✅ Use the PR title and description above</li>
+              </ol>
+              
+              <div class="automation-benefits">
+                <h5>🤖 GitHub Actions Magic</h5>
+                <p>This is where we would tell you what GitHub Actions were doing, but we vibe-coded this whole thing and wouldn't understand what's happening anyway, and if you had to use easy mode, you probably wouldn't either.</p>
+              </div>              
+            </div>
+          </div>
+        </div>
+
+        <div class="pr-actions">
+          <button class="pr-btn secondary" onclick="closePrPreviewModal()">Close</button>
+          <button class="pr-btn primary" onclick="window.open('https://github.com/FlounderFounder/default_website', '_blank')">
+            Open GitHub →
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- JavaScript Files -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="/scripts/features/supabase-voting.js"></script>
+    <script src="/scripts/utils/simple-profanity-filter.js"></script>
+    <script>
+      // Enable Supabase for the main page
+      window.USE_SUPABASE = true;
+    </script>
+    <script src="/scripts/core/data-loader.js"></script>
+    <script src="/scripts/core/voting-system.js"></script>
+    <script src="/scripts/utils/share-utils.js"></script>
+    <script src="/scripts/core/navigation.js"></script>
+    <script src="/scripts/core/ui-manager.js"></script>
+    <script src="/scripts/core/main.js"></script>
+    <script src="/scripts/features/easy-mode.js"></script>
+  </body>
+</html>
