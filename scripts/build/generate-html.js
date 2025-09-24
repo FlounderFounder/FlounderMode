@@ -1,181 +1,193 @@
 #!/usr/bin/env node
 
-/**
- * HTML Page Generator for Floundermode Dictionary Terms
- * Generates individual HTML pages from JSON term files
- */
-
 const fs = require('fs');
 const path = require('path');
 
-function generateHtmlPage(termData, filename) {
-  const termName = termData.term;
-  const definition = termData.definition;
-  const usage = termData.usage;
-  const relatedTags = termData.related || [];
+// Template for individual definitions
+const definitionTemplate = `
+            <div class="definition-item" id="{{DEF_ID}}">
+              <div class="definition-content">
+                <div class="definition-text">{{DEFINITION_TEXT}}</div>
+                <div class="definition-example">"{{USAGE_TEXT}}"</div>
+              </div>
+              <div class="definition-author">by {{AUTHOR}} {{DATE}}</div>
+              <div class="definition-votes">
+                <button class="vote-btn vote-up" onclick="submitVote('{{DEF_ID}}', 'up')" data-def-id="{{DEF_ID}}">
+                  ▲
+                </button>
+                <div class="vote-count">0</div>
+                <button class="vote-btn vote-down" onclick="submitVote('{{DEF_ID}}', 'down')" data-def-id="{{DEF_ID}}">
+                  ▼
+                </button>
+                <button class="share-btn" onclick="shareDefinition('{{DEF_ID}}')" data-def-id="{{DEF_ID}}" title="Share this definition">
+                  📤
+                </button>
+              </div>
+            </div>`;
+
+// Load term data from JSON files
+const termsDir = path.join(__dirname, '../../terms');
+const termFiles = fs.readdirSync(termsDir).filter(file => file.endsWith('.json'));
+
+const terms = {};
+
+termFiles.forEach(file => {
+  const slug = file.replace('.json', '');
+  const filePath = path.join(termsDir, file);
+  const termData = JSON.parse(fs.readFileSync(filePath, 'utf8'));
   
-  // Generate related tags HTML
-  const relatedTagsHtml = relatedTags.map(tag => 
+  // Convert related array to HTML tags
+  const relatedTags = termData.related.map(tag => 
     `<span class="related-tag">${tag}</span>`
-  ).join('\n            ');
+  );
   
-  // Generate share function call
-  const shareFunctionCall = `shareTerm('${termName.replace(/'/g, "\\'")}', '${definition.replace(/'/g, "\\'")}', '${usage.replace(/'/g, "\\'")}')`;
+  // Generate share function name
+  const shareFunction = `share${termData.term.replace(/\s+/g, '')}`;
   
-  return `<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>${termName} - Floundermode Dictionary</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" type="image/x-icon" href="../favicon.ico" />
-    
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap" rel="stylesheet">
-    
-    <!-- CSS Files -->
-    <link rel="stylesheet" href="../styles/main.css">
-    <link rel="stylesheet" href="../styles/easy-mode.css">
-  </head>
-  <body>
-    <header class="main-header">
-      <div class="header-content">
-        <h1 class="page-title">Floundermode Dictionary</h1>
-        <nav class="header-nav">
-          <a href="../" class="nav-button">← Back to Dictionary</a>
-          <button class="nav-button dark-mode-toggle" onclick="toggleDarkMode()">
-            🌙 Dark
-          </button>
-        </nav>
-      </div>
-    </header>
-
-    <main class="main-content">
-      <div class="term-page">
-        <h1 class="term-title">${termName}</h1>
-        <div class="modal-definition-section">
-          <h3 class="modal-section-title">DEFINITION</h3>
-          <div class="modal-content-block definition-block">
-            <div class="modal-accent-bar definition-accent"></div>
-            <div class="modal-text-content">${definition}</div>
-          </div>
-        </div>
-
-        <div class="modal-usage-section">
-          <h3 class="modal-section-title">USAGE EXAMPLE</h3>
-          <div class="modal-content-block usage-block">
-            <div class="modal-accent-bar usage-accent"></div>
-            <div class="modal-text-content">"${usage}"</div>
-          </div>
-        </div>
-        
-        <div class="term-related">
-          <h2>Related Terms</h2>
-          <div class="related-tags">
-            ${relatedTagsHtml}
-          </div>
-        </div>
-        
-        <div class="term-actions">
-          <button onclick="${shareFunctionCall}" class="share-button">
-            📤 Share This Term
-          </button>
-        </div>
-      </div>
-    </main>
-
-    <!-- JavaScript Files -->
-    <script src="../scripts/utils/simple-profanity-filter.js"></script>
-    <script src="../scripts/core/main.js"></script>
-  </body>
-</html>`;
-}
-
-function generateHtmlFromJson(jsonFilePath, outputDir = 'pages') {
-  try {
-    // Read the JSON file
-    const jsonContent = fs.readFileSync(jsonFilePath, 'utf8');
-    const termData = JSON.parse(jsonContent);
-    
-    // Generate filename for HTML (same as JSON but with .html extension)
-    const jsonFilename = path.basename(jsonFilePath, '.json');
-    const htmlFilename = `${jsonFilename}.html`;
-    const htmlPath = path.join(outputDir, htmlFilename);
-    
-    // Generate HTML content
-    const htmlContent = generateHtmlPage(termData, jsonFilename);
-    
-    // Ensure output directory exists
-    if (!fs.existsSync(outputDir)) {
-      fs.mkdirSync(outputDir, { recursive: true });
-    }
-    
-    // Write HTML file
-    fs.writeFileSync(htmlPath, htmlContent);
-    
-    console.log(`✅ Generated HTML page: ${htmlPath}`);
-    return htmlPath;
-    
-  } catch (error) {
-    console.error(`❌ Error generating HTML for ${jsonFilePath}:`, error.message);
-    throw error;
-  }
-}
-
-function generateAllHtmlPages(termsDir = 'terms', pagesDir = 'pages') {
-  console.log('🔄 Generating HTML pages for all terms...\n');
-  
-  if (!fs.existsSync(termsDir)) {
-    console.error(`❌ Terms directory '${termsDir}' does not exist`);
-    return;
-  }
-  
-  const jsonFiles = fs.readdirSync(termsDir).filter(f => f.endsWith('.json'));
-  
-  if (jsonFiles.length === 0) {
-    console.log('⚠️  No JSON files found in terms directory');
-    return;
-  }
-  
-  const generatedFiles = [];
-  
-  for (const jsonFile of jsonFiles) {
-    const jsonPath = path.join(termsDir, jsonFile);
-    try {
-      const htmlPath = generateHtmlFromJson(jsonPath, pagesDir);
-      generatedFiles.push(htmlPath);
-    } catch (error) {
-      console.error(`Failed to generate HTML for ${jsonFile}`);
-    }
-  }
-  
-  console.log(`\n📊 Generated ${generatedFiles.length} HTML pages`);
-  return generatedFiles;
-}
-
-// Run if this script is executed directly
-if (require.main === module) {
-  const args = process.argv.slice(2);
-  
-  if (args.length === 0) {
-    // Generate all HTML pages
-    generateAllHtmlPages();
-  } else if (args.length === 1) {
-    // Generate HTML for specific JSON file
-    const jsonFile = args[0];
-    if (!fs.existsSync(jsonFile)) {
-      console.error(`❌ File '${jsonFile}' does not exist`);
-      process.exit(1);
-    }
-    generateHtmlFromJson(jsonFile);
+  // Handle both simple format (definition) and complex format (definitions array)
+  let definitions;
+  if (termData.definitions) {
+    definitions = termData.definitions.map((def, index) => {
+      // Ensure unique IDs for existing definitions
+      if (def.id === 'def-1' || def.id === 'def-2') {
+        const termSlug = termData.term.toLowerCase().replace(/[^a-z0-9]/g, '-');
+        return { ...def, id: `${termSlug}-def-${index + 1}` };
+      }
+      return def;
+    });
+  } else if (termData.definition) {
+    // Convert simple format to complex format with unique ID
+    const termSlug = termData.term.toLowerCase().replace(/[^a-z0-9]/g, '-');
+    definitions = [{
+      id: `${termSlug}-def-1`,
+      definition: termData.definition,
+      usage: termData.usage || '',
+      author: termData.author || 'Anonymous',
+      date: termData.date || new Date().toISOString().split('T')[0],
+      isPrimary: true,
+      upvotes: 0,
+      downvotes: 0,
+      netScore: 0
+    }];
   } else {
-    console.log('Usage:');
-    console.log('  node generate-html.js                    # Generate all HTML pages');
-    console.log('  node generate-html.js <json-file>         # Generate HTML for specific JSON file');
-    process.exit(1);
+    console.error(`Term ${slug} has no definitions or definition field`);
+    return;
   }
-}
+  
+  terms[slug] = {
+    name: termData.term,
+    shareFunction: shareFunction,
+    definitions: definitions,
+    relatedTags: relatedTags
+  };
+});
 
-module.exports = { generateHtmlPage, generateHtmlFromJson, generateAllHtmlPages };
+// Update the terms manifest
+const manifestPath = path.join(__dirname, 'terms-manifest.json');
+const manifest = {
+  terms: termFiles.sort(),
+  lastUpdated: new Date().toISOString(),
+  version: "1.0"
+};
+
+fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2));
+console.log('Updated terms-manifest.json');
+
+// Read template
+const templatePath = path.join(__dirname, '../../templates', 'term-page-template.html');
+const template = fs.readFileSync(templatePath, 'utf8');
+
+// Generate pages
+Object.entries(terms).forEach(([slug, termData]) => {
+  // Handle both simple format (definition) and complex format (definitions array)
+  let definitions;
+  if (termData.definitions) {
+    definitions = termData.definitions.map((def, index) => {
+      // Ensure unique IDs for existing definitions
+      if (def.id === 'def-1' || def.id === 'def-2') {
+        const termSlug = termData.term.toLowerCase().replace(/[^a-z0-9]/g, '-');
+        return { ...def, id: `${termSlug}-def-${index + 1}` };
+      }
+      return def;
+    });
+  } else if (termData.definition) {
+    // Convert simple format to complex format with unique ID
+    const termSlug = termData.term.toLowerCase().replace(/[^a-z0-9]/g, '-');
+    definitions = [{
+      id: `${termSlug}-def-1`,
+      definition: termData.definition,
+      usage: termData.usage || '',
+      author: termData.author || 'Anonymous',
+      date: termData.date || new Date().toISOString().split('T')[0],
+      isPrimary: true,
+      upvotes: 0,
+      downvotes: 0,
+      netScore: 0
+    }];
+  } else {
+    console.error(`Term ${slug} has no definitions or definition field`);
+    return;
+  }
+
+  // Process definitions to handle legacy 'votes' field and ensure voting properties
+  const processedDefinitions = definitions.map(def => {
+    const processedDef = { ...def };
+    // Handle legacy 'votes' field from JSON files
+    if (def.votes !== undefined && def.upvotes === undefined) {
+      processedDef.upvotes = def.votes;
+      processedDef.downvotes = 0;
+      processedDef.netScore = def.votes;
+    } else {
+      if (def.upvotes === undefined) processedDef.upvotes = 0;
+      if (def.downvotes === undefined) processedDef.downvotes = 0;
+      if (def.netScore === undefined) processedDef.netScore = def.upvotes - def.downvotes;
+    }
+    return processedDef;
+  });
+
+  // Sort definitions by netScore (highest first), then by upvotes as tiebreaker
+  const sortedDefinitions = [...processedDefinitions].sort((a, b) => {
+    if (b.netScore !== a.netScore) {
+      return b.netScore - a.netScore;
+    }
+    return b.upvotes - a.upvotes;
+  });
+
+  // Generate definitions HTML
+  const definitionsHtml = sortedDefinitions.map(def => {
+    return definitionTemplate
+      .replace(/{{DEF_ID}}/g, def.id)
+      .replace(/{{DEF_NUMBER}}/g, def.number)
+      .replace(/{{DEFINITION_TEXT}}/g, def.definition)
+      .replace(/{{USAGE_TEXT}}/g, def.usage)
+      .replace(/{{AUTHOR}}/g, def.author)
+      .replace(/{{DATE}}/g, def.date || 'Unknown Date');
+  }).join('\n');
+
+  // Generate definitions data for JavaScript
+  const definitionsData = JSON.stringify(sortedDefinitions.map(def => ({
+    id: def.id,
+    definition: def.definition,
+    usage: def.usage,
+    author: def.author,
+    isPrimary: def.isPrimary || false,
+    upvotes: def.upvotes || 0,
+    downvotes: def.downvotes || 0,
+    netScore: def.netScore || 0
+  })), null, 12);
+
+  // Generate final HTML
+  const finalHtml = template
+    .replace(/{{TERM_NAME}}/g, termData.name)
+    .replace(/{{DEFINITIONS}}/g, definitionsHtml)
+    .replace(/{{RELATED_TAGS}}/g, termData.relatedTags.join('\n            '))
+    .replace(/{{SHARE_FUNCTION}}/g, termData.shareFunction)
+    .replace(/{{DEFINITIONS_DATA}}/g, definitionsData);
+
+  // Write file
+  const outputPath = path.join(__dirname, '../../pages', `${slug}.html`);
+  fs.writeFileSync(outputPath, finalHtml);
+  console.log(`Generated ${slug}.html`);
+});
+
+console.log('All pages generated successfully!');
