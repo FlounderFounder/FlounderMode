@@ -22,31 +22,40 @@ A comprehensive dictionary of internet slang, memes, and digital culture termino
 
 ### 2. Local Development
 ```bash
-# Install dependencies
+# Install dependencies (if needed)
 npm install
 
 # Start local server
-npm run dev
-# or
 python3 -m http.server 8000
+# or try different ports if 8000 is busy:
+python3 -m http.server 8001
+python3 -m http.server 8002
 ```
 
 ### 3. Deploy to GitHub Pages
 1. Push to your GitHub repository
 2. Enable GitHub Pages in repository settings
-3. Your site will be live at `https://username.github.io/repository-name`
+3. Your site will be live at `https://flounderfounder.github.io/FlounderMode`
 
 ## 📁 Project Structure
 
 ```
 ├── scripts/
-│   ├── main.js              # Main application logic
-│   ├── supabase-voting.js   # Supabase integration
-│   └── easy-mode.js         # Contribution system
+│   ├── core/                # Core application files
+│   │   ├── main.js          # Main application logic
+│   │   ├── ui-manager.js    # Modal and UI management
+│   │   └── voting-system.js # Voting functionality
+│   ├── features/            # Feature modules
+│   │   ├── supabase-voting.js # Supabase integration
+│   │   └── easy-mode.js     # Contribution system
+│   └── utils/               # Utility functions
 ├── styles/
-│   ├── main.css            # Main styles
+│   ├── main.css            # Main styles & mobile optimization
+│   ├── modal.css           # Modal styling
 │   ├── definitions.css     # Definition-specific styles
-│   └── voting-ui.css       # Voting interface styles
+│   ├── voting-ui.css       # Voting interface styles
+│   ├── navigation.css      # Header and navigation
+│   └── carousel.css        # Term carousel styling
 ├── terms/                  # JSON files for each term
 ├── pages/                  # Generated individual term pages
 └── supabase-schema.sql     # Database setup

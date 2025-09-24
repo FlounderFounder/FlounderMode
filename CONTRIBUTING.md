@@ -90,8 +90,8 @@ New definitions are automatically:
 ### Setup
 ```bash
 # Clone the repository
-git clone https://github.com/FlounderFounder/default_website.git
-cd default_website
+git clone https://github.com/FlounderFounder/FlounderMode.git
+cd FlounderMode
 
 # Install dependencies
 npm install
