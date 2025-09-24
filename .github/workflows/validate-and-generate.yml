@@ -2,7 +2,7 @@ name: Validate, Generate, and Sync
 
 on:
   push:
-    branches: [ main, test-github-action ]
+    branches: [ master, test-github-action ]
     paths:
       - 'terms/**'
       - 'terms-manifest.json'
