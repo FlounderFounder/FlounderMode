@@ -88,7 +88,7 @@ function generateHtmlPage(termData, filename) {
 
     <!-- JavaScript Files -->
     <script src="../scripts/utils/simple-profanity-filter.js"></script>
-    <script src="../scripts/main.js"></script>
+    <script src="../scripts/core/main.js"></script>
   </body>
 </html>`;
 }
