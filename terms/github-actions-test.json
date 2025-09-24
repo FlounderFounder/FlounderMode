@@ -1,0 +1,6 @@
+{
+  "term": "GitHub Actions Test",
+  "definition": "A test term to verify that GitHub Actions are working correctly with our automated workflow.",
+  "usage": "This term tests the GitHub Actions validation and HTML generation process.",
+  "related": ["Testing", "GitHub Actions", "Automation", "CI/CD"]
+}
