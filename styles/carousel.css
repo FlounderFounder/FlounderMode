@@ -67,8 +67,8 @@
   border: 3px solid #000;
   border-radius: 15px;
   min-height: 120px;
-  width: 340px;
-  max-width: calc(100vw - 6rem);
+  width: 340px !important; /* Static width, not responsive */
+  max-width: 340px !important; /* Static max-width */
   top: -12rem;
   left: 3rem;
   padding: .75rem;
@@ -84,8 +84,6 @@
 
 @media (max-width: 768px) {
   .speech-bubble {
-    width: calc(100vw - 4rem);
-    max-width: calc(100vw - 4rem);
     left: 1rem;
     top: -10rem;
   }
