@@ -177,11 +177,11 @@
           
           // ===== SUPABASE VOTING SYSTEM FOR HTML PAGES =====
           // Note: userVotes and allVotes are declared in main.js
-          const USE_SUPABASE = true;
+          window.USE_SUPABASE = true;
           
           // Initialize Supabase voting
           async function initSupabaseVoting() {
-            if (USE_SUPABASE && window.supabaseVoting) {
+            if (window.USE_SUPABASE && window.supabaseVoting) {
               try {
                 console.log('Initializing Supabase voting...');
                 allVotes = await window.supabaseVoting.loadVoteData();
@@ -262,7 +262,7 @@
               window.saveUserVotes();
             }
             
-            if (USE_SUPABASE && window.supabaseVoting) {
+            if (window.USE_SUPABASE && window.supabaseVoting) {
               const result = await window.supabaseVoting.submitVote(definitionId, voteType);
               if (result) {
                 allVotes = result;
