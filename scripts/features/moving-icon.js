@@ -210,19 +210,21 @@ class MovingIcon {
         if (this.icon) {
             this.icon.remove();
         }
+        
+        // Notify the event manager that this event has ended
+        if (window.randomEventManager) {
+            window.randomEventManager.endEvent('bouncing-icon');
+        }
     }
 }
 
-// Initialize the moving icon randomly when the page loads
+// Initialize the moving icon using the random event manager
 document.addEventListener('DOMContentLoaded', () => {
     console.log('DOM loaded, current path:', window.location.pathname); // Debug log
     // Only create the icon on the main page, not on the test page
     if (!window.location.pathname.includes('test-page.html')) {
-        // Random chance to show the icon (30% probability)
-        const shouldShowIcon = Math.random() < 0.3;
-        console.log('Random chance to show icon:', shouldShowIcon); // Debug log
-        
-        if (shouldShowIcon) {
+        // Register the bouncing icon event with the random event manager
+        window.randomEventManager.registerEvent('bouncing-icon', 0.3, () => {
             console.log('Creating moving icon...'); // Debug log
             // Clean up any existing icon first
             if (window.movingIcon) {
@@ -232,9 +234,10 @@ document.addEventListener('DOMContentLoaded', () => {
             // Create a fresh icon instance
             window.movingIcon = new MovingIcon();
             console.log('Moving icon created:', window.movingIcon); // Debug log
-        } else {
-            console.log('Icon not showing this time (random chance)'); // Debug log
-        }
+            
+            // Return the icon instance so the event manager can track it
+            return window.movingIcon;
+        });
     } else {
         console.log('On test page, not creating icon'); // Debug log
     }
