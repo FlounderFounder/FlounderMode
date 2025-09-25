@@ -231,6 +231,56 @@ body.dark-mode .autocomplete-item:hover {
   opacity: 0.1;
 }
 
+/* Window Bar - Modal Style */
+.term-page .window-bar {
+  background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+  color: #fff;
+  padding: 0.3rem 0.8rem;
+  border-bottom: 2px solid #000;
+  border-radius: 13px 13px 0 0;
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 1.1rem;
+  letter-spacing: 1px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: -2rem -2rem 0 -2rem;
+  position: relative;
+}
+
+.term-page .window-title {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #fff;
+}
+
+.term-page .window-button {
+  background: linear-gradient(135deg, #ff4757 0%, #ff3742 100%);
+  color: #fff;
+  border: 2px solid #000;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 1.2rem;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.term-page .window-button:hover {
+  transform: scale(1.15) rotate(5deg);
+  box-shadow: 0 6px 12px rgba(255, 71, 87, 0.4);
+}
+
+.term-page .window-button:active {
+  transform: scale(0.95) rotate(0deg);
+}
+
 .term-title {
   font-family: "Bebas Neue", sans-serif;
   font-size: clamp(2.5rem, 6vw, 4rem);
@@ -474,6 +524,16 @@ body.dark-mode .term-page::before {
   opacity: 0.2;
 }
 
+/* Dark mode window bar */
+body.dark-mode .term-page .window-bar {
+  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+  border-bottom-color: #444;
+}
+
+body.dark-mode .term-page .window-button {
+  border-color: #444;
+}
+
 body.dark-mode .term-title {
   color: #fff;
   border-bottom-color: #444;
@@ -572,6 +632,19 @@ body.dark-mode .term-actions .share-button:hover {
     padding: 1.5rem;
     border-radius: 12px;
     border-width: 2px;
+  }
+  
+  .term-page .window-bar {
+    margin: -1.5rem -1.5rem 0 -1.5rem;
+    padding: 0.25rem 0.6rem;
+    font-size: 1rem;
+    border-radius: 10px 10px 0 0;
+  }
+  
+  .term-page .window-button {
+    width: 24px;
+    height: 24px;
+    font-size: 1rem;
   }
   
   .term-title {
