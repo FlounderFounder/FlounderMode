@@ -4,9 +4,21 @@
 let userVotes = new Map(); // Track user votes per definition
 let allVotes = {}; // Store all vote counts from Supabase
 
-// Load vote data from localStorage (fallback when Supabase is unavailable)
+// Load vote data from Supabase or localStorage fallback
 async function loadVoteData() {
   try {
+    if (window.USE_SUPABASE && window.supabaseVoting) {
+      console.log('Loading vote data from Supabase...');
+      const supabaseVotes = await window.supabaseVoting.loadVoteData();
+      if (supabaseVotes) {
+        allVotes = supabaseVotes;
+        console.log('Loaded Supabase vote data:', allVotes);
+        return;
+      }
+    }
+    
+    // Fallback to localStorage
+    console.log('Falling back to localStorage vote data...');
     const savedVotes = localStorage.getItem('flounderVotes');
     if (savedVotes) {
       const votesData = JSON.parse(savedVotes);
@@ -26,7 +38,7 @@ async function loadVoteData() {
       });
     }
   } catch (error) {
-    console.warn('Failed to load vote data from localStorage:', error);
+    console.warn('Failed to load vote data:', error);
     allVotes = {};
   }
 }
@@ -181,6 +193,30 @@ async function initVotingSystem() {
   loadUserVotes();
 }
 
+// Global function to update all vote displays across the entire site
+function updateAllVoteDisplays() {
+  console.log('Updating all vote displays across the site');
+  
+  // Update all vote buttons
+  document.querySelectorAll('[data-def-id]').forEach(button => {
+    const defId = button.getAttribute('data-def-id');
+    updateVoteButtons(defId);
+  });
+  
+  // Update all vote counts
+  document.querySelectorAll('.vote-count').forEach(voteCount => {
+    const definitionId = voteCount.closest('.definition-item')?.id;
+    if (definitionId && allVotes[definitionId]) {
+      voteCount.textContent = allVotes[definitionId].netScore;
+    }
+  });
+  
+  // Call any page-specific update functions
+  if (window.updateAllVoteCounts && typeof window.updateAllVoteCounts === 'function') {
+    window.updateAllVoteCounts();
+  }
+}
+
 // Export functions for use by other modules
 window.VotingSystem = {
   submitVote,
@@ -191,7 +227,9 @@ window.VotingSystem = {
   updateVoteCountOptimistically,
   initVotingSystem,
   getUserVotes: () => userVotes,
-  getAllVotes: () => allVotes
+  getAllVotes: () => allVotes,
+  setAllVotes: (votes) => { allVotes = votes; }, // Setter for allVotes
+  updateAllVoteDisplays // Global update function
 };
 
 // Make submitVote globally available for HTML onclick handlers

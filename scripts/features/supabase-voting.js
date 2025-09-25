@@ -197,6 +197,8 @@ function getUserId() {
 
 // Real-time subscription to vote changes
 function subscribeToVoteChanges(callback) {
+  console.log('Setting up real-time subscription to votes table...');
+  
   const subscription = supabaseClient
     .channel('votes')
     .on('postgres_changes', 
@@ -206,12 +208,21 @@ function subscribeToVoteChanges(callback) {
         table: 'votes' 
       }, 
       (payload) => {
-        console.log('Vote change detected:', payload);
+        console.log('🔔 Real-time vote change detected:', payload);
         // Reload vote data when changes occur
-        loadVoteDataFromSupabase().then(callback);
+        loadVoteDataFromSupabase().then(callback).catch(error => {
+          console.error('Error reloading vote data after real-time update:', error);
+        });
       }
     )
-    .subscribe();
+    .subscribe((status) => {
+      console.log('Real-time subscription status:', status);
+      if (status === 'SUBSCRIBED') {
+        console.log('✅ Successfully subscribed to real-time vote updates');
+      } else if (status === 'CHANNEL_ERROR') {
+        console.error('❌ Error subscribing to real-time updates');
+      }
+    });
 
   return subscription;
 }

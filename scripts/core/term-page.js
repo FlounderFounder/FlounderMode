@@ -168,61 +168,68 @@ function updateVoteCountOptimistically(definitionId, voteChange) {
   }
 }
 
-// Submit a vote for a definition (override the one in main.js for individual pages)
+// Submit a vote for a definition - use centralized voting system
 window.submitVote = async function(definitionId, voteType) {
-  console.log('Voting:', definitionId, voteType);
+  console.log('Individual page voting:', definitionId, voteType);
   
-  const existingVote = userVotes.get(definitionId);
-  
-  let voteChange = 0;
-  if (existingVote === voteType) {
-    userVotes.delete(definitionId);
-    voteChange = voteType === 'up' ? -1 : 1;
+  // Use the centralized voting system from VotingSystem module
+  if (window.VotingSystem && window.VotingSystem.submitVote) {
+    await window.VotingSystem.submitVote(definitionId, voteType);
   } else {
-    userVotes.set(definitionId, voteType);
-    if (existingVote) {
-      voteChange = voteType === 'up' ? 2 : -2;
+    console.warn('VotingSystem not available, falling back to local implementation');
+    // Fallback to local implementation if VotingSystem not available
+    const existingVote = userVotes.get(definitionId);
+    
+    let voteChange = 0;
+    if (existingVote === voteType) {
+      userVotes.delete(definitionId);
+      voteChange = voteType === 'up' ? -1 : 1;
     } else {
-      voteChange = voteType === 'up' ? 1 : -1;
-    }
-  }
-  
-  updateVoteCountOptimistically(definitionId, voteChange);
-  updateVoteButtons(definitionId);
-  
-  // Use the saveUserVotes function from main.js
-  if (window.saveUserVotes) {
-    window.saveUserVotes();
-  }
-  
-  if (USE_SUPABASE && window.supabaseVoting) {
-    const result = await window.supabaseVoting.submitVote(definitionId, voteType);
-    if (result) {
-      allVotes = result;
-      updateVoteButtons(definitionId);
-    } else {
-      // Revert optimistic update on failure
-      updateVoteCountOptimistically(definitionId, -voteChange);
-      if (existingVote === voteType) {
-        userVotes.set(definitionId, voteType);
+      userVotes.set(definitionId, voteType);
+      if (existingVote) {
+        voteChange = voteType === 'up' ? 2 : -2;
       } else {
-        userVotes.delete(definitionId);
+        voteChange = voteType === 'up' ? 1 : -1;
       }
-      if (window.saveUserVotes) {
-        window.saveUserVotes();
+    }
+    
+    updateVoteCountOptimistically(definitionId, voteChange);
+    updateVoteButtons(definitionId);
+    
+    // Use the saveUserVotes function from main.js
+    if (window.saveUserVotes) {
+      window.saveUserVotes();
+    }
+    
+    if (USE_SUPABASE && window.supabaseVoting) {
+      const result = await window.supabaseVoting.submitVote(definitionId, voteType);
+      if (result) {
+        allVotes = result;
+        updateVoteButtons(definitionId);
+      } else {
+        // Revert optimistic update on failure
+        updateVoteCountOptimistically(definitionId, -voteChange);
+        if (existingVote === voteType) {
+          userVotes.set(definitionId, voteType);
+        } else {
+          userVotes.delete(definitionId);
+        }
+        if (window.saveUserVotes) {
+          window.saveUserVotes();
+        }
+        updateVoteButtons(definitionId);
       }
-      updateVoteButtons(definitionId);
-    }
-  } else {
-    // Fallback to local counting
-    if (!allVotes[definitionId]) {
-      allVotes[definitionId] = { upvotes: 0, downvotes: 0, netScore: 0 };
-    }
-    allVotes[definitionId].netScore += voteChange;
-    if (voteType === 'up') {
-      allVotes[definitionId].upvotes += (voteChange > 0 ? 1 : -1);
     } else {
-      allVotes[definitionId].downvotes += (voteChange < 0 ? 1 : -1);
+      // Fallback to local counting
+      if (!allVotes[definitionId]) {
+        allVotes[definitionId] = { upvotes: 0, downvotes: 0, netScore: 0 };
+      }
+      allVotes[definitionId].netScore += voteChange;
+      if (voteType === 'up') {
+        allVotes[definitionId].upvotes += (voteChange > 0 ? 1 : -1);
+      } else {
+        allVotes[definitionId].downvotes += (voteChange < 0 ? 1 : -1);
+      }
     }
   }
 };
@@ -315,20 +322,26 @@ function handleDefinitionDeepLink() {
 
 // Initialize voting on page load
 document.addEventListener('DOMContentLoaded', async function() {
-  // Load user votes using the function from main.js
-  if (window.loadUserVotes) {
-    window.loadUserVotes();
-  }
-  
   // Wait a bit to ensure all scripts are loaded
   setTimeout(async () => {
+    // Use centralized voting system if available
+    if (window.VotingSystem && window.VotingSystem.loadUserVotes) {
+      window.VotingSystem.loadUserVotes();
+    } else if (window.loadUserVotes) {
+      window.loadUserVotes();
+    }
+    
     // Initialize Supabase voting
     await initSupabaseVoting();
     
-    // Update all vote buttons with current state
+    // Update all vote buttons with current state using centralized system
     document.querySelectorAll('[data-def-id]').forEach(button => {
       const defId = button.getAttribute('data-def-id');
-      updateVoteButtons(defId);
+      if (window.VotingSystem && window.VotingSystem.updateVoteButtons) {
+        window.VotingSystem.updateVoteButtons(defId);
+      } else {
+        updateVoteButtons(defId);
+      }
     });
   }, 100);
   

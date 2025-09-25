@@ -100,15 +100,9 @@
             shareTerm('Dashboard Fatigue', definitions);
           }
           
-          // Share term function for individual pages
+          // Share term function for individual pages - now uses modal
           window.shareTerm = function(term, definitions, definitionId = null) {
             console.log('shareTerm called with:', { term, definitions, definitionId });
-            
-            // Build URL for the current page
-            let termUrl = window.location.href;
-            if (definitionId) {
-              termUrl += `#${definitionId}`;
-            }
             
             // Use specific definition if provided, otherwise primary or first definition
             let targetDef;
@@ -119,22 +113,28 @@
               targetDef = definitions.find(d => d.isPrimary) || definitions[0];
             }
             
-            const shareText = `Check out "${term}" from Floundermode Dictionary: ${termUrl}`;
-            
-            console.log('Generated share text:', shareText);
-
-            // Try native share first, then clipboard
-            if (navigator.share) {
-              navigator.share({
-                title: `${term} - Floundermode Dictionary`,
-                text: shareText,
-                url: termUrl
-              }).catch(err => {
-                console.log('Native share failed:', err);
-                fallbackShare(shareText);
-              });
+            // Use the global shareTerm function from share-utils.js
+            if (window.ShareUtils && window.ShareUtils.openShareModal) {
+              window.ShareUtils.openShareModal(targetDef.id, term, targetDef);
             } else {
-              fallbackShare(shareText);
+              // Fallback to old behavior if modal not available
+              const shareText = `Check out "${term}" from Floundermode Dictionary: ${window.location.href}`;
+              
+              console.log('Generated share text:', shareText);
+
+              // Try native share first, then clipboard
+              if (navigator.share) {
+                navigator.share({
+                  title: `${term} - Floundermode Dictionary`,
+                  text: shareText,
+                  url: window.location.href
+                }).catch(err => {
+                  console.log('Native share failed:', err);
+                  fallbackShare(shareText);
+                });
+              } else {
+                fallbackShare(shareText);
+              }
             }
           };
           
@@ -215,17 +215,43 @@
           async function initSupabaseVoting() {
             if (window.USE_SUPABASE && window.supabaseVoting) {
               try {
-                console.log('Initializing Supabase voting...');
+                console.log('Initializing Supabase voting on individual page...');
+                
+                // Always load fresh data from Supabase for individual pages
                 allVotes = await window.supabaseVoting.loadVoteData();
-                console.log('Loaded vote data:', allVotes);
+                console.log('Loaded vote data from Supabase:', allVotes);
+                
+                // Update centralized vote data if VotingSystem is available
+                if (window.VotingSystem && window.VotingSystem.setAllVotes) {
+                  window.VotingSystem.setAllVotes(allVotes);
+                  console.log('Updated centralized vote data');
+                }
                 
                 // Update all vote counts on the page
                 updateAllVoteCounts();
                 
                 // Subscribe to real-time changes
                 window.supabaseVoting.subscribeToChanges((updatedVotes) => {
+                  console.log('Individual page received real-time update:', updatedVotes);
                   allVotes = updatedVotes;
+                  
+                  // Update centralized vote data if available
+                  if (window.VotingSystem && window.VotingSystem.setAllVotes) {
+                    window.VotingSystem.setAllVotes(updatedVotes);
+                  }
+                  
+                  // Update all vote counts on this page
                   updateAllVoteCounts();
+                  
+                  // Update vote buttons
+                  document.querySelectorAll('[data-def-id]').forEach(button => {
+                    const defId = button.getAttribute('data-def-id');
+                    if (window.VotingSystem && window.VotingSystem.updateVoteButtons) {
+                      window.VotingSystem.updateVoteButtons(defId);
+                    } else {
+                      updateVoteButtons(defId);
+                    }
+                  });
                 });
               } catch (error) {
                 console.error('Failed to initialize Supabase voting:', error);
@@ -243,12 +269,20 @@
           
           // Update all vote counts on the page
           function updateAllVoteCounts() {
-            console.log('Updating all vote counts with data:', allVotes);
-            document.querySelectorAll('.vote-count').forEach(voteCount => {
-              const definitionId = voteCount.closest('.definition-item').id;
+            console.log('🔢 Updating all vote counts with data:', allVotes);
+            console.log('🔍 Found vote count elements:', document.querySelectorAll('.vote-count').length);
+            
+            document.querySelectorAll('.vote-count').forEach((voteCount, index) => {
+              const definitionId = voteCount.closest('.definition-item')?.id;
               const votes = allVotes[definitionId] || { netScore: 0 };
-              console.log(`Updating ${definitionId}: ${votes.netScore}`);
+              console.log(`📊 Vote count ${index + 1}: ${definitionId} = ${votes.netScore}`);
               voteCount.textContent = votes.netScore;
+            });
+            
+            // Also update any vote buttons
+            document.querySelectorAll('[data-def-id]').forEach(button => {
+              const defId = button.getAttribute('data-def-id');
+              console.log(`🔘 Updating vote button for ${defId}`);
             });
           }
           
@@ -267,61 +301,68 @@
             }
           }
           
-          // Submit a vote for a definition (override the one in main.js for individual pages)
+          // Submit a vote for a definition - use centralized voting system
           window.submitVote = async function(definitionId, voteType) {
-            console.log('Voting:', definitionId, voteType);
+            console.log('Individual page voting:', definitionId, voteType);
             
-            const existingVote = userVotes.get(definitionId);
-            
-            let voteChange = 0;
-            if (existingVote === voteType) {
-              userVotes.delete(definitionId);
-              voteChange = voteType === 'up' ? -1 : 1;
+            // Use the centralized voting system from VotingSystem module
+            if (window.VotingSystem && window.VotingSystem.submitVote) {
+              await window.VotingSystem.submitVote(definitionId, voteType);
             } else {
-              userVotes.set(definitionId, voteType);
-              if (existingVote) {
-                voteChange = voteType === 'up' ? 2 : -2;
+              console.warn('VotingSystem not available, falling back to local implementation');
+              // Fallback to local implementation if VotingSystem not available
+              const existingVote = userVotes.get(definitionId);
+              
+              let voteChange = 0;
+              if (existingVote === voteType) {
+                userVotes.delete(definitionId);
+                voteChange = voteType === 'up' ? -1 : 1;
               } else {
-                voteChange = voteType === 'up' ? 1 : -1;
-              }
-            }
-            
-            updateVoteCountOptimistically(definitionId, voteChange);
-            updateVoteButtons(definitionId);
-            
-            // Use the saveUserVotes function from main.js
-            if (window.saveUserVotes) {
-              window.saveUserVotes();
-            }
-            
-            if (window.USE_SUPABASE && window.supabaseVoting) {
-              const result = await window.supabaseVoting.submitVote(definitionId, voteType);
-              if (result) {
-                allVotes = result;
-                updateVoteButtons(definitionId);
-              } else {
-                // Revert optimistic update on failure
-                updateVoteCountOptimistically(definitionId, -voteChange);
-                if (existingVote === voteType) {
-                  userVotes.set(definitionId, voteType);
+                userVotes.set(definitionId, voteType);
+                if (existingVote) {
+                  voteChange = voteType === 'up' ? 2 : -2;
                 } else {
-                  userVotes.delete(definitionId);
+                  voteChange = voteType === 'up' ? 1 : -1;
                 }
-                if (window.saveUserVotes) {
-                  window.saveUserVotes();
+              }
+              
+              updateVoteCountOptimistically(definitionId, voteChange);
+              updateVoteButtons(definitionId);
+              
+              // Use the saveUserVotes function from main.js
+              if (window.saveUserVotes) {
+                window.saveUserVotes();
+              }
+              
+              if (window.USE_SUPABASE && window.supabaseVoting) {
+                const result = await window.supabaseVoting.submitVote(definitionId, voteType);
+                if (result) {
+                  allVotes = result;
+                  updateVoteButtons(definitionId);
+                } else {
+                  // Revert optimistic update on failure
+                  updateVoteCountOptimistically(definitionId, -voteChange);
+                  if (existingVote === voteType) {
+                    userVotes.set(definitionId, voteType);
+                  } else {
+                    userVotes.delete(definitionId);
+                  }
+                  if (window.saveUserVotes) {
+                    window.saveUserVotes();
+                  }
+                  updateVoteButtons(definitionId);
                 }
-                updateVoteButtons(definitionId);
-              }
-            } else {
-              // Fallback to local counting
-              if (!allVotes[definitionId]) {
-                allVotes[definitionId] = { upvotes: 0, downvotes: 0, netScore: 0 };
-              }
-              allVotes[definitionId].netScore += voteChange;
-              if (voteType === 'up') {
-                allVotes[definitionId].upvotes += (voteChange > 0 ? 1 : -1);
               } else {
-                allVotes[definitionId].downvotes += (voteChange < 0 ? 1 : -1);
+                // Fallback to local counting
+                if (!allVotes[definitionId]) {
+                  allVotes[definitionId] = { upvotes: 0, downvotes: 0, netScore: 0 };
+                }
+                allVotes[definitionId].netScore += voteChange;
+                if (voteType === 'up') {
+                  allVotes[definitionId].upvotes += (voteChange > 0 ? 1 : -1);
+                } else {
+                  allVotes[definitionId].downvotes += (voteChange < 0 ? 1 : -1);
+                }
               }
             }
           };
@@ -354,7 +395,7 @@
             }
           }
           
-          // Share definition function
+          // Share definition function - now uses modal
           window.shareDefinition = function(definitionId) {
             const definitions = [
           {
@@ -371,53 +412,75 @@
             const definition = definitions.find(d => d.id === definitionId);
             if (!definition) return;
 
-            const shareText = `Dashboard Fatigue: ${definition.definition}\n\n"${definition.usage}"\n\n— ${definition.author || 'Anonymous'}\n\nFrom Floundermode Dictionary`;
-            
-            if (navigator.share) {
-              navigator.share({
-                title: `Dashboard Fatigue - Floundermode Dictionary`,
-                text: shareText,
-                url: window.location.href
-              }).catch(err => console.log('Error sharing:', err));
+            // Use the global shareDefinition function from share-utils.js
+            if (window.ShareUtils && window.ShareUtils.openShareModal) {
+              window.ShareUtils.openShareModal(definitionId, 'Dashboard Fatigue', definition);
             } else {
-              // Fallback: copy to clipboard
-              navigator.clipboard.writeText(shareText).then(() => {
-                // Show a brief success message
-                const shareBtn = document.querySelector(`[data-def-id="${definitionId}"]`);
-                const originalText = shareBtn.innerHTML;
-                shareBtn.innerHTML = '✓';
-                shareBtn.style.background = '#22c55e';
-                shareBtn.style.color = 'white';
-                
-                setTimeout(() => {
-                  shareBtn.innerHTML = originalText;
-                  shareBtn.style.background = '';
-                  shareBtn.style.color = '';
-                }, 1000);
-              }).catch(err => {
-                console.log('Error copying to clipboard:', err);
-                alert('Share text copied to clipboard!');
-              });
+              // Fallback to old behavior if modal not available
+              const shareText = `Dashboard Fatigue: ${definition.definition}\n\n"${definition.usage}"\n\n— ${definition.author || 'Anonymous'}\n\nFrom Floundermode Dictionary`;
+              
+              if (navigator.share) {
+                navigator.share({
+                  title: `Dashboard Fatigue - Floundermode Dictionary`,
+                  text: shareText,
+                  url: window.location.href
+                }).catch(err => console.log('Error sharing:', err));
+              } else {
+                // Fallback: copy to clipboard
+                navigator.clipboard.writeText(shareText).then(() => {
+                  // Show a brief success message
+                  const shareBtn = document.querySelector(`[data-def-id="${definitionId}"]`);
+                  const originalText = shareBtn.innerHTML;
+                  shareBtn.innerHTML = '✓';
+                  shareBtn.style.background = '#22c55e';
+                  shareBtn.style.color = 'white';
+                  
+                  setTimeout(() => {
+                    shareBtn.innerHTML = originalText;
+                    shareBtn.style.background = '';
+                    shareBtn.style.color = '';
+                  }, 1000);
+                }).catch(err => {
+                  console.log('Error copying to clipboard:', err);
+                  alert('Share text copied to clipboard!');
+                });
+              }
             }
           };
 
           // Initialize voting on page load
           document.addEventListener('DOMContentLoaded', async function() {
-            // Load user votes using the function from main.js
-            if (window.loadUserVotes) {
-              window.loadUserVotes();
-            }
-            
             // Wait a bit to ensure all scripts are loaded
             setTimeout(async () => {
+              console.log('Individual page: Initializing voting system...');
+              
+              // Initialize VotingSystem if not already done
+              if (window.VotingSystem && window.VotingSystem.initVotingSystem) {
+                await window.VotingSystem.initVotingSystem();
+                console.log('Individual page: VotingSystem initialized');
+              }
+              
+              // Use centralized voting system if available
+              if (window.VotingSystem && window.VotingSystem.loadUserVotes) {
+                window.VotingSystem.loadUserVotes();
+              } else if (window.loadUserVotes) {
+                window.loadUserVotes();
+              }
+              
               // Initialize Supabase voting
               await initSupabaseVoting();
               
-              // Update all vote buttons with current state
+              // Update all vote buttons with current state using centralized system
               document.querySelectorAll('[data-def-id]').forEach(button => {
                 const defId = button.getAttribute('data-def-id');
-                updateVoteButtons(defId);
+                if (window.VotingSystem && window.VotingSystem.updateVoteButtons) {
+                  window.VotingSystem.updateVoteButtons(defId);
+                } else {
+                  updateVoteButtons(defId);
+                }
               });
+              
+              console.log('Individual page: Voting initialization complete');
             }, 100);
           });
         </script>

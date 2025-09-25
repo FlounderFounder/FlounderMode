@@ -4,6 +4,12 @@
 async function init() {
   console.log('Initializing Floundermode Dictionary...');
   
+  // Check if required modules are loaded
+  console.log('DataLoader available:', !!window.DataLoader);
+  console.log('VotingSystem available:', !!window.VotingSystem);
+  console.log('UIManager available:', !!window.UIManager);
+  console.log('Navigation available:', !!window.Navigation);
+  
   // Load all terms first
   await window.DataLoader.loadAllTerms();
   
@@ -11,7 +17,11 @@ async function init() {
   await window.VotingSystem.initVotingSystem();
   
   // Initialize UI components
-  await window.UIManager.initUI();
+  if (window.UIManager && window.UIManager.initUI) {
+    await window.UIManager.initUI();
+  } else {
+    console.error('UIManager not available!');
+  }
   
   // Initialize dark mode
   window.Navigation.initDarkMode();
@@ -24,14 +34,18 @@ async function init() {
     // Initialize all definitions in Supabase first
     await window.supabaseVoting.batchInitializeTerms(flounderTerms);
     
-    const allVotes = await window.supabaseVoting.loadVoteData();
+    // Load vote data through VotingSystem (which will use Supabase)
+    await window.VotingSystem.loadVoteData();
+    
     // Subscribe to real-time changes
     window.supabaseVoting.subscribeToChanges((newVotes) => {
-      // Update UI for all visible definitions
-      document.querySelectorAll('[data-def-id]').forEach(button => {
-        const defId = button.getAttribute('data-def-id');
-        window.VotingSystem.updateVoteButtons(defId);
-      });
+      console.log('Real-time vote update received:', newVotes);
+      
+      // Update the centralized vote data
+      window.VotingSystem.setAllVotes(newVotes);
+      
+      // Use the global update function to update all vote displays
+      window.VotingSystem.updateAllVoteDisplays();
     });
   } else {
     console.log('Using localStorage fallback for voting...');
@@ -43,7 +57,10 @@ async function init() {
 
 // Initialize the app when DOM is loaded
 document.addEventListener("DOMContentLoaded", function() {
-  init();
+  // Add a small delay to ensure all scripts are loaded
+  setTimeout(() => {
+    init();
+  }, 100);
 });
 
 // Legacy fallback functions for backward compatibility

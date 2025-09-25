@@ -118,6 +118,15 @@ function openModal(term) {
   // Generate definitions HTML
   const definitionsHtml = generateDefinitionsHtml(term.definitions);
   
+  // Update vote buttons after modal opens to ensure sync
+  setTimeout(() => {
+    term.definitions.forEach(def => {
+      if (window.VotingSystem && window.VotingSystem.updateVoteButtons) {
+        window.VotingSystem.updateVoteButtons(def.id);
+      }
+    });
+  }, 100);
+  
   // Add prominent term name within the content (Urban Dictionary style)
   const termNameDisplay = `
     <div class="modal-term-name">
