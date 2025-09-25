@@ -152,7 +152,13 @@ python3 -m http.server 8000
 ### Build Process
 
 ```bash
-# Generate pages for all terms
+# Generate pages incrementally (only changed terms)
+npm run generate-incremental
+
+# Force regenerate all pages
+npm run generate-force
+
+# Legacy: Generate all pages (same as --force)
 npm run generate-pages
 
 # Validate everything
@@ -160,6 +166,9 @@ npm run validate
 
 # Deploy (happens automatically via GitHub Pages)
 ```
+
+**🚀 New: Incremental Generation**
+The build system now uses intelligent incremental updates that only regenerate pages when term files have actually changed. This makes development much faster - see [INCREMENTAL_GENERATION.md](INCREMENTAL_GENERATION.md) for details.
 
 ### Tech Stack
 
@@ -175,7 +184,7 @@ Simple. Fast. Scalable.
 ## Contribution Workflow
 
 1. **Create/Update**: Add your term JSON file
-2. **Generate**: Run `npm run generate-pages` locally (optional)
+2. **Generate**: Run `npm run generate-incremental` locally (optional)
 3. **Commit**: Push to your fork
 4. **PR**: Create pull request to main branch
 5. **Review**: Automated checks + community feedback

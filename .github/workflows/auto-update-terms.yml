@@ -80,8 +80,8 @@ jobs:
     
     - name: Generate HTML pages for new terms
       run: |
-        echo "Generating HTML pages for all terms..."
-        node scripts/generate-html.js
+        echo "Generating HTML pages incrementally..."
+        npm run generate-incremental
     
     - name: Update main.js with new terms
       run: |
@@ -166,7 +166,7 @@ jobs:
           ✅ **JSON Validation**: All term files have valid JSON format
           ✅ **Duplicate Check**: No duplicate terms found
           ✅ **File Integration**: Updated \`scripts/main.js\` with new term files
-          ✅ **HTML Generation**: Generated individual HTML pages for all terms
+          ✅ **HTML Generation**: Generated individual HTML pages incrementally (only changed terms)
           
           Your term has been automatically integrated into the site! The new term will be available once this PR is merged.
           

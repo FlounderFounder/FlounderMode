@@ -5,7 +5,7 @@ on:
     branches: [ master, test-github-action ]
     paths:
       - 'terms/**'
-      - 'terms-manifest.json'
+      - 'scripts/build/terms-manifest.json'
 
 permissions:
   contents: write  # Allow writing to repository contents
@@ -102,8 +102,8 @@ jobs:
         
     - name: Generate HTML pages
       run: |
-        echo "📄 Generating HTML pages..."
-        node generate-pages.js
+        echo "📄 Generating HTML pages incrementally..."
+        npm run generate-incremental
         echo ""
         echo "📄 Checking generated files:"
         ls -la pages/
@@ -148,7 +148,7 @@ jobs:
             console.log('🔄 Starting Supabase sync...');
             
             // Read terms manifest
-            const manifestPath = path.join(__dirname, 'terms-manifest.json');
+            const manifestPath = path.join(__dirname, 'scripts/build/terms-manifest.json');
             const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
             
             console.log(`📄 Found ${manifest.terms.length} terms to sync`);
@@ -261,11 +261,11 @@ jobs:
         else
           echo "📝 Committing changes..."
           # Only add specific directories/files that the action should modify
-          git add pages/ terms-manifest.json
+          git add pages/ scripts/build/terms-manifest.json
           git commit -m "🤖 Auto-generate pages and update manifest
 
-          - Generated HTML pages for all terms
-          - Updated terms-manifest.json
+          - Generated HTML pages incrementally (only changed terms)
+          - Updated scripts/build/terms-manifest.json with file hashes
           - Generated $(ls pages/*.html | wc -l) HTML files"
           
           echo "🚀 Pushing changes..."
