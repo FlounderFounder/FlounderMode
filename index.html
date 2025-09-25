@@ -24,6 +24,7 @@
     <link rel="stylesheet" href="/styles/navigation.css">
     <link rel="stylesheet" href="/styles/carousel.css">
     <link rel="stylesheet" href="/styles/moving-icon.css">
+    <link rel="stylesheet" href="/styles/flappy-fish.css">
     
   </head>
   <body>
@@ -243,6 +244,68 @@
       </div>
     </div>
 
+    <!-- Share Modal -->
+    <div class="share-modal hide" id="shareModal">
+      <div class="window-bar">
+        <span>Share Definition</span>
+        <button class="window-button" onclick="closeShareModal()">✕</button>
+      </div>
+      <div class="share-modal-content">
+        <div class="share-header">
+          <h3>🔗 Share this definition</h3>
+          <p>Copy the link or embed code to share this definition with others.</p>
+        </div>
+        
+        <div class="share-section">
+          <h4>👀 Preview</h4>
+          <div class="embed-preview">
+            <p>How this will look when embedded:</p>
+            <div id="embedPreview" class="embed-preview-content"></div>
+          </div>
+        </div>
+        
+        <div class="share-section">
+          <h4>📋 Direct Link</h4>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-label">Share this link</span>
+              <button class="copy-btn" onclick="copyToClipboard('shareLink')">📋 Copy</button>
+            </div>
+            <code id="shareLink"></code>
+          </div>
+        </div>
+
+        <div class="share-section">
+          <h4>🔗 Embed Code</h4>
+          <div class="theme-toggle-container">
+            <label class="theme-toggle-label">
+              <input type="radio" name="embedTheme" value="light" checked onchange="updateEmbedCode()">
+              <span class="theme-option">☀️ Light Mode</span>
+            </label>
+            <label class="theme-toggle-label">
+              <input type="radio" name="embedTheme" value="dark" onchange="updateEmbedCode()">
+              <span class="theme-option">🌙 Dark Mode</span>
+            </label>
+          </div>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-label">Copy embed code</span>
+              <button class="copy-btn" onclick="copyToClipboard('embedCode')">📋 Copy</button>
+            </div>
+            <pre id="embedCode"></pre>
+          </div>
+        </div>
+
+
+        <div class="share-actions">
+          <button class="share-btn secondary" onclick="closeShareModal()">Close</button>
+          <button class="share-btn primary" onclick="openShareLink()">
+            Open Link →
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- JavaScript Files -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="/scripts/features/supabase-voting.js"></script>
@@ -261,6 +324,6 @@
     <script src="/scripts/features/easy-mode.js"></script>
     <script src="/scripts/features/moving-icon.js"></script>
     <script src="/scripts/features/floating-message.js"></script>
-    <script src="/scripts/features/retro-stock-chart.js"></script>
+    <script src="/scripts/features/flappy-fish.js"></script>
   </body>
 </html>

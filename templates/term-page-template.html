@@ -68,15 +68,9 @@
             shareTerm('{{TERM_NAME}}', definitions);
           }
           
-          // Share term function for individual pages
+          // Share term function for individual pages - now uses modal
           window.shareTerm = function(term, definitions, definitionId = null) {
             console.log('shareTerm called with:', { term, definitions, definitionId });
-            
-            // Build URL for the current page
-            let termUrl = window.location.href;
-            if (definitionId) {
-              termUrl += `#${definitionId}`;
-            }
             
             // Use specific definition if provided, otherwise primary or first definition
             let targetDef;
@@ -87,22 +81,28 @@
               targetDef = definitions.find(d => d.isPrimary) || definitions[0];
             }
             
-            const shareText = `Check out "${term}" from Floundermode Dictionary: ${termUrl}`;
-            
-            console.log('Generated share text:', shareText);
-
-            // Try native share first, then clipboard
-            if (navigator.share) {
-              navigator.share({
-                title: `${term} - Floundermode Dictionary`,
-                text: shareText,
-                url: termUrl
-              }).catch(err => {
-                console.log('Native share failed:', err);
-                fallbackShare(shareText);
-              });
+            // Use the global shareTerm function from share-utils.js
+            if (window.ShareUtils && window.ShareUtils.openShareModal) {
+              window.ShareUtils.openShareModal(targetDef.id, term, targetDef);
             } else {
-              fallbackShare(shareText);
+              // Fallback to old behavior if modal not available
+              const shareText = `Check out "${term}" from Floundermode Dictionary: ${window.location.href}`;
+              
+              console.log('Generated share text:', shareText);
+
+              // Try native share first, then clipboard
+              if (navigator.share) {
+                navigator.share({
+                  title: `${term} - Floundermode Dictionary`,
+                  text: shareText,
+                  url: window.location.href
+                }).catch(err => {
+                  console.log('Native share failed:', err);
+                  fallbackShare(shareText);
+                });
+              } else {
+                fallbackShare(shareText);
+              }
             }
           };
           
@@ -322,39 +322,45 @@
             }
           }
           
-          // Share definition function
+          // Share definition function - now uses modal
           window.shareDefinition = function(definitionId) {
             const definitions = {{DEFINITIONS_DATA}};
             const definition = definitions.find(d => d.id === definitionId);
             if (!definition) return;
 
-            const shareText = `{{TERM_NAME}}: ${definition.definition}\n\n"${definition.usage}"\n\n— ${definition.author || 'Anonymous'}\n\nFrom Floundermode Dictionary`;
-            
-            if (navigator.share) {
-              navigator.share({
-                title: `{{TERM_NAME}} - Floundermode Dictionary`,
-                text: shareText,
-                url: window.location.href
-              }).catch(err => console.log('Error sharing:', err));
+            // Use the global shareDefinition function from share-utils.js
+            if (window.ShareUtils && window.ShareUtils.openShareModal) {
+              window.ShareUtils.openShareModal(definitionId, '{{TERM_NAME}}', definition);
             } else {
-              // Fallback: copy to clipboard
-              navigator.clipboard.writeText(shareText).then(() => {
-                // Show a brief success message
-                const shareBtn = document.querySelector(`[data-def-id="${definitionId}"]`);
-                const originalText = shareBtn.innerHTML;
-                shareBtn.innerHTML = '✓';
-                shareBtn.style.background = '#22c55e';
-                shareBtn.style.color = 'white';
-                
-                setTimeout(() => {
-                  shareBtn.innerHTML = originalText;
-                  shareBtn.style.background = '';
-                  shareBtn.style.color = '';
-                }, 1000);
-              }).catch(err => {
-                console.log('Error copying to clipboard:', err);
-                alert('Share text copied to clipboard!');
-              });
+              // Fallback to old behavior if modal not available
+              const shareText = `{{TERM_NAME}}: ${definition.definition}\n\n"${definition.usage}"\n\n— ${definition.author || 'Anonymous'}\n\nFrom Floundermode Dictionary`;
+              
+              if (navigator.share) {
+                navigator.share({
+                  title: `{{TERM_NAME}} - Floundermode Dictionary`,
+                  text: shareText,
+                  url: window.location.href
+                }).catch(err => console.log('Error sharing:', err));
+              } else {
+                // Fallback: copy to clipboard
+                navigator.clipboard.writeText(shareText).then(() => {
+                  // Show a brief success message
+                  const shareBtn = document.querySelector(`[data-def-id="${definitionId}"]`);
+                  const originalText = shareBtn.innerHTML;
+                  shareBtn.innerHTML = '✓';
+                  shareBtn.style.background = '#22c55e';
+                  shareBtn.style.color = 'white';
+                  
+                  setTimeout(() => {
+                    shareBtn.innerHTML = originalText;
+                    shareBtn.style.background = '';
+                    shareBtn.style.color = '';
+                  }, 1000);
+                }).catch(err => {
+                  console.log('Error copying to clipboard:', err);
+                  alert('Share text copied to clipboard!');
+                });
+              }
             }
           };
 
