@@ -1,6 +1,6 @@
 /* Floundermode Dictionary - Main Coordinator */
 
-// Main initialization function
+// Main initialization function with progressive loading
 async function init() {
   console.log('Initializing Floundermode Dictionary...');
   
@@ -10,33 +10,51 @@ async function init() {
   console.log('UIManager available:', !!window.UIManager);
   console.log('Navigation available:', !!window.Navigation);
   
-  // Load all terms first
-  await window.DataLoader.loadAllTerms();
+  // Start loading terms immediately (this will use cache if available)
+  const termsPromise = window.DataLoader.loadAllTerms();
   
-  // Initialize voting system
-  await window.VotingSystem.initVotingSystem();
-  
-  // Initialize UI components
+  // Initialize UI components with loading state
   if (window.UIManager && window.UIManager.initUI) {
     await window.UIManager.initUI();
   } else {
     console.error('UIManager not available!');
   }
   
-  // Initialize dark mode
+  // Initialize dark mode immediately (no dependencies)
   window.Navigation.initDarkMode();
   
-  // Load vote data from Supabase or localStorage
-  const flounderTerms = window.DataLoader.getAllTerms();
+  // Wait for terms to load
+  const flounderTerms = await termsPromise;
   
+  // Populate UI with loaded terms
+  if (window.UIManager && window.UIManager.populateUI) {
+    window.UIManager.hideLoadingState();
+    window.UIManager.populateUI(flounderTerms);
+  }
+  
+  // Initialize voting system in parallel with Supabase operations
+  const votingPromise = window.VotingSystem.initVotingSystem();
+  
+  // Initialize Supabase operations in parallel
+  let supabasePromise = Promise.resolve();
   if (window.USE_SUPABASE && window.supabaseVoting) {
     console.log('Using Supabase for voting...');
-    // Initialize all definitions in Supabase first
-    await window.supabaseVoting.batchInitializeTerms(flounderTerms);
-    
-    // Load vote data through VotingSystem (which will use Supabase)
-    await window.VotingSystem.loadVoteData();
-    
+    supabasePromise = Promise.all([
+      // Initialize all definitions in Supabase (optimized batch operation)
+      window.supabaseVoting.batchInitializeTerms(flounderTerms),
+      // Load vote data through VotingSystem (which will use Supabase)
+      window.VotingSystem.loadVoteData()
+    ]);
+  } else {
+    console.log('Using localStorage fallback for voting...');
+    supabasePromise = window.VotingSystem.loadVoteData();
+  }
+  
+  // Wait for all voting operations to complete
+  await Promise.all([votingPromise, supabasePromise]);
+  
+  // Set up real-time subscriptions after everything is loaded
+  if (window.USE_SUPABASE && window.supabaseVoting) {
     // Subscribe to real-time changes
     window.supabaseVoting.subscribeToChanges((newVotes) => {
       console.log('Real-time vote update received:', newVotes);
@@ -47,9 +65,6 @@ async function init() {
       // Use the global update function to update all vote displays
       window.VotingSystem.updateAllVoteDisplays();
     });
-  } else {
-    console.log('Using localStorage fallback for voting...');
-    await window.VotingSystem.loadVoteData();
   }
   
   console.log('Floundermode Dictionary initialized successfully!');

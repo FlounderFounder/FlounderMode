@@ -4,15 +4,28 @@
 let userVotes = new Map(); // Track user votes per definition
 let allVotes = {}; // Store all vote counts from Supabase
 
-// Load vote data from Supabase or localStorage fallback
+// Load vote data from Supabase or localStorage fallback with caching
 async function loadVoteData() {
   try {
+    // First, try to load cached vote data for immediate display
+    const cachedVotes = getCachedVoteData();
+    if (cachedVotes && Object.keys(cachedVotes).length > 0) {
+      console.log('Using cached vote data for immediate display');
+      allVotes = cachedVotes;
+      // Update UI immediately with cached data
+      updateAllVoteDisplays();
+    }
+
     if (window.USE_SUPABASE && window.supabaseVoting) {
-      console.log('Loading vote data from Supabase...');
+      console.log('Loading fresh vote data from Supabase...');
       const supabaseVotes = await window.supabaseVoting.loadVoteData();
       if (supabaseVotes) {
         allVotes = supabaseVotes;
-        console.log('Loaded Supabase vote data:', allVotes);
+        // Cache the fresh data
+        cacheVoteData(supabaseVotes);
+        console.log('Loaded fresh Supabase vote data:', allVotes);
+        // Update UI with fresh data
+        updateAllVoteDisplays();
         return;
       }
     }
@@ -36,6 +49,8 @@ async function loadVoteData() {
           allVotes[defId].netScore--;
         }
       });
+      // Cache the processed data
+      cacheVoteData(allVotes);
     }
   } catch (error) {
     console.warn('Failed to load vote data:', error);
@@ -187,8 +202,54 @@ function updateVoteButtons(definitionId) {
   }
 }
 
-// Initialize voting system
+// Vote data caching functions
+function cacheVoteData(voteData) {
+  try {
+    const cacheData = {
+      votes: voteData,
+      timestamp: Date.now(),
+      version: '1.0'
+    };
+    localStorage.setItem('flounderVoteCache', JSON.stringify(cacheData));
+    console.log('Vote data cached successfully');
+  } catch (error) {
+    console.warn('Failed to cache vote data:', error);
+  }
+}
+
+function getCachedVoteData() {
+  try {
+    const cached = localStorage.getItem('flounderVoteCache');
+    if (!cached) return null;
+    
+    const cacheData = JSON.parse(cached);
+    const cacheAge = Date.now() - cacheData.timestamp;
+    const maxAge = 2 * 60 * 1000; // 2 minutes for vote data (shorter than terms)
+    
+    if (cacheAge > maxAge) {
+      console.log('Vote cache expired, clearing');
+      localStorage.removeItem('flounderVoteCache');
+      return null;
+    }
+    
+    return cacheData.votes;
+  } catch (error) {
+    console.warn('Failed to read cached vote data:', error);
+    return null;
+  }
+}
+
+// Initialize voting system with immediate cached data
 async function initVotingSystem() {
+  // Load cached vote data immediately for instant UI
+  const cachedVotes = getCachedVoteData();
+  if (cachedVotes && Object.keys(cachedVotes).length > 0) {
+    console.log('Initializing with cached vote data for instant display');
+    allVotes = cachedVotes;
+    updateAllVoteDisplays();
+  }
+  
+  // Load fresh data in background
   await loadVoteData();
   loadUserVotes();
 }
@@ -229,7 +290,9 @@ window.VotingSystem = {
   getUserVotes: () => userVotes,
   getAllVotes: () => allVotes,
   setAllVotes: (votes) => { allVotes = votes; }, // Setter for allVotes
-  updateAllVoteDisplays // Global update function
+  updateAllVoteDisplays, // Global update function
+  cacheVoteData,
+  getCachedVoteData
 };
 
 // Make submitVote globally available for HTML onclick handlers

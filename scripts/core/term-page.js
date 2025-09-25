@@ -112,11 +112,12 @@ function showToast(message) {
 // Note: userVotes and allVotes are declared in main.js
 const USE_SUPABASE = true;
 
-// Initialize Supabase voting
+// Initialize Supabase voting with optimistic loading
 async function initSupabaseVoting() {
   if (USE_SUPABASE && window.supabaseVoting) {
     try {
       console.log('Initializing Supabase voting...');
+      // Load fresh data from Supabase (this will also cache it)
       allVotes = await window.supabaseVoting.loadVoteData();
       console.log('Loaded vote data:', allVotes);
       
@@ -320,8 +321,18 @@ function handleDefinitionDeepLink() {
   }
 }
 
-// Initialize voting on page load
+// Initialize voting on page load with optimistic loading
 document.addEventListener('DOMContentLoaded', async function() {
+  // Show cached votes immediately for instant display
+  if (window.VotingSystem && window.VotingSystem.getCachedVoteData) {
+    const cachedVotes = window.VotingSystem.getCachedVoteData();
+    if (cachedVotes && Object.keys(cachedVotes).length > 0) {
+      console.log('Term page: Using cached votes for immediate display');
+      allVotes = cachedVotes;
+      updateAllVoteCounts();
+    }
+  }
+  
   // Wait a bit to ensure all scripts are loaded
   setTimeout(async () => {
     // Use centralized voting system if available
@@ -331,7 +342,7 @@ document.addEventListener('DOMContentLoaded', async function() {
       window.loadUserVotes();
     }
     
-    // Initialize Supabase voting
+    // Initialize Supabase voting (this will update with fresh data)
     await initSupabaseVoting();
     
     // Update all vote buttons with current state using centralized system

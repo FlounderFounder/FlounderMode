@@ -179,13 +179,13 @@
           // Note: userVotes and allVotes are declared in main.js
           window.USE_SUPABASE = true;
           
-          // Initialize Supabase voting
+          // Initialize Supabase voting with optimistic loading
           async function initSupabaseVoting() {
             if (window.USE_SUPABASE && window.supabaseVoting) {
               try {
                 console.log('Initializing Supabase voting on individual page...');
                 
-                // Always load fresh data from Supabase for individual pages
+                // Load fresh data from Supabase (this will also cache it)
                 allVotes = await window.supabaseVoting.loadVoteData();
                 console.log('Loaded vote data from Supabase:', allVotes);
                 
@@ -405,8 +405,18 @@
             }
           };
 
-          // Initialize voting on page load
+          // Initialize voting on page load with optimistic loading
           document.addEventListener('DOMContentLoaded', async function() {
+            // Show cached votes immediately for instant display
+            if (window.VotingSystem && window.VotingSystem.getCachedVoteData) {
+              const cachedVotes = window.VotingSystem.getCachedVoteData();
+              if (cachedVotes && Object.keys(cachedVotes).length > 0) {
+                console.log('Template: Using cached votes for immediate display');
+                allVotes = cachedVotes;
+                updateAllVoteCounts();
+              }
+            }
+            
             // Wait a bit to ensure all scripts are loaded
             setTimeout(async () => {
               console.log('Individual page: Initializing voting system...');
@@ -424,7 +434,7 @@
                 window.loadUserVotes();
               }
               
-              // Initialize Supabase voting
+              // Initialize Supabase voting (this will update with fresh data)
               await initSupabaseVoting();
               
               // Update all vote buttons with current state using centralized system

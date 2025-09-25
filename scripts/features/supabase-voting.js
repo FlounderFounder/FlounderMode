@@ -64,6 +64,11 @@ async function loadVoteDataFromSupabase() {
         aggregatedVotes[defId].upvotes - aggregatedVotes[defId].downvotes;
     });
     
+    // Cache the vote data for future loads
+    if (window.VotingSystem && window.VotingSystem.cacheVoteData) {
+      window.VotingSystem.cacheVoteData(aggregatedVotes);
+    }
+    
     return aggregatedVotes;
   } catch (error) {
     console.error('Error loading vote data:', error);
@@ -173,13 +178,49 @@ async function initializeDefinitionsInSupabase(termData) {
   }
 }
 
-// Batch initialize multiple terms
+// Batch initialize multiple terms with optimized database queries
 async function batchInitializeTerms(termsArray) {
   try {
-    for (const term of termsArray) {
-      await initializeDefinitionsInSupabase(term);
+    if (!termsArray || termsArray.length === 0) {
+      console.log('No terms to initialize');
+      return;
     }
-    console.log(`Initialized ${termsArray.length} terms for voting`);
+
+    // Collect all definition IDs from all terms
+    const allDefinitionIds = [];
+    termsArray.forEach(term => {
+      if (term.definitions) {
+        term.definitions.forEach(def => {
+          allDefinitionIds.push(def.id);
+        });
+      }
+    });
+
+    if (allDefinitionIds.length === 0) {
+      console.log('No definitions to initialize');
+      return;
+    }
+
+    // Single query to check which definitions already exist
+    const { data: existingVotes, error: fetchError } = await supabaseClient
+      .from('votes')
+      .select('definition_id')
+      .in('definition_id', allDefinitionIds);
+
+    if (fetchError) {
+      console.error('Error checking existing definitions:', fetchError);
+      return;
+    }
+
+    // Find definitions that don't exist yet
+    const existingDefinitionIds = new Set(existingVotes.map(vote => vote.definition_id));
+    const newDefinitionIds = allDefinitionIds.filter(id => !existingDefinitionIds.has(id));
+
+    console.log(`Found ${newDefinitionIds.length} new definitions to initialize out of ${allDefinitionIds.length} total`);
+    
+    // No need to create records - they'll be created when first vote is cast
+    // This optimization eliminates unnecessary database writes
+    console.log(`Initialized ${termsArray.length} terms for voting (${newDefinitionIds.length} new definitions ready)`);
   } catch (error) {
     console.error('Error batch initializing terms:', error);
   }

@@ -469,3 +469,40 @@ body.dark-mode .term-usage p .term-emphasis {
   }
 }
 
+/* Loading state styles */
+.loading-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  font-size: 1.1rem;
+  color: #666;
+  font-style: italic;
+}
+
+.loading-state::before {
+  content: '';
+  width: 20px;
+  height: 20px;
+  border: 2px solid #f3f3f3;
+  border-top: 2px solid #3498db;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-right: 10px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Dark mode loading state */
+body.dark-mode .loading-state {
+  color: #ccc;
+}
+
+body.dark-mode .loading-state::before {
+  border: 2px solid #444;
+  border-top: 2px solid #60a5fa;
+}
+

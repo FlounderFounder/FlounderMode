@@ -1,6 +1,6 @@
 /* Floundermode Dictionary - UI Manager Module */
 
-// Initialize UI components
+// Initialize UI components with loading state
 async function initUI() {
   const searchInput = document.getElementById("searchInput");
   const autocompleteList = document.getElementById("autocompleteList");
@@ -10,50 +10,84 @@ async function initUI() {
   const modalContent = document.getElementById("modalContent");
   const wotdContainer = document.querySelector(".wotd-container");
 
-  // Get terms from DataLoader module
+  // Show loading state immediately
+  showLoadingState();
+
+  // Get terms from DataLoader module (may be cached)
   const flounderTerms = window.DataLoader ? window.DataLoader.getAllTerms() : [];
   
   if (flounderTerms.length === 0) {
     console.warn('No terms loaded yet, UI initialization may be incomplete');
-    return; // Exit early if no terms
+    // Don't return early - let the UI show loading state
   }
+  // Note: populateUI will be called from main.js after terms are loaded
+}
 
-  // Search functionality
-  searchInput.addEventListener("input", () => {
-    const value = searchInput.value.toLowerCase();
-    autocompleteList.innerHTML = "";
+// Show loading state
+function showLoadingState() {
+  const carousel = document.getElementById("carousel");
+  if (carousel) {
+    carousel.innerHTML = '<div class="loading-state">Loading terms...</div>';
+  }
+  
+  const wotdContainer = document.querySelector(".wotd-container");
+  if (wotdContainer) {
     wotdContainer.classList.add("hide");
+  }
+}
 
-    if (!value) {
-      autocompleteList.classList.add("hidden");
-      // Reset to initial state when search is cleared
-      window.Navigation?.hideWotd();
-      return;
-    }
+// Hide loading state
+function hideLoadingState() {
+  const loadingElement = document.querySelector('.loading-state');
+  if (loadingElement) {
+    loadingElement.remove();
+  }
+}
 
-    const matches = flounderTerms.filter((term) =>
-      term.term.toLowerCase().includes(value)
-    );
+// Populate UI with terms data
+function populateUI(flounderTerms) {
+  // Search functionality
+  const searchInput = document.getElementById("searchInput");
+  const autocompleteList = document.getElementById("autocompleteList");
+  const wotdContainer = document.querySelector(".wotd-container");
 
-    if (matches.length == 0) {
-      autocompleteList.classList.add("hidden");
-      return;
-    }
+  if (searchInput) {
+    searchInput.addEventListener("input", () => {
+      const value = searchInput.value.toLowerCase();
+      autocompleteList.innerHTML = "";
+      wotdContainer.classList.add("hide");
 
-    autocompleteList.classList.remove("hidden");
-    matches.forEach((match) => {
-      const item = document.createElement("div");
-      item.className = "autocomplete-item";
-      item.textContent = match.term;
-      item.onclick = () => {
-        searchInput.value = "";
-        autocompleteList.innerHTML = "";
+      if (!value) {
         autocompleteList.classList.add("hidden");
-        openModal(match);
-      };
-      autocompleteList.appendChild(item);
+        // Reset to initial state when search is cleared
+        window.Navigation?.hideWotd();
+        return;
+      }
+
+      const matches = flounderTerms.filter((term) =>
+        term.term.toLowerCase().includes(value)
+      );
+
+      if (matches.length == 0) {
+        autocompleteList.classList.add("hidden");
+        return;
+      }
+
+      autocompleteList.classList.remove("hidden");
+      matches.forEach((match) => {
+        const item = document.createElement("div");
+        item.className = "autocomplete-item";
+        item.textContent = match.term;
+        item.onclick = () => {
+          searchInput.value = "";
+          autocompleteList.innerHTML = "";
+          autocompleteList.classList.add("hidden");
+          openModal(match);
+        };
+        autocompleteList.appendChild(item);
+      });
     });
-  });
+  }
 
   // Initialize components
   populateCarousel();
@@ -373,6 +407,9 @@ function shareCurrentTerm() {
 // Export functions for use by other modules
 window.UIManager = {
   initUI,
+  populateUI,
+  showLoadingState,
+  hideLoadingState,
   openModal,
   closeModal,
   generateDefinitionsHtml,

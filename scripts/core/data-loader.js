@@ -3,15 +3,22 @@
 // Private variable for data management
 let flounderTerms = [];
 
-// Dynamic term loading function
+// Dynamic term loading function with parallel fetching
 async function loadAllTerms() {
   try {
+    // Check cache first
+    const cachedTerms = getCachedTerms();
+    if (cachedTerms && cachedTerms.length > 0) {
+      console.log(`Using cached terms (${cachedTerms.length} terms)`);
+      flounderTerms = cachedTerms;
+      return cachedTerms;
+    }
+
     // First, try to get the list of term files from a manifest or API
-    // For now, we'll use a fallback approach that tries to load common patterns
     const possibleTerms = await discoverTermFiles();
-    const terms = [];
     
-    for (const file of possibleTerms) {
+    // Load all terms in parallel instead of sequentially
+    const termPromises = possibleTerms.map(async (file) => {
       try {
         const response = await fetch(`/terms/${file}`);
         if (response.ok) {
@@ -59,15 +66,25 @@ async function loadAllTerms() {
             });
           }
           
-          terms.push(term);
+          return term;
         }
+        return null;
       } catch (error) {
         console.warn(`Failed to load term file ${file}:`, error);
+        return null;
       }
-    }
+    });
+
+    // Wait for all terms to load in parallel
+    const termResults = await Promise.all(termPromises);
+    const terms = termResults.filter(term => term !== null);
     
     flounderTerms = terms;
-    console.log(`Loaded ${terms.length} terms`);
+    
+    // Cache the terms for future loads
+    cacheTerms(terms);
+    
+    console.log(`Loaded ${terms.length} terms in parallel`);
     return terms;
   } catch (error) {
     console.error('Error loading terms:', error);
@@ -123,11 +140,50 @@ function getDefinitionById(definitionId) {
   return null;
 }
 
+// Caching functions for performance
+function cacheTerms(terms) {
+  try {
+    const cacheData = {
+      terms: terms,
+      timestamp: Date.now(),
+      version: '1.0'
+    };
+    localStorage.setItem('flounderTermsCache', JSON.stringify(cacheData));
+    console.log('Terms cached successfully');
+  } catch (error) {
+    console.warn('Failed to cache terms:', error);
+  }
+}
+
+function getCachedTerms() {
+  try {
+    const cached = localStorage.getItem('flounderTermsCache');
+    if (!cached) return null;
+    
+    const cacheData = JSON.parse(cached);
+    const cacheAge = Date.now() - cacheData.timestamp;
+    const maxAge = 5 * 60 * 1000; // 5 minutes
+    
+    if (cacheAge > maxAge) {
+      console.log('Cache expired, clearing');
+      localStorage.removeItem('flounderTermsCache');
+      return null;
+    }
+    
+    return cacheData.terms;
+  } catch (error) {
+    console.warn('Failed to read cached terms:', error);
+    return null;
+  }
+}
+
 // Export functions for use by other modules
 window.DataLoader = {
   loadAllTerms,
   getAllTerms,
   getTermByName,
   getDefinitionById,
-  discoverTermFiles
+  discoverTermFiles,
+  cacheTerms,
+  getCachedTerms
 };
