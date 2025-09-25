@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Disrupt - Floundermode Dictionary</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/x-icon" href="../favicon.ico" />
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap" rel="stylesheet">
+    
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="../styles/main.css">
+    <link rel="stylesheet" href="../styles/easy-mode.css">
+    <link rel="stylesheet" href="../styles/voting-ui.css">
+    <link rel="stylesheet" href="../styles/definitions.css">
+    <link rel="stylesheet" href="../styles/speech-bubble-fix.css">
+    <link rel="stylesheet" href="../styles/toast.css">
+    <link rel="stylesheet" href="../styles/share.css">
+    <link rel="stylesheet" href="../styles/components.css">
+    <link rel="stylesheet" href="../styles/modal.css">
+    <link rel="stylesheet" href="../styles/navigation.css">
+    <link rel="stylesheet" href="../styles/carousel.css">
+    
+  </head>
+  <body>
+    <header class="main-header">
+      <div class="header-content">
+        <h1 class="page-title">Floundermode Dictionary</h1>
+        <nav class="header-nav">
+          <a href="../" class="nav-button">← Back to Dictionary</a>
+        <button class="nav-button dark-mode-toggle" onclick="toggleDarkMode()">
+          🌙 Dark
+        </button>
+        </nav>
+      </div>
+    </header>
+
+    <main class="main-content">
+      <div class="term-page">
+        <h1 class="term-title">Disrupt</h1>
+        
+        <div class="definitions-container">
+          <h2 class="definitions-title">DEFINITIONS</h2>
+          <div class="definitions-list">
+            
+            <div class="definition-item" id="disrupt-def-1">
+              <div class="definition-content">
+                <div class="definition-text">To enter an established market with venture capital, ignore existing regulations, undercut prices until competitors die, then raise prices once you've achieved dominance.</div>
+                <div class="definition-example">"We're disrupting real estate by turning every apartment into a short-term rental and calling housing scarcity 'market efficiency.'"</div>
+              </div>
+              <div class="definition-author">by Carter Wynn 2025-09-25</div>
+              <div class="definition-votes">
+                <button class="vote-btn vote-up" onclick="submitVote('disrupt-def-1', 'up')" data-def-id="disrupt-def-1">
+                  ▲
+                </button>
+                <div class="vote-count">0</div>
+                <button class="vote-btn vote-down" onclick="submitVote('disrupt-def-1', 'down')" data-def-id="disrupt-def-1">
+                  ▼
+                </button>
+                <button class="share-btn" onclick="shareDefinition('disrupt-def-1')" data-def-id="disrupt-def-1" title="Share this definition">
+                  📤
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="term-related">
+          <h2>Related Terms</h2>
+          <div class="related-tags">
+            <span class="related-tag">Innovation</span>
+            <span class="related-tag">Move Fast and Break Things</span>
+            <span class="related-tag">Regulatory Arbitrage</span>
+            <span class="related-tag">Blitzscaling</span>
+            <span class="related-tag">Pivot</span>
+          </div>
+        </div>
+        
+        <div class="term-actions">
+          <button onclick="shareDisrupt()" class="share-button">
+            📤 Share This Term
+          </button>
+        </div>
+        
+        <script>
+          function shareDisrupt() {
+            const definitions = [
+          {
+                    "id": "disrupt-def-1",
+                    "definition": "To enter an established market with venture capital, ignore existing regulations, undercut prices until competitors die, then raise prices once you've achieved dominance.",
+                    "usage": "We're disrupting real estate by turning every apartment into a short-term rental and calling housing scarcity 'market efficiency.'",
+                    "author": "Carter Wynn",
+                    "isPrimary": true,
+                    "upvotes": 0,
+                    "downvotes": 0,
+                    "netScore": 0
+          }
+];
+            shareTerm('Disrupt', definitions);
+          }
+          
+          // Share term function for individual pages - now uses modal
+          window.shareTerm = function(term, definitions, definitionId = null) {
+            console.log('shareTerm called with:', { term, definitions, definitionId });
+            
+            // Use specific definition if provided, otherwise primary or first definition
+            let targetDef;
+            if (definitionId) {
+              targetDef = definitions.find(d => d.id === definitionId);
+            }
+            if (!targetDef) {
+              targetDef = definitions.find(d => d.isPrimary) || definitions[0];
+            }
+            
+            // Use the global shareTerm function from share-utils.js
+            if (window.ShareUtils && window.ShareUtils.openShareModal) {
+              window.ShareUtils.openShareModal(targetDef.id, term, targetDef);
+            } else {
+              // Fallback to old behavior if modal not available
+              const shareText = `Check out "${term}" from Floundermode Dictionary: ${window.location.href}`;
+              
+              console.log('Generated share text:', shareText);
+
+              // Try native share first, then clipboard
+              if (navigator.share) {
+                navigator.share({
+                  title: `${term} - Floundermode Dictionary`,
+                  text: shareText,
+                  url: window.location.href
+                }).catch(err => {
+                  console.log('Native share failed:', err);
+                  fallbackShare(shareText);
+                });
+              } else {
+                fallbackShare(shareText);
+              }
+            }
+          };
+          
+          // Fallback share function
+          window.fallbackShare = function(text) {
+            console.log('fallbackShare called with:', text);
+            
+            // Try the modern clipboard API first
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+              console.log('Using modern clipboard API');
+              navigator.clipboard.writeText(text).then(() => {
+                console.log('Clipboard write successful');
+                showToast('Copied to clipboard!');
+              }).catch(err => {
+                console.log('Clipboard API failed:', err);
+                // Try fallback method
+                tryFallbackCopy(text);
+              });
+            } else {
+              console.log('Clipboard API not available, using fallback');
+              tryFallbackCopy(text);
+            }
+          };
+          
+          // Fallback copy function
+          function tryFallbackCopy(text) {
+            try {
+              const textArea = document.createElement('textarea');
+              textArea.value = text;
+              textArea.style.position = 'fixed';
+              textArea.style.left = '-999999px';
+              textArea.style.top = '-999999px';
+              document.body.appendChild(textArea);
+              textArea.focus();
+              textArea.select();
+              const successful = document.execCommand('copy');
+              document.body.removeChild(textArea);
+              
+              if (successful) {
+                showToast('Copied to clipboard!');
+              } else {
+                alert('Share text copied to clipboard!');
+              }
+            } catch (err) {
+              console.log('Fallback copy failed:', err);
+              alert('Share text copied to clipboard!');
+            }
+          }
+          
+          // Simple toast notification
+          function showToast(message) {
+            const toast = document.createElement('div');
+            toast.textContent = message;
+            toast.style.cssText = `
+              position: fixed;
+              top: 20px;
+              right: 20px;
+              background: #22c55e;
+              color: white;
+              padding: 12px 20px;
+              border-radius: 8px;
+              z-index: 10000;
+              font-family: inherit;
+              font-size: 14px;
+              box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            `;
+            document.body.appendChild(toast);
+            setTimeout(() => {
+              document.body.removeChild(toast);
+            }, 2000);
+          }
+          
+          // Copy to clipboard function for share modal
+          function copyToClipboard(elementId) {
+            const element = document.getElementById(elementId);
+            if (!element) return;
+            
+            const text = element.textContent || element.innerText;
+            
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+              navigator.clipboard.writeText(text).then(() => {
+                showToast('Copied to clipboard!');
+              }).catch(err => {
+                console.log('Clipboard API failed:', err);
+                tryFallbackCopy(text);
+              });
+            } else {
+              tryFallbackCopy(text);
+            }
+          }
+          
+          // ===== SUPABASE VOTING SYSTEM FOR HTML PAGES =====
+          // Note: userVotes and allVotes are declared in main.js
+          window.USE_SUPABASE = true;
+          
+          // Initialize Supabase voting with optimistic loading
+          async function initSupabaseVoting() {
+            if (window.USE_SUPABASE && window.supabaseVoting) {
+              try {
+                console.log('Initializing Supabase voting on individual page...');
+                
+                // Load fresh data from Supabase (this will also cache it)
+                allVotes = await window.supabaseVoting.loadVoteData();
+                console.log('Loaded vote data from Supabase:', allVotes);
+                
+                // Update centralized vote data if VotingSystem is available
+                if (window.VotingSystem && window.VotingSystem.setAllVotes) {
+                  window.VotingSystem.setAllVotes(allVotes);
+                  console.log('Updated centralized vote data');
+                }
+                
+                // Update all vote counts on the page
+                updateAllVoteCounts();
+                
+                // Subscribe to real-time changes
+                window.supabaseVoting.subscribeToChanges((updatedVotes) => {
+                  console.log('Individual page received real-time update:', updatedVotes);
+                  allVotes = updatedVotes;
+                  
+                  // Update centralized vote data if available
+                  if (window.VotingSystem && window.VotingSystem.setAllVotes) {
+                    window.VotingSystem.setAllVotes(updatedVotes);
+                  }
+                  
+                  // Update all vote counts on this page
+                  updateAllVoteCounts();
+                  
+                  // Update vote buttons
+                  document.querySelectorAll('[data-def-id]').forEach(button => {
+                    const defId = button.getAttribute('data-def-id');
+                    if (window.VotingSystem && window.VotingSystem.updateVoteButtons) {
+                      window.VotingSystem.updateVoteButtons(defId);
+                    } else {
+                      updateVoteButtons(defId);
+                    }
+                  });
+                });
+              } catch (error) {
+                console.error('Failed to initialize Supabase voting:', error);
+                // Fallback: try to load from localStorage or use default values
+                console.log('Using fallback vote data');
+                allVotes = {};
+                updateAllVoteCounts();
+              }
+            } else {
+              console.log('Supabase voting not available, using fallback');
+              allVotes = {};
+              updateAllVoteCounts();
+            }
+          }
+          
+          // Update all vote counts on the page
+          function updateAllVoteCounts() {
+            console.log('🔢 Updating all vote counts with data:', allVotes);
+            console.log('🔍 Found vote count elements:', document.querySelectorAll('.vote-count').length);
+            
+            document.querySelectorAll('.vote-count').forEach((voteCount, index) => {
+              const definitionId = voteCount.closest('.definition-item')?.id;
+              const votes = allVotes[definitionId] || { netScore: 0 };
+              console.log(`📊 Vote count ${index + 1}: ${definitionId} = ${votes.netScore}`);
+              voteCount.textContent = votes.netScore;
+            });
+            
+            // Also update any vote buttons
+            document.querySelectorAll('[data-def-id]').forEach(button => {
+              const defId = button.getAttribute('data-def-id');
+              console.log(`🔘 Updating vote button for ${defId}`);
+            });
+          }
+          
+          // Update vote count optimistically
+          function updateVoteCountOptimistically(definitionId, voteChange) {
+            const voteCount = document.querySelector(`#${definitionId} .vote-count`);
+            if (voteCount) {
+              const currentCount = parseInt(voteCount.textContent) || 0;
+              voteCount.textContent = currentCount + voteChange;
+              
+              // Add animation class
+              voteCount.classList.add('vote-updated');
+              setTimeout(() => {
+                voteCount.classList.remove('vote-updated');
+              }, 300);
+            }
+          }
+          
+          // Submit a vote for a definition - use centralized voting system
+          window.submitVote = async function(definitionId, voteType) {
+            console.log('Individual page voting:', definitionId, voteType);
+            
+            // Use the centralized voting system from VotingSystem module
+            if (window.VotingSystem && window.VotingSystem.submitVote) {
+              await window.VotingSystem.submitVote(definitionId, voteType);
+            } else {
+              console.warn('VotingSystem not available, falling back to local implementation');
+              // Fallback to local implementation if VotingSystem not available
+              const existingVote = userVotes.get(definitionId);
+              
+              let voteChange = 0;
+              if (existingVote === voteType) {
+                userVotes.delete(definitionId);
+                voteChange = voteType === 'up' ? -1 : 1;
+              } else {
+                userVotes.set(definitionId, voteType);
+                if (existingVote) {
+                  voteChange = voteType === 'up' ? 2 : -2;
+                } else {
+                  voteChange = voteType === 'up' ? 1 : -1;
+                }
+              }
+              
+              updateVoteCountOptimistically(definitionId, voteChange);
+              updateVoteButtons(definitionId);
+              
+              // Use the saveUserVotes function from main.js
+              if (window.saveUserVotes) {
+                window.saveUserVotes();
+              }
+              
+              if (window.USE_SUPABASE && window.supabaseVoting) {
+                const result = await window.supabaseVoting.submitVote(definitionId, voteType);
+                if (result) {
+                  allVotes = result;
+                  updateVoteButtons(definitionId);
+                } else {
+                  // Revert optimistic update on failure
+                  updateVoteCountOptimistically(definitionId, -voteChange);
+                  if (existingVote === voteType) {
+                    userVotes.set(definitionId, voteType);
+                  } else {
+                    userVotes.delete(definitionId);
+                  }
+                  if (window.saveUserVotes) {
+                    window.saveUserVotes();
+                  }
+                  updateVoteButtons(definitionId);
+                }
+              } else {
+                // Fallback to local counting
+                if (!allVotes[definitionId]) {
+                  allVotes[definitionId] = { upvotes: 0, downvotes: 0, netScore: 0 };
+                }
+                allVotes[definitionId].netScore += voteChange;
+                if (voteType === 'up') {
+                  allVotes[definitionId].upvotes += (voteChange > 0 ? 1 : -1);
+                } else {
+                  allVotes[definitionId].downvotes += (voteChange < 0 ? 1 : -1);
+                }
+              }
+            }
+          };
+          
+          // Update the vote button UI
+          function updateVoteButtons(definitionId) {
+            const upButton = document.querySelector(`button[data-def-id="${definitionId}"].vote-up`);
+            const downButton = document.querySelector(`button[data-def-id="${definitionId}"].vote-down`);
+            const voteCount = document.querySelector(`button[data-def-id="${definitionId}"].vote-up`).parentElement.querySelector('.vote-count');
+            
+            if (upButton && downButton && voteCount) {
+              const userVote = userVotes.get(definitionId);
+              
+              // Reset all button states
+              upButton.classList.remove('voted');
+              downButton.classList.remove('voted');
+              
+              // Apply voted state
+              if (userVote === 'up') {
+                upButton.classList.add('voted');
+              } else if (userVote === 'down') {
+                downButton.classList.add('voted');
+              }
+              
+              // Update vote count (simple local count for demo)
+              const upVotes = Array.from(userVotes.values()).filter(v => v === 'up').length;
+              const downVotes = Array.from(userVotes.values()).filter(v => v === 'down').length;
+              const netScore = upVotes - downVotes;
+              voteCount.textContent = netScore;
+            }
+          }
+          
+          // Share definition function - now uses modal
+          window.shareDefinition = function(definitionId) {
+            const definitions = [
+          {
+                    "id": "disrupt-def-1",
+                    "definition": "To enter an established market with venture capital, ignore existing regulations, undercut prices until competitors die, then raise prices once you've achieved dominance.",
+                    "usage": "We're disrupting real estate by turning every apartment into a short-term rental and calling housing scarcity 'market efficiency.'",
+                    "author": "Carter Wynn",
+                    "isPrimary": true,
+                    "upvotes": 0,
+                    "downvotes": 0,
+                    "netScore": 0
+          }
+];
+            const definition = definitions.find(d => d.id === definitionId);
+            if (!definition) return;
+
+            // Use the global shareDefinition function from share-utils.js
+            if (window.ShareUtils && window.ShareUtils.openShareModal) {
+              window.ShareUtils.openShareModal(definitionId, 'Disrupt', definition);
+            } else {
+              // Fallback to old behavior if modal not available
+              const shareText = `Disrupt: ${definition.definition}\n\n"${definition.usage}"\n\n— ${definition.author || 'Anonymous'}\n\nFrom Floundermode Dictionary`;
+              
+              if (navigator.share) {
+                navigator.share({
+                  title: `Disrupt - Floundermode Dictionary`,
+                  text: shareText,
+                  url: window.location.href
+                }).catch(err => console.log('Error sharing:', err));
+              } else {
+                // Fallback: copy to clipboard
+                navigator.clipboard.writeText(shareText).then(() => {
+                  // Show a brief success message
+                  const shareBtn = document.querySelector(`[data-def-id="${definitionId}"]`);
+                  const originalText = shareBtn.innerHTML;
+                  shareBtn.innerHTML = '✓';
+                  shareBtn.style.background = '#22c55e';
+                  shareBtn.style.color = 'white';
+                  
+                  setTimeout(() => {
+                    shareBtn.innerHTML = originalText;
+                    shareBtn.style.background = '';
+                    shareBtn.style.color = '';
+                  }, 1000);
+                }).catch(err => {
+                  console.log('Error copying to clipboard:', err);
+                  alert('Share text copied to clipboard!');
+                });
+              }
+            }
+          };
+
+          // Initialize voting on page load with optimistic loading
+          document.addEventListener('DOMContentLoaded', async function() {
+            // Show cached votes immediately for instant display
+            if (window.VotingSystem && window.VotingSystem.getCachedVoteData) {
+              const cachedVotes = window.VotingSystem.getCachedVoteData();
+              if (cachedVotes && Object.keys(cachedVotes).length > 0) {
+                console.log('Template: Using cached votes for immediate display');
+                allVotes = cachedVotes;
+                updateAllVoteCounts();
+              }
+            }
+            
+            // Wait a bit to ensure all scripts are loaded
+            setTimeout(async () => {
+              console.log('Individual page: Initializing voting system...');
+              
+              // Initialize VotingSystem if not already done
+              if (window.VotingSystem && window.VotingSystem.initVotingSystem) {
+                await window.VotingSystem.initVotingSystem();
+                console.log('Individual page: VotingSystem initialized');
+              }
+              
+              // Use centralized voting system if available
+              if (window.VotingSystem && window.VotingSystem.loadUserVotes) {
+                window.VotingSystem.loadUserVotes();
+              } else if (window.loadUserVotes) {
+                window.loadUserVotes();
+              }
+              
+              // Initialize Supabase voting (this will update with fresh data)
+              await initSupabaseVoting();
+              
+              // Update all vote buttons with current state using centralized system
+              document.querySelectorAll('[data-def-id]').forEach(button => {
+                const defId = button.getAttribute('data-def-id');
+                if (window.VotingSystem && window.VotingSystem.updateVoteButtons) {
+                  window.VotingSystem.updateVoteButtons(defId);
+                } else {
+                  updateVoteButtons(defId);
+                }
+              });
+              
+              console.log('Individual page: Voting initialization complete');
+            }, 100);
+          });
+        </script>
+      </div>
+    </main>
+
+    <!-- Share Modal -->
+    <div class="share-modal hide" id="shareModal">
+      <div class="window-bar">
+        <span>Share Definition</span>
+        <button class="window-button" onclick="closeShareModal()">✕</button>
+      </div>
+      <div class="share-modal-content">
+        <div class="share-header">
+          <h3>🔗 Share this definition</h3>
+          <p>Copy the link or embed code to share this definition with others.</p>
+        </div>
+        
+        <div class="share-section">
+          <h4>👀 Preview</h4>
+          <div class="embed-preview">
+            <p>How this will look when embedded:</p>
+            <div id="embedPreview" class="embed-preview-content"></div>
+          </div>
+        </div>
+        
+        <div class="share-section">
+          <h4>📋 Direct Link</h4>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-label">Share this link</span>
+              <button class="copy-btn" onclick="copyToClipboard('shareLink')">📋 Copy</button>
+            </div>
+            <code id="shareLink"></code>
+          </div>
+        </div>
+
+        <div class="share-section">
+          <h4>🔗 Embed Code</h4>
+          <div class="theme-toggle-container">
+            <label class="theme-toggle-label">
+              <input type="radio" name="embedTheme" value="light" checked onchange="updateEmbedCode()">
+              <span class="theme-option">☀️ Light Mode</span>
+            </label>
+            <label class="theme-toggle-label">
+              <input type="radio" name="embedTheme" value="dark" onchange="updateEmbedCode()">
+              <span class="theme-option">🌙 Dark Mode</span>
+            </label>
+          </div>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-label">Copy embed code</span>
+              <button class="copy-btn" onclick="copyToClipboard('embedCode')">📋 Copy</button>
+            </div>
+            <pre id="embedCode"></pre>
+          </div>
+        </div>
+
+        <div class="share-actions">
+          <button class="share-btn secondary" onclick="closeShareModal()">Close</button>
+          <button class="share-btn primary" onclick="openShareLink()">
+            Open Link →
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Supabase -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    
+    <!-- JavaScript Files -->
+    <script src="../scripts/utils/simple-profanity-filter.js"></script>
+    <script src="../scripts/features/supabase-voting.js"></script>
+    <script src="../scripts/core/data-loader.js"></script>
+    <script src="../scripts/core/voting-system.js"></script>
+    <script src="../scripts/utils/share-utils.js"></script>
+    <script src="../scripts/core/navigation.js"></script>
+    <script src="../scripts/core/main.js"></script>
+    
+    <script>
+      // Handle deep linking to specific definitions
+      function handleDefinitionDeepLink() {
+        const hash = window.location.hash;
+        if (hash) {
+          const definitionId = hash.substring(1); // Remove the #
+          const targetElement = document.getElementById(definitionId);
+          if (targetElement) {
+            // Scroll to the definition
+            targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            
+            // Add a subtle highlight effect
+            targetElement.style.transition = 'box-shadow 0.3s ease';
+            targetElement.style.boxShadow = '0 0 20px rgba(0, 123, 255, 0.5)';
+            
+            // Remove highlight after 3 seconds
+            setTimeout(() => {
+              targetElement.style.boxShadow = '';
+            }, 3000);
+          }
+        }
+      }
+      
+      // Run on page load
+      document.addEventListener('DOMContentLoaded', function() {
+        // Initialize dark mode from saved preference
+        window.Navigation.initDarkMode();
+        
+        // Handle deep linking to specific definitions
+        handleDefinitionDeepLink();
+      });
+      
+      // Also run if hash changes (for single-page navigation)
+      window.addEventListener('hashchange', handleDefinitionDeepLink);
+    </script>
+  </body>
+</html>

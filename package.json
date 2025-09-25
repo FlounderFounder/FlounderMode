@@ -5,6 +5,8 @@
   "scripts": {
     "generate-html": "node scripts/generate-html.js",
     "generate-pages": "node generate-pages.js",
+    "generate-incremental": "node scripts/build/incremental-generator.js",
+    "generate-force": "node scripts/build/incremental-generator.js --force",
     "dev": "python3 -m http.server 8000",
     "build": "echo 'No build step required for static site'"
   },

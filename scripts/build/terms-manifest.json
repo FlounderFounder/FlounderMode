@@ -1,13 +1,20 @@
 {
   "terms": [
     "dashboard-fatigue.json",
+    "disrupt.json",
     "founder-gut.json",
-    "github-action-test.json",
     "meta-investment.json",
     "mvp-theater.json",
-    "supabase-sync-test.json",
     "vibe-driven-dev.json"
   ],
-  "lastUpdated": "2025-09-24T08:32:25.632Z",
-  "version": "1.0"
+  "lastUpdated": "2025-09-25T08:19:20.064Z",
+  "version": "1.0",
+  "termHashes": {
+    "dashboard-fatigue.json": "461aeff147b1e38676b7d04cc12a1780f8409e51c3067bdc1231889b241d828d",
+    "founder-gut.json": "861d98916c478568721151cd4fe42b54b542be21004efa46ac05d07c2baf0cd3",
+    "meta-investment.json": "cd3d7386626ef19b073a768a34c775f5506e3f0724cdad95f037927b06812763",
+    "mvp-theater.json": "a02a70c61d65721d644fd0aa63de52b82859365a9d85799fafd2021ef3a13ea0",
+    "vibe-driven-dev.json": "1436fee0234dd6fd5f2c2fb928a9a4dcf66ef00cb4d222323695cf5e2df4e6c6",
+    "disrupt.json": "86a2e84d81f7d633ef0dbedc5cd226f9eede21390f6b790d3185defd9071c303"
+  }
 }
