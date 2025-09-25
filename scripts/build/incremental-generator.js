@@ -297,6 +297,10 @@ function generatePagesIncremental(options = {}) {
   });
   
   saveManifest(manifestPath, manifest);
+  
+  // Also save a copy in the root directory for the data loader
+  const rootManifestPath = path.join(__dirname, '../../terms-manifest.json');
+  saveManifest(rootManifestPath, manifest);
 
   // Print summary
   console.log('\n📊 Generation Summary:');
