@@ -207,17 +207,36 @@
             }, 2000);
           }
           
+          // Copy to clipboard function for share modal
+          function copyToClipboard(elementId) {
+            const element = document.getElementById(elementId);
+            if (!element) return;
+            
+            const text = element.textContent || element.innerText;
+            
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+              navigator.clipboard.writeText(text).then(() => {
+                showToast('Copied to clipboard!');
+              }).catch(err => {
+                console.log('Clipboard API failed:', err);
+                tryFallbackCopy(text);
+              });
+            } else {
+              tryFallbackCopy(text);
+            }
+          }
+          
           // ===== SUPABASE VOTING SYSTEM FOR HTML PAGES =====
           // Note: userVotes and allVotes are declared in main.js
           window.USE_SUPABASE = true;
           
-          // Initialize Supabase voting
+          // Initialize Supabase voting with optimistic loading
           async function initSupabaseVoting() {
             if (window.USE_SUPABASE && window.supabaseVoting) {
               try {
                 console.log('Initializing Supabase voting on individual page...');
                 
-                // Always load fresh data from Supabase for individual pages
+                // Load fresh data from Supabase (this will also cache it)
                 allVotes = await window.supabaseVoting.loadVoteData();
                 console.log('Loaded vote data from Supabase:', allVotes);
                 
@@ -448,8 +467,18 @@
             }
           };
 
-          // Initialize voting on page load
+          // Initialize voting on page load with optimistic loading
           document.addEventListener('DOMContentLoaded', async function() {
+            // Show cached votes immediately for instant display
+            if (window.VotingSystem && window.VotingSystem.getCachedVoteData) {
+              const cachedVotes = window.VotingSystem.getCachedVoteData();
+              if (cachedVotes && Object.keys(cachedVotes).length > 0) {
+                console.log('Template: Using cached votes for immediate display');
+                allVotes = cachedVotes;
+                updateAllVoteCounts();
+              }
+            }
+            
             // Wait a bit to ensure all scripts are loaded
             setTimeout(async () => {
               console.log('Individual page: Initializing voting system...');
@@ -467,7 +496,7 @@
                 window.loadUserVotes();
               }
               
-              // Initialize Supabase voting
+              // Initialize Supabase voting (this will update with fresh data)
               await initSupabaseVoting();
               
               // Update all vote buttons with current state using centralized system
@@ -486,6 +515,67 @@
         </script>
       </div>
     </main>
+
+    <!-- Share Modal -->
+    <div class="share-modal hide" id="shareModal">
+      <div class="window-bar">
+        <span>Share Definition</span>
+        <button class="window-button" onclick="closeShareModal()">✕</button>
+      </div>
+      <div class="share-modal-content">
+        <div class="share-header">
+          <h3>🔗 Share this definition</h3>
+          <p>Copy the link or embed code to share this definition with others.</p>
+        </div>
+        
+        <div class="share-section">
+          <h4>👀 Preview</h4>
+          <div class="embed-preview">
+            <p>How this will look when embedded:</p>
+            <div id="embedPreview" class="embed-preview-content"></div>
+          </div>
+        </div>
+        
+        <div class="share-section">
+          <h4>📋 Direct Link</h4>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-label">Share this link</span>
+              <button class="copy-btn" onclick="copyToClipboard('shareLink')">📋 Copy</button>
+            </div>
+            <code id="shareLink"></code>
+          </div>
+        </div>
+
+        <div class="share-section">
+          <h4>🔗 Embed Code</h4>
+          <div class="theme-toggle-container">
+            <label class="theme-toggle-label">
+              <input type="radio" name="embedTheme" value="light" checked onchange="updateEmbedCode()">
+              <span class="theme-option">☀️ Light Mode</span>
+            </label>
+            <label class="theme-toggle-label">
+              <input type="radio" name="embedTheme" value="dark" onchange="updateEmbedCode()">
+              <span class="theme-option">🌙 Dark Mode</span>
+            </label>
+          </div>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-label">Copy embed code</span>
+              <button class="copy-btn" onclick="copyToClipboard('embedCode')">📋 Copy</button>
+            </div>
+            <pre id="embedCode"></pre>
+          </div>
+        </div>
+
+        <div class="share-actions">
+          <button class="share-btn secondary" onclick="closeShareModal()">Close</button>
+          <button class="share-btn primary" onclick="openShareLink()">
+            Open Link →
+          </button>
+        </div>
+      </div>
+    </div>
 
     <!-- Supabase -->
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>

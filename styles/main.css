@@ -205,267 +205,416 @@ body.dark-mode .autocomplete-item:hover {
 
 
 
-/* Individual Term Page Styles */
+/* Individual Term Page Styles - Enhanced Modal-like Design */
 .term-page {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 1rem;
-  background: rgba(255, 255, 255, 0.9);
-  border-radius: 8px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: #fff;
+  border: 3px solid #000;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15), 6px 6px 0 #000;
   backdrop-filter: blur(10px);
+  position: relative;
+}
+
+.term-page::before {
+  content: '';
+  position: absolute;
+  top: -3px;
+  left: -3px;
+  right: -3px;
+  bottom: -3px;
+  background: linear-gradient(135deg, #8b5cf6, #3b82f6, #22c55e);
+  border-radius: 16px;
+  z-index: -1;
+  opacity: 0.1;
 }
 
 .term-title {
   font-family: "Bebas Neue", sans-serif;
   font-size: clamp(2.5rem, 6vw, 4rem);
-  margin: 0 0 1rem 0;
+  margin: 0 0 2rem 0;
   letter-spacing: 2px;
   color: #000;
   text-align: center;
-  border-bottom: 2px solid #000;
-  padding-bottom: 0.5rem;
+  border-bottom: 3px solid #000;
+  padding-bottom: 1rem;
+  position: relative;
+}
+
+.term-title::after {
+  content: '';
+  position: absolute;
+  bottom: -3px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 3px;
+  background: linear-gradient(90deg, #8b5cf6, #3b82f6, #22c55e);
+  border-radius: 2px;
 }
 
 .term-definition,
 .term-usage,
 .term-related {
-  margin-bottom: 1rem;
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: #f8fafc;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  position: relative;
 }
 
 .term-definition h2,
 .term-usage h2,
 .term-related h2 {
-  font-family: "Bebas Neue", sans-serif;
-  font-size: 1.1rem;
-  margin: 0 0 0.5rem 0;
-  letter-spacing: 1px;
-  color: #333;
+  font-family: "Roboto Mono", monospace;
+  font-size: 0.9rem;
+  font-weight: bold;
+  margin: 0 0 1rem 0;
+  letter-spacing: 2px;
+  color: #4a5568;
+  text-transform: uppercase;
+  border-bottom: 2px solid #e2e8f0;
+  padding-bottom: 0.5rem;
+  position: relative;
+}
+
+.term-definition h2::after,
+.term-usage h2::after,
+.term-related h2::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 30px;
+  height: 2px;
+  background: linear-gradient(90deg, #8b5cf6, #3b82f6);
+  border-radius: 1px;
 }
 
 .term-definition p,
 .term-usage p {
-  font-size: 0.95rem;
-  line-height: 1.4;
+  font-size: 1rem;
+  line-height: 1.6;
   margin: 0;
-  padding: 0.6rem;
-  border-radius: 6px;
-  border-left: 3px solid #93d0ff;
+  padding: 1rem;
+  border-radius: 8px;
+  border-left: 4px solid #2563eb;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  position: relative;
+  font-family: "Roboto Mono", monospace;
 }
 
-/* Emphasis styling for terms within definitions */
+.term-definition p {
+  background: linear-gradient(135deg, #e0f2f7 0%, #f0f9ff 100%);
+  border-left-color: #2563eb;
+}
+
+.term-usage p {
+  background: linear-gradient(135deg, #e6faed 0%, #f0fdf4 100%);
+  border-left-color: #22c55e;
+}
+
+/* Enhanced emphasis styling for terms within definitions */
 .term-definition p strong,
 .term-usage p strong {
   font-weight: bold;
-  color: #2563eb;
-  background: rgba(37, 99, 235, 0.1);
-  padding: 0.1rem 0.2rem;
-  border-radius: 3px;
+  color: #1d4ed8;
+  background: rgba(29, 78, 216, 0.15);
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+  border: 1px solid rgba(29, 78, 216, 0.2);
 }
 
 /* Special emphasis for the main term */
 .term-definition p .term-emphasis {
   font-weight: bold;
-  color: #1d4ed8;
-  background: rgba(29, 78, 216, 0.15);
-  padding: 0.15rem 0.3rem;
-  border-radius: 4px;
-  font-size: 1.05em;
-}
-
-.term-definition p {
-  background: transparent;
-  border-left-color: #2563eb;
-}
-
-.term-usage p {
-  background: rgba(34, 197, 94, 0.08);
-  border-left-color: #22c55e;
+  color: #1e40af;
+  background: linear-gradient(135deg, rgba(29, 78, 216, 0.2), rgba(59, 130, 246, 0.1));
+  padding: 0.3rem 0.5rem;
+  border-radius: 6px;
+  font-size: 1.1em;
+  border: 2px solid rgba(29, 78, 216, 0.3);
+  box-shadow: 0 2px 4px rgba(29, 78, 216, 0.1);
 }
 
 .related-tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.3rem;
-  margin-top: 0.5rem;
+  gap: 0.5rem;
+  margin-top: 1rem;
 }
 
 .related-tag {
-  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
   color: white;
-  padding: 0.3rem 0.8rem;
-  border-radius: 16px;
-  font-size: 0.8rem;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
   font-weight: 600;
   border: 2px solid #000;
-  box-shadow: 0 2px 4px rgba(99, 102, 241, 0.3), 1px 1px 0 #000;
+  box-shadow: 0 4px 8px rgba(139, 92, 246, 0.3), 2px 2px 0 #000;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 1px;
   transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  font-family: "Roboto Mono", monospace;
+  position: relative;
+  overflow: hidden;
+}
+
+.related-tag::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s ease;
 }
 
 .related-tag:hover {
-  background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%);
-  transform: translateY(-2px) scale(1.05);
-  box-shadow: 0 6px 12px rgba(99, 102, 241, 0.4), 3px 3px 0 #000;
+  background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 8px 16px rgba(139, 92, 246, 0.4), 4px 4px 0 #000;
+}
+
+.related-tag:hover::before {
+  left: 100%;
 }
 
 .related-tag:active {
-  transform: translateY(0) scale(0.98);
-  background: linear-gradient(135deg, #3730a3 0%, #312e81 100%);
+  transform: translateY(-1px) scale(1.02);
+  background: linear-gradient(135deg, #6d28d9 0%, #5b21b6 100%);
 }
 
-/* Term actions styling for individual pages */
+/* Term actions styling for individual pages - Enhanced */
 .term-actions {
-  margin-top: 1rem;
+  margin-top: 2rem;
   text-align: center;
-  padding-top: 0.8rem;
-  border-top: 1px solid #eee;
+  padding: 2rem;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  border: 2px solid #cbd5e1;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  position: relative;
+}
+
+.term-actions::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #8b5cf6, #3b82f6, #22c55e);
+  border-radius: 12px 12px 0 0;
 }
 
 .term-actions .share-button {
   display: inline-block;
-  background: transparent;
-  color: #8b5cf6;
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  color: #fff;
+  padding: 1rem 2rem;
+  border-radius: 12px;
   text-decoration: none;
-  font-weight: 600;
+  font-weight: 700;
   font-family: "Roboto Mono", monospace;
-  font-size: 0.9rem;
-  letter-spacing: 1px;
-  border: 2px solid #8b5cf6;
-  box-shadow: none;
+  font-size: 1rem;
+  letter-spacing: 2px;
+  border: 3px solid #000;
+  box-shadow: 0 6px 16px rgba(139, 92, 246, 0.3), 4px 4px 0 #000;
   transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
   text-transform: uppercase;
   cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.term-actions .share-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s ease;
 }
 
 .term-actions .share-button:hover {
-  background: rgba(139, 92, 246, 0.1);
-  transform: translateY(-3px) scale(1.05);
-  box-shadow: 0 8px 16px rgba(139, 92, 246, 0.2);
+  background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+  transform: translateY(-4px) scale(1.05);
+  box-shadow: 0 10px 24px rgba(139, 92, 246, 0.4), 6px 6px 0 #000;
+}
+
+.term-actions .share-button:hover::before {
+  left: 100%;
 }
 
 .term-actions .share-button:active {
-  transform: translateY(-1px) scale(1.02);
-  box-shadow: 0 4px 8px rgba(139, 92, 246, 0.2);
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 6px 12px rgba(139, 92, 246, 0.3), 3px 3px 0 #000;
 }
 
-/* Dark mode styles for term pages */
+/* Dark mode styles for term pages - Enhanced */
 body.dark-mode .term-page {
-  background: rgba(26, 26, 26, 0.9);
+  background: #1a1a1a;
   color: #fff;
+  border: 3px solid #444;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), 6px 6px 0 #444;
+}
+
+body.dark-mode .term-page::before {
+  background: linear-gradient(135deg, #8b5cf6, #3b82f6, #22c55e);
+  opacity: 0.2;
 }
 
 body.dark-mode .term-title {
   color: #fff;
-  border-bottom-color: #fff;
+  border-bottom-color: #444;
+}
+
+body.dark-mode .term-title::after {
+  background: linear-gradient(90deg, #8b5cf6, #3b82f6, #22c55e);
+}
+
+body.dark-mode .term-definition,
+body.dark-mode .term-usage,
+body.dark-mode .term-related {
+  background: #2d2d2d;
+  border: 2px solid #444;
 }
 
 body.dark-mode .term-definition h2,
 body.dark-mode .term-usage h2,
 body.dark-mode .term-related h2 {
-  color: #fff;
+  color: #e2e8f0;
+  border-bottom-color: #444;
+}
+
+body.dark-mode .term-definition h2::after,
+body.dark-mode .term-usage h2::after,
+body.dark-mode .term-related h2::after {
+  background: linear-gradient(90deg, #8b5cf6, #3b82f6);
 }
 
 body.dark-mode .term-definition p,
 body.dark-mode .term-usage p {
-  background: rgba(255, 255, 255, 0.1);
-  border-left-color: #fff;
-  color: #fff;
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  border-left-color: #3b82f6;
+  color: #e2e8f0;
 }
 
 body.dark-mode .term-definition p {
-  background: rgba(59, 130, 246, 0.2);
+  background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
   border-left-color: #3b82f6;
 }
 
 body.dark-mode .term-usage p {
-  background: rgba(34, 197, 94, 0.2);
+  background: linear-gradient(135deg, #166534 0%, #15803d 100%);
   border-left-color: #22c55e;
 }
 
-body.dark-mode .related-tag {
-  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
-  color: white;
-  border: 2px solid #fff;
-  box-shadow: 0 4px 8px rgba(99, 102, 241, 0.3), 2px 2px 0 #fff;
-}
-
-body.dark-mode .term-actions {
-  border-top-color: #444;
-}
-
-body.dark-mode .term-actions .share-button {
-  border: 2px solid #8b5cf6;
-  color: #8b5cf6;
-  box-shadow: none;
-}
-
-body.dark-mode .term-actions .share-button:hover {
-  background: rgba(139, 92, 246, 0.2);
-  box-shadow: 0 8px 16px rgba(139, 92, 246, 0.3);
-}
-
-body.dark-mode .term-actions .share-button:active {
-  box-shadow: 0 4px 8px rgba(139, 92, 246, 0.2);
-}
-
-/* Dark mode emphasis styling */
 body.dark-mode .term-definition p strong,
 body.dark-mode .term-usage p strong {
   color: #60a5fa;
   background: rgba(96, 165, 250, 0.2);
+  border: 1px solid rgba(96, 165, 250, 0.3);
 }
 
 body.dark-mode .term-definition p .term-emphasis,
 body.dark-mode .term-usage p .term-emphasis {
   color: #3b82f6;
-  background: rgba(59, 130, 246, 0.25);
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.3), rgba(96, 165, 250, 0.2));
+  border: 2px solid rgba(59, 130, 246, 0.4);
 }
 
-/* Mobile responsiveness for term pages */
+body.dark-mode .related-tag {
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  border: 2px solid #fff;
+  box-shadow: 0 4px 8px rgba(139, 92, 246, 0.3), 2px 2px 0 #fff;
+}
+
+body.dark-mode .related-tag:hover {
+  background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+  box-shadow: 0 8px 16px rgba(139, 92, 246, 0.4), 4px 4px 0 #fff;
+}
+
+body.dark-mode .term-actions {
+  background: linear-gradient(135deg, #2d2d2d 0%, #1a1a1a 100%);
+  border: 2px solid #444;
+}
+
+body.dark-mode .term-actions::before {
+  background: linear-gradient(90deg, #8b5cf6, #3b82f6, #22c55e);
+}
+
+body.dark-mode .term-actions .share-button {
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  border: 3px solid #fff;
+  box-shadow: 0 6px 16px rgba(139, 92, 246, 0.3), 4px 4px 0 #fff;
+}
+
+body.dark-mode .term-actions .share-button:hover {
+  background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+  box-shadow: 0 10px 24px rgba(139, 92, 246, 0.4), 6px 6px 0 #fff;
+}
+
+/* Mobile responsiveness for term pages - Enhanced */
 @media (max-width: 768px) {
   .term-page {
-    margin: 0.3rem;
-    padding: 0.8rem;
+    margin: 1rem;
+    padding: 1.5rem;
+    border-radius: 12px;
+    border-width: 2px;
   }
   
   .term-title {
     font-size: clamp(2rem, 8vw, 3rem);
-    margin-bottom: 0.8rem;
-    padding-bottom: 0.3rem;
-  }
-  
-  .term-definition p,
-  .term-usage p {
-    font-size: 0.85rem;
-    padding: 0.4rem;
-    margin-bottom: 0.8rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.8rem;
   }
   
   .term-definition,
   .term-usage,
   .term-related {
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+  }
+  
+  .term-definition p,
+  .term-usage p {
+    font-size: 0.9rem;
+    padding: 0.8rem;
     margin-bottom: 0.8rem;
   }
   
   .term-definition h2,
   .term-usage h2,
   .term-related h2 {
-    font-size: 1rem;
-    margin-bottom: 0.3rem;
+    font-size: 0.8rem;
+    margin-bottom: 0.8rem;
   }
   
   .term-actions {
-    margin-top: 0.8rem;
-    padding-top: 0.6rem;
+    margin-top: 1.5rem;
+    padding: 1.5rem;
+  }
+  
+  .term-actions .share-button {
+    padding: 0.8rem 1.5rem;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
   }
   
   .related-tag {
-    padding: 0.25rem 0.6rem;
-    font-size: 0.7rem;
+    padding: 0.4rem 0.8rem;
+    font-size: 0.75rem;
   }
 }
 
