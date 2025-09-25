@@ -18,9 +18,7 @@ body {
 }
 
 /* Ensure all elements respect viewport width */
-* {
-  max-width: 100%;
-}
+
 
 /* Search Styles */
 .search-container {
@@ -231,28 +229,22 @@ body.dark-mode .autocomplete-item:hover {
   opacity: 0.1;
 }
 
-/* Window Bar - Modal Style */
+/* Window Bar - Exact Modal Style */
 .term-page .window-bar {
   background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
   color: #fff;
   padding: 0.3rem 0.8rem;
-  border-bottom: 2px solid #000;
-  border-radius: 13px 13px 0 0;
-  font-family: "Bebas Neue", sans-serif;
-  font-size: 1.1rem;
-  letter-spacing: 1px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin: -2rem -2rem 0 -2rem;
-  position: relative;
-}
-
-.term-page .window-title {
+  flex-shrink: 0;
+  border-radius: 13px 13px 0 0;
+  border-bottom: 2px solid #000;
   font-family: "Bebas Neue", sans-serif;
   font-size: 1.1rem;
-  font-weight: bold;
-  color: #fff;
+  letter-spacing: 1px;
+  margin: -2rem -2rem 0 -2rem;
+  position: relative;
 }
 
 .term-page .window-button {
@@ -261,24 +253,26 @@ body.dark-mode .autocomplete-item:hover {
   border: 2px solid #000;
   width: 28px;
   height: 28px;
-  border-radius: 50%;
-  cursor: pointer;
-  font-size: 1.2rem;
-  font-weight: bold;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s ease;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  border-radius: 50%;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .term-page .window-button:hover {
+  background: linear-gradient(135deg, #ff3742 0%, #ff2f3a 100%);
   transform: scale(1.15) rotate(5deg);
   box-shadow: 0 6px 12px rgba(255, 71, 87, 0.4);
 }
 
 .term-page .window-button:active {
   transform: scale(0.95) rotate(0deg);
+  background: linear-gradient(135deg, #ff2f3a 0%, #ff1a1a 100%);
 }
 
 .term-title {
@@ -524,14 +518,14 @@ body.dark-mode .term-page::before {
   opacity: 0.2;
 }
 
-/* Dark mode window bar */
+/* Dark mode window bar - matches modal exactly */
 body.dark-mode .term-page .window-bar {
-  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
-  border-bottom-color: #444;
+  background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+  border-bottom-color: #000;
 }
 
 body.dark-mode .term-page .window-button {
-  border-color: #444;
+  border-color: #000;
 }
 
 body.dark-mode .term-title {
@@ -637,14 +631,14 @@ body.dark-mode .term-actions .share-button:hover {
   .term-page .window-bar {
     margin: -1.5rem -1.5rem 0 -1.5rem;
     padding: 0.25rem 0.6rem;
-    font-size: 1rem;
-    border-radius: 10px 10px 0 0;
+    font-size: 0.9rem;
+    border-radius: 4px 4px 0 0;
   }
   
   .term-page .window-button {
-    width: 24px;
-    height: 24px;
-    font-size: 1rem;
+    width: 28px;
+    height: 28px;
+    font-size: 16px;
   }
   
   .term-title {
