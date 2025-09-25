@@ -1,5 +1,5 @@
 # 🐟 Floundermode Dictionary
-<img width="350" height="350" alt="E97AA800-B251-4208-AB06-A55B554FC094" src="https://github.com/user-attachments/assets/ec6a6dea-783b-42ef-8820-17f43bb2e036" align="center"/>
+![FLOUNDERMODE](https://github.com/user-attachments/assets/ec6a6dea-783b-42ef-8820-17f43bb2e036)
 
 The room is quiet. Slides glow behind you. Investors wait.
 
