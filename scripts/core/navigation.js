@@ -19,15 +19,36 @@ function scrollToTop() {
 
 // Show about modal
 function showAbout() {
-  const aboutModal = {
-    term: "About Floundermode Dictionary",
-    definition:
-      "A comprehensive dictionary of internet slang, memes, and digital culture terminology. Floundermode captures the evolving language of online communities.",
-    usage:
-      "Navigate through terms using the search bar, browse randomly, or click through the carousel below.",
-    related: [],
-  };
-  window.openModal(aboutModal);
+  const modalTitle = document.getElementById("modalTitle");
+  const modalContent = document.getElementById("modalContent");
+  const termModal = document.getElementById("termModal");
+  
+  modalTitle.textContent = "About Floundermode Dictionary";
+  
+  modalContent.innerHTML = `
+    <div style="text-align: left; padding: 1rem 0; line-height: 1.7;">
+      <p style="margin-bottom: 1.5rem;">
+        The Floundermode Dictionary is like Urban Dictionary for Silicon Valley. We define all the terms that make you nod knowingly in meetings while secretly wondering what the hell anyone is actually talking about.
+      </p>
+      <p style="margin-bottom: 1.5rem;">
+        From "stealth mode" (we have no product) to "pivoting" (our original idea was terrible), we're building the honest translation guide for startup speak.
+      </p>
+      <p style="margin-bottom: 2rem;">
+        Because sometimes you need to know that "thought leadership" just means posting obvious insights on LinkedIn.
+      </p>
+      <p style="margin-bottom: 2rem; font-style: italic; color: #666;">
+      </p>
+      <div style="text-align: center;">
+        <button onclick="window.open('https://github.com/FlounderFounder/default_website', '_blank')" 
+                class="contribute-button github-button">
+          Check out our GitHub
+        </button>
+      </div>
+    </div>
+  `;
+  
+  termModal.classList.remove("hide");
+  termModal.classList.add("show");
 }
 
 // Show contributing modal

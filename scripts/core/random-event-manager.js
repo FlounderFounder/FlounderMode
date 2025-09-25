@@ -8,7 +8,11 @@ class RandomEventManager {
     
     // Register a new random event
     registerEvent(eventName, probability, eventFunction) {
-        console.log(`Registering event: ${eventName} with probability: ${probability}`);
+        console.log(`Registering event: ${eventName} with probability: ${probability} - DISABLED`);
+        
+        // Random events are currently disabled
+        // Simply log that the event was registered but don't trigger it
+        return;
         
         // Check if we can trigger this event
         if (this.canTriggerEvent()) {
