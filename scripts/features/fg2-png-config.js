@@ -52,7 +52,9 @@ const PNG_CONFIG = {
         backgroundType: 'color', // 'color', 'gradient', or 'image'
         textAlign: 'center',
         logoPosition: 'bottom-right',
-        logo: '/assets/logos/menacingly_red.png' // Default logo selection
+        logo: '/assets/logos/menacingly_red.png', // Default logo selection
+        textBoxColor: '#FFFFFF', // Text box background color when using image backgrounds
+        textBoxOpacity: 1.0 // Text box opacity (0.0 to 1.0)
     },
     
     // Get all background images (wallpapers only)

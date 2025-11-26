@@ -177,6 +177,7 @@
     text-transform: none;
     letter-spacing: 0;
     white-space: nowrap;
+    color: #000;
 }
 
 /* Toolbar Controls */
@@ -190,11 +191,18 @@
     font-family: 'Tahoma', 'Arial', sans-serif;
     font-weight: 400;
     height: 21px;
+    color: #000;
 }
 
 .customize-group select {
     cursor: pointer;
     min-width: 100px;
+    color: #000;
+}
+
+.customize-group select option {
+    color: #000;
+    background: #FFF;
 }
 
 .customize-group input[type="range"] {
@@ -232,6 +240,7 @@
     font-weight: 400;
     font-family: 'Tahoma', 'Arial', sans-serif;
     min-width: 32px;
+    color: #000;
 }
 
 /* Color Input */
@@ -384,15 +393,70 @@
     font-family: 'Tahoma', 'Arial', sans-serif;
 }
 
-/* Share Options - Horizontal Row */
+/* Share Options - Simplified Layout */
 .share-options {
     display: flex;
-    gap: 2px;
-    padding: 2px;
+    gap: 8px;
+    padding: 8px;
     background: #ECE9D8;
-    border: 1px solid;
-    border-color: #808080 #FFF #FFF #808080;
     flex-wrap: wrap;
+    justify-content: center;
+}
+
+/* New Share/Download Buttons */
+.primary-share-btn,
+.secondary-share-btn {
+    padding: 10px 24px;
+    font-size: 13px;
+    font-weight: 700;
+    font-family: 'Tahoma', 'Arial', sans-serif;
+    cursor: pointer;
+    border: 1px solid;
+    transition: all 0.1s ease;
+    flex: 1;
+    min-width: 150px;
+    max-width: 250px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.primary-share-btn {
+    background: linear-gradient(to bottom, #B9D7FF 0%, #6BA4E8 100%);
+    border-color: #6BA4E8 #2B5C99 #2B5C99 #6BA4E8;
+    color: #000;
+}
+
+.primary-share-btn:hover:not(:disabled) {
+    background: linear-gradient(to bottom, #C9E7FF 0%, #7BB4F8 100%);
+}
+
+.primary-share-btn:active:not(:disabled) {
+    border-color: #2B5C99 #6BA4E8 #6BA4E8 #2B5C99;
+    background: #5A94D8;
+}
+
+.secondary-share-btn {
+    background: linear-gradient(to bottom, #ECE9D8 0%, #C0C0C0 100%);
+    border-color: #FFF #555 #555 #FFF;
+    color: #000;
+}
+
+.secondary-share-btn:hover:not(:disabled) {
+    background: linear-gradient(to bottom, #F5F4F0 0%, #D0D0D0 100%);
+}
+
+.secondary-share-btn:active:not(:disabled) {
+    border-color: #555 #FFF #FFF #555;
+    background: #B0B0B0;
+}
+
+.primary-share-btn:disabled,
+.secondary-share-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
 }
 
 .share-option-btn {
@@ -584,6 +648,7 @@
         font-size: 10px;
         font-weight: 700;
         flex-shrink: 0;
+        color: #000;
     }
     
     .tab-content .customize-group select {
@@ -608,6 +673,7 @@
     
     .customize-group span {
         font-size: 10px;
+        color: #000;
     }
     
     #preview-container {
@@ -626,15 +692,16 @@
         gap: 6px;
     }
     
-    .share-btn {
-        width: 60px;
-        height: 60px;
-        border: 4px solid #000000;
+    .share-options {
+        flex-direction: column;
+        width: 100%;
     }
     
-    .share-btn svg {
-        width: 28px;
-        height: 28px;
+    .primary-share-btn,
+    .secondary-share-btn {
+        width: 100%;
+        max-width: none;
+        min-width: 0;
     }
 }
 
@@ -715,6 +782,7 @@
     width: 90px;
     font-size: 11px;
     text-align: left;
+    color: #000;
 }
 
 .tab-content .customize-group select,
@@ -748,28 +816,16 @@
         font-size: 14px;
     }
     
-    .share-btn {
-        width: 55px;
-        height: 55px;
-        border: 4px solid #000000;
-        box-shadow: 7px 7px 0px #000000;
-    }
-    
-    .share-btn:hover {
-        box-shadow: 9px 9px 0px #000000;
-    }
-    
-    .share-btn:active {
-        box-shadow: 3px 3px 0px #000000;
-    }
-    
-    .share-btn svg {
-        width: 24px;
-        height: 24px;
+    .primary-share-btn,
+    .secondary-share-btn {
+        font-size: 12px;
+        padding: 8px 16px;
+        height: 32px;
     }
     
     .customize-group label {
         font-size: 10px;
+        color: #000;
     }
     
     .customize-group select,

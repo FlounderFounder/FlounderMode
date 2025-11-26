@@ -20,7 +20,7 @@
         
         <!-- Action Buttons -->
         <div class="button-group">
-            <button class="refresh-btn" id="refresh-btn">NEXT</button>
+            <button class="refresh-btn" id="refresh-btn">🔀</button>
             <button class="share-btn" id="share-btn" title="Share as PNG">
                 <!-- Upload/Share Icon -->
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="square" stroke-linejoin="miter">
@@ -234,6 +234,22 @@
                                     <option value="">None</option>
                                     <!-- Options loaded from png-config.js -->
                                 </select>
+                            </div>
+                            
+                            <!-- Text Box Color (for image backgrounds) -->
+                            <div class="customize-group">
+                                <label>Text Box Color</label>
+                                <div class="color-input-group">
+                                    <input type="color" id="text-box-color" value="#FFFFFF">
+                                    <input type="text" id="text-box-color-hex" value="#FFFFFF">
+                                </div>
+                            </div>
+                            
+                            <!-- Text Box Opacity -->
+                            <div class="customize-group">
+                                <label>Text Box Opacity</label>
+                                <input type="range" id="text-box-opacity" min="0" max="1" step="0.05" value="1">
+                                <span id="text-box-opacity-value">100%</span>
                             </div>
                         </div>
                         

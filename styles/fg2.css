@@ -139,26 +139,25 @@ body.bg-fit {
    ---------------------------------------------------------------------------- */
 
 .refresh-btn {
-    background-color: #FF0000;
-    color: #FFFFFF;
+    background-color: #FFD700;
+    color: #000000;
     border: 5px solid #000000;
     padding: 15px 40px;
-    font-size: 24px;
+    font-size: 40px;
     border-radius: 0px;
     cursor: pointer;
     font-weight: 900;
     box-shadow: 10px 10px 0px #000000;
     transition: all 0.1s ease;
-    text-transform: uppercase;
-    letter-spacing: 3px;
     height: 70px;
     display: flex;
     align-items: center;
     justify-content: center;
+    line-height: 1;
 }
 
 .refresh-btn:hover {
-    background-color: #FF3333;
+    background-color: #FFED4E;
     transform: translate(-3px, -3px);
     box-shadow: 13px 13px 0px #000000;
 }
@@ -177,7 +176,7 @@ body.bg-fit {
     bottom: 0;
     left: 0;
     right: 0;
-    height: 30px;
+    height: 40px;
     background: linear-gradient(to bottom, #3086EC 0%, #2A7DE6 10%, #1D6BD9 90%, #1454C4 100%);
     border-top: 1px solid #2A5FAC;
     display: flex;
@@ -189,11 +188,10 @@ body.bg-fit {
 }
 
 .menu-btn {
-    height: 24px;
+    height: 32px;
     background: linear-gradient(to bottom, #6FD86F 0%, #5BC75B 10%, #4EB94E 48%, #45B045 52%, #399F39 100%);
     color: #FFFFFF;
     border: 1px outset #4DB94D;
-    border-left: none;
     border-radius: 0 3px 3px 0;
     padding: 0 18px 0 8px;
     font-size: 11px;
@@ -206,7 +204,7 @@ body.bg-fit {
     transition: none;
     font-family: 'Tahoma', 'Arial', sans-serif;
     text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);
-    margin: 3px 0 3px 3px;
+    margin: 4px 0 4px 0;
     position: relative;
     font-style: italic;
 }
@@ -249,7 +247,7 @@ body.bg-fit {
 
 .start-menu {
     position: fixed;
-    bottom: 32px;
+    bottom: 42px;
     left: 0;
     width: 380px;
     max-width: calc(100vw - 20px);
@@ -695,7 +693,7 @@ body.bg-fit {
     
     .refresh-btn {
         padding: 12px 30px;
-        font-size: 20px;
+        font-size: 32px;
         border: 4px solid #000000;
         box-shadow: 8px 8px 0px #000000;
         height: 60px;
@@ -776,8 +774,7 @@ body.bg-fit {
     
     .refresh-btn {
         padding: 10px 25px;
-        font-size: 18px;
-        letter-spacing: 2px;
+        font-size: 28px;
         border: 4px solid #000000;
         height: 55px;
     }
