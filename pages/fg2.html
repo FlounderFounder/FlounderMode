@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FG2 - Phrase Generator | Floundermode</title>
+    <title>2025 Tech Confessions | Floundermode</title>
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
     <link rel="stylesheet" href="/styles/fg2.css?v=25">
     <link rel="stylesheet" href="/styles/fg2-share.css?v=7">
@@ -36,8 +36,8 @@
          DESKTOP ICON - Submit Phrase
          ======================================================================== -->
     <div class="desktop-icon" id="submit-icon" onclick="openSubmitModal()">
-        <div class="desktop-icon-image">📝</div>
-        <div class="desktop-icon-label">Add Yours</div>
+        <div class="desktop-icon-image">💬</div>
+        <div class="desktop-icon-label">Confess</div>
     </div>
 
     <!-- ========================================================================
@@ -66,11 +66,11 @@
             <!-- Projects will be loaded from config.js -->
         </div>
         
-        <!-- Submit Phrase Menu Item -->
+        <!-- Submit Confession Menu Item -->
         <div class="start-menu-divider"></div>
         <a href="#" class="start-menu-item" onclick="openSubmitModal(); toggleMenu(); return false;">
-            <div class="start-menu-item-icon">📝</div>
-            <div class="start-menu-item-text">Add Yours</div>
+            <div class="start-menu-item-icon">💬</div>
+            <div class="start-menu-item-text">Confess</div>
         </a>
         
         <!-- Settings Footer -->
@@ -166,8 +166,8 @@
         <!-- Window Title Bar -->
         <div class="window-titlebar">
             <div class="window-title">
-                <span class="window-icon">📝</span>
-                Submit your observation
+                <span class="window-icon">💬</span>
+                Submit Your Tech Confession
             </div>
             <button class="window-close-btn" onclick="closeSubmitModal()">&times;</button>
         </div>
@@ -181,7 +181,7 @@
             
             <form id="submit-phrase-form" onsubmit="handlePhraseSubmit(event)">
                 <div class="form-group">
-                    <label class="form-label">Your Phrase *</label>
+                    <label class="form-label">Your Confession *</label>
                     <textarea 
                         id="phrase-input" 
                         name="phrase" 

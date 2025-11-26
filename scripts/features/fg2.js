@@ -1,5 +1,6 @@
 // ============================================================================
-// PHRASE GENERATOR - Main Application
+// 2025 TECH CONFESSIONS - Main Application
+// Real sentiments from mostly real people navigating tech culture
 // ============================================================================
 
 // ----------------------------------------------------------------------------
@@ -367,7 +368,7 @@ function updateClock() {
 }
 
 // ----------------------------------------------------------------------------
-// PHRASE SUBMISSION
+// CONFESSION SUBMISSION
 // ----------------------------------------------------------------------------
 
 /**
@@ -385,7 +386,7 @@ function getSupabaseClient() {
 }
 
 /**
- * Open submit phrase modal
+ * Open submit confession modal
  */
 function openSubmitModal() {
     const modal = document.getElementById('submit-window');
@@ -403,7 +404,7 @@ function openSubmitModal() {
 }
 
 /**
- * Close submit phrase modal
+ * Close submit confession modal
  */
 function closeSubmitModal() {
     const modal = document.getElementById('submit-window');
@@ -425,7 +426,7 @@ function closeSuccessModal() {
 }
 
 /**
- * Submit another phrase
+ * Submit another confession
  */
 function submitAnother() {
     // Close success modal
@@ -456,7 +457,7 @@ function updateCharCounter(inputId, counterId, maxLength) {
 }
 
 /**
- * Handle phrase submission
+ * Handle confession submission
  */
 async function handlePhraseSubmit(event) {
     event.preventDefault();
@@ -466,7 +467,7 @@ async function handlePhraseSubmit(event) {
     const authorInput = document.getElementById('author-input');
     
     if (!phraseInput || !phraseInput.value.trim()) {
-        alert('Please enter a phrase!');
+        alert('Please enter your confession!');
         return;
     }
     
@@ -521,7 +522,7 @@ async function handlePhraseSubmit(event) {
             if (successMessage) {
                 successMessage.innerHTML = `
                     <h3>❌ Oops!</h3>
-                    <p>There was an error submitting your observation. Please try again.</p>
+                    <p>There was an error submitting your confession. Please try again.</p>
                 `;
             }
             successModal.classList.add('active');
@@ -539,7 +540,7 @@ function showSubmittingMessage() {
         if (successMessage) {
             successMessage.innerHTML = `
                 <h3>📤 Submitting...</h3>
-                <p>Sending your observation...</p>
+                <p>Sending your confession...</p>
             `;
         }
         successModal.classList.remove('hide');
@@ -556,9 +557,9 @@ function showSuccessMessage() {
         const successMessage = successModal.querySelector('.success-message');
         if (successMessage) {
             successMessage.innerHTML = `
-                <h3>🎉 Thanks for your submission!</h3>
-                <p>Your observation has been sent and will be reviewed. If it makes the cut, it'll be added to the rotation.</p>
-                <p>Feel the chaos? Submit another.</p>
+                <h3>🎉 Thanks for your confession!</h3>
+                <p>Your honest take has been sent and will be reviewed. If it resonates, it'll join the other real sentiments in rotation.</p>
+                <p>Got more to confess? Submit another.</p>
             `;
         }
     }
@@ -572,7 +573,7 @@ function showSuccessMessage() {
  * Initialize the application
  */
 async function init() {
-    console.log('Initializing Phrase Generator...');
+    console.log('Initializing 2025 Tech Confessions - Real sentiments from real people...');
     
     // Load phrases
     await loadPhrases();
@@ -654,7 +655,7 @@ async function init() {
         }
     });
     
-    console.log('Phrase Generator initialized!');
+    console.log('2025 Tech Confessions initialized!');
 }
 
 // Start the app when DOM is ready

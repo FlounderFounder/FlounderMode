@@ -1,5 +1,5 @@
 // ============================================================================
-// FG2 SHARE - PNG Export & Social Sharing (html2canvas approach)
+// 2025 TECH CONFESSIONS SHARE - PNG Export & Social Sharing (html2canvas approach)
 // ============================================================================
 
 // State
@@ -675,7 +675,7 @@ async function shareImage() {
         const { blob } = await getCanvasAndBlob();
         
         // Create file for sharing
-        const file = new File([blob], `fg2-phrase-${Date.now()}.png`, { type: 'image/png' });
+        const file = new File([blob], `2025-tech-confessions-${Date.now()}.png`, { type: 'image/png' });
         
         // Check if Web Share API is supported with files
         if (navigator.canShare && navigator.canShare({ files: [file] })) {
@@ -709,7 +709,7 @@ async function downloadPNG() {
         const url = canvas.toDataURL('image/png');
         const a = document.createElement('a');
         a.href = url;
-        a.download = `fg2-phrase-${Date.now()}.png`;
+        a.download = `2025-tech-confessions-${Date.now()}.png`;
         a.click();
         
         showToast('Image downloaded!');
@@ -870,4 +870,4 @@ window.closeShareModal = closeShareModal;
 window.downloadPNG = downloadPNG;
 window.shareImage = shareImage;
 
-console.log('FG2 Share module loaded');
+console.log('2025 Tech Confessions Share module loaded');
