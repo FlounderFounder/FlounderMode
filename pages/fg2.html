@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FG2 - Phrase Generator | Floundermode</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="stylesheet" href="/styles/fg2.css?v=25">
+    <link rel="stylesheet" href="/styles/fg2-share.css?v=7">
+</head>
+<body>
+    <!-- ========================================================================
+         MAIN CONTENT - Phrase Display & Action Buttons
+         ======================================================================== -->
+    <div class="container">
+        <!-- Speech Bubble with Random Phrase -->
+        <div class="speech-bubble" id="speech-bubble">
+            <div id="phrase-text">Loading...</div>
+        </div>
+        
+        <!-- Action Buttons -->
+        <div class="button-group">
+            <button class="refresh-btn" id="refresh-btn">NEXT</button>
+            <button class="share-btn" id="share-btn" title="Share as PNG">
+                <!-- Upload/Share Icon -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="square" stroke-linejoin="miter">
+                    <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
+                    <polyline points="16 6 12 2 8 6"></polyline>
+                    <line x1="12" y1="2" x2="12" y2="15"></line>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- ========================================================================
+         WINDOWS XP TASKBAR
+         ======================================================================== -->
+    <div class="taskbar">
+        <!-- Start Button -->
+        <button class="menu-btn" onclick="toggleMenu()">
+            <span>start</span>
+        </button>
+        
+        <!-- System Tray Clock -->
+        <div class="taskbar-time" id="taskbar-time">12:00 PM</div>
+    </div>
+
+    <!-- ========================================================================
+         START MENU - Projects & Links
+         ======================================================================== -->
+    <div class="start-menu" id="start-menu">
+        <div class="start-menu-header">
+            <h3>PROJECTS</h3>
+        </div>
+        
+        <!-- Menu Items - Add/Edit your projects here -->
+        <div class="start-menu-items" id="start-menu-items">
+            <!-- Projects will be loaded from config.js -->
+        </div>
+        
+        <!-- Settings Footer -->
+        <div class="start-menu-settings">
+            <button class="settings-menu-btn" onclick="openSettings(); toggleMenu();">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="3"></circle>
+                    <path d="M12 1v6m0 6v6M5.64 5.64l4.24 4.24m4.24 4.24l4.24 4.24M1 12h6m6 0h6M5.64 18.36l4.24-4.24m4.24-4.24l4.24-4.24"></path>
+                </svg>
+                <span>Settings</span>
+            </button>
+        </div>
+        
+        <!-- Social Media Links Footer -->
+        <div class="start-menu-footer" id="start-menu-footer">
+            <!-- Social links will be loaded from config.js -->
+        </div>
+    </div>
+
+    <!-- ========================================================================
+         SETTINGS WINDOW - Change Background
+         ======================================================================== -->
+    <div class="settings-window" id="settings-window">
+        <!-- Window Title Bar -->
+        <div class="window-titlebar">
+            <div class="window-title">
+                <span class="window-icon">🎨</span>
+                Change Background
+            </div>
+            <button class="window-close-btn" onclick="closeSettings()">&times;</button>
+        </div>
+        
+        <!-- Window Content -->
+        <div class="window-content">
+            <!-- Monitor Preview -->
+            <div class="monitor-preview">
+                <div class="monitor-frame">
+                    <div class="monitor-screen" id="preview-content"></div>
+                </div>
+            </div>
+            
+            <!-- Controls -->
+            <div class="controls-section">
+                <label class="control-label">SELECT BACKGROUND</label>
+                <select class="wallpaper-dropdown" id="wallpaper-select" onchange="changeWallpaperFromDropdown(this.value)" size="8">
+                    <option value="none">(None)</option>
+                    <optgroup label="━━━ Built-in Themes ━━━">
+                        <option value="default">🎨 Default Yellow</option>
+                        <option value="gradient1">🎨 Purple Gradient</option>
+                        <option value="gradient2">🎨 Pink Gradient</option>
+                        <option value="gradient3">🎨 Blue Gradient</option>
+                        <option value="xp">🎨 Windows XP</option>
+                        <option value="dark">🎨 Dark</option>
+                    </optgroup>
+                    <optgroup label="━━━ Custom Wallpapers ━━━" id="custom-wallpapers-optgroup">
+                        <!-- Dynamically populated -->
+                    </optgroup>
+                </select>
+            </div>
+            
+            <!-- Position Controls -->
+            <div class="controls-section">
+                <label class="control-label">POSITION</label>
+                <select class="wallpaper-dropdown" id="position-select" onchange="changeWallpaperPosition(this.value)">
+                    <option value="fill">Fill</option>
+                    <option value="fit">Fit</option>
+                    <option value="center">Center</option>
+                    <option value="stretch">Stretch</option>
+                    <option value="tile">Tile</option>
+                </select>
+            </div>
+            
+            <!-- Background Color -->
+            <div class="controls-section">
+                <label class="control-label">BG COLOR</label>
+                <div class="color-picker-row">
+                    <input type="color" class="color-picker" id="bg-color-picker" onchange="changeBackgroundColor(this.value)" value="#FAFF00">
+                    <input type="text" class="color-input" id="bg-color-input" onchange="changeBackgroundColor(this.value)" value="#FAFF00" pattern="^#[0-9A-Fa-f]{6}$">
+                </div>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="buttons-row">
+                <button class="action-button action-button-primary" onclick="closeSettings()">APPLY</button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ========================================================================
+         SHARE MODAL - Export & Social Sharing
+         ======================================================================== -->
+    <div id="share-modal" class="modal">
+        <div class="modal-content modal-content-wide">
+            <button class="close-btn" id="close-share-modal">&times;</button>
+            <h2>Customize & Share</h2>
+            
+            <div class="share-layout">
+                <!-- Left: Customization Options -->
+                <div class="customization-panel">
+                    <h3>Customize Design</h3>
+                    
+                    <!-- XP Style Tabs -->
+                    <div class="xp-tabs">
+                        <button class="xp-tab active" data-tab="text">Text</button>
+                        <button class="xp-tab" data-tab="background">Background</button>
+                        <button class="xp-tab" data-tab="logo">Logo</button>
+                    </div>
+                    
+                    <!-- Tab Content Container -->
+                    <div class="tab-content-container">
+                        <!-- TEXT TAB -->
+                        <div class="tab-content active" data-content="text">
+                            <!-- Font Selection -->
+                            <div class="customize-group">
+                                <label>Font</label>
+                                <select id="font-select">
+                                    <!-- Options loaded from png-config.js -->
+                                </select>
+                            </div>
+                            
+                            <!-- Font Size -->
+                            <div class="customize-group">
+                                <label>Font Size</label>
+                                <input type="range" id="font-size" min="24" max="72" value="48">
+                                <span id="font-size-value">48px</span>
+                            </div>
+                            
+                            <!-- Text Color -->
+                            <div class="customize-group">
+                                <label>Text Color</label>
+                                <div class="color-input-group">
+                                    <input type="color" id="text-color" value="#000000">
+                                    <input type="text" id="text-color-hex" value="#000000">
+                                </div>
+                            </div>
+                            
+                            <!-- Text Alignment -->
+                            <div class="customize-group">
+                                <label>Text Align</label>
+                                <div class="button-group-inline">
+                                    <button class="align-btn" data-align="left">L</button>
+                                    <button class="align-btn active" data-align="center">C</button>
+                                    <button class="align-btn" data-align="right">R</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- BACKGROUND TAB -->
+                        <div class="tab-content" data-content="background">
+                            <!-- Background Color -->
+                            <div class="customize-group">
+                                <label>Solid Color</label>
+                                <div class="color-input-group">
+                                    <input type="color" id="bg-color" value="#FFFFFF">
+                                    <input type="text" id="bg-color-hex" value="#FFFFFF">
+                                </div>
+                            </div>
+                            
+                            <!-- Background Gradient -->
+                            <div class="customize-group">
+                                <label>Gradient</label>
+                                <div class="color-input-group">
+                                    <input type="color" id="gradient-color1" value="#667eea" title="Gradient Color 1">
+                                    <input type="color" id="gradient-color2" value="#764ba2" title="Gradient Color 2">
+                                </div>
+                                <select id="gradient-direction" style="margin-top: 8px;">
+                                    <!-- Options loaded from png-config.js -->
+                                </select>
+                            </div>
+                            
+                            <!-- Background Image -->
+                            <div class="customize-group">
+                                <label>Image</label>
+                                <select id="background-image-select">
+                                    <option value="">None</option>
+                                    <!-- Options loaded from png-config.js -->
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <!-- LOGO TAB -->
+                        <div class="tab-content" data-content="logo">
+                            <!-- Logo Selection -->
+                            <div class="customize-group">
+                                <label>Logo</label>
+                                <select id="logo-select">
+                                    <!-- Options loaded from png-config.js -->
+                                </select>
+                            </div>
+                            
+                            <!-- Logo Position -->
+                            <div class="customize-group">
+                                <label>Position</label>
+                                <select id="logo-position-select">
+                                    <!-- Options loaded from png-config.js -->
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button class="reset-btn" id="reset-customization">Reset to Default</button>
+                </div>
+                
+                <!-- Right: Preview -->
+                <div class="preview-panel">
+                    <h3>Preview</h3>
+                    <div id="preview-container"></div>
+                    
+                    <!-- Sharing Options Row -->
+                    <div class="share-section">
+                        <p class="share-heading">Share this image</p>
+                        <div class="share-options"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================================================
+         SCRIPTS - Load in correct order at end of body
+         ======================================================================== -->
+    <script src="/scripts/features/fg2-config.js?v=5"></script>
+    <script src="/scripts/features/fg2-png-config.js?v=4"></script>
+    <script src="/scripts/lib/html2canvas.min.js"></script>
+    <script src="/scripts/features/fg2.js?v=26"></script>
+    <script src="/scripts/features/fg2-share.js?v=10"></script>
+</body>
+</html>
+

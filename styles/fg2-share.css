@@ -1,0 +1,790 @@
+/* ============================================================================
+   FG2 SHARE MODAL - Windows XP + MS Paint Style
+   ============================================================================ */
+
+/* Share Button - Icon Only Square */
+.share-btn {
+    background-color: #00F5FF;
+    color: #000000;
+    border: 5px solid #000000;
+    padding: 0;
+    width: 70px;
+    height: 70px;
+    border-radius: 0px;
+    cursor: pointer;
+    font-weight: 900;
+    box-shadow: 10px 10px 0px #000000;
+    transition: all 0.1s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Arial Black', 'Arial', sans-serif;
+}
+
+.share-btn svg {
+    width: 32px;
+    height: 32px;
+}
+
+.share-btn:hover {
+    background-color: #B5FF00;
+    transform: translate(-3px, -3px);
+    box-shadow: 13px 13px 0px #000000;
+}
+
+.share-btn:active {
+    transform: translate(5px, 5px);
+    box-shadow: 5px 5px 0px #000000;
+}
+
+/* Modal Overlay */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 10000;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.modal.active {
+    display: flex;
+}
+
+/* Windows XP Window Style */
+.modal-content {
+    background: #ECE9D8;
+    border: 3px solid;
+    border-color: #FFF #555 #555 #FFF;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    position: relative;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    max-width: 900px;
+    width: 100%;
+    overflow: hidden;
+}
+
+.modal-content-wide {
+    max-width: 1100px;
+}
+
+/* XP Title Bar */
+.modal-content h2 {
+    margin: 0;
+    padding: 6px 8px;
+    background: linear-gradient(to bottom, #0997FF 0%, #0053EE 100%);
+    color: #FFF;
+    font-size: 13px;
+    font-weight: 700;
+    font-family: 'Tahoma', 'Arial', sans-serif;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-transform: none;
+    letter-spacing: 0;
+}
+
+.modal-content h2::before {
+    content: '🎨';
+    font-size: 16px;
+}
+
+/* XP Close Button */
+.close-btn {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    width: 21px;
+    height: 21px;
+    background: linear-gradient(to bottom, #F17070 0%, #D13838 100%);
+    border: 1px solid;
+    border-color: #FFF #555 #555 #FFF;
+    color: #FFF;
+    font-size: 16px;
+    font-weight: 700;
+    font-family: 'Arial', sans-serif;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    transition: all 0.1s ease;
+    padding: 0;
+}
+
+.close-btn:hover {
+    background: linear-gradient(to bottom, #FF8888 0%, #E14545 100%);
+}
+
+.close-btn:active {
+    border-color: #555 #FFF #FFF #555;
+}
+
+/* Modal Body */
+.share-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    background: #ECE9D8;
+    padding: 4px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+/* Customization Panel */
+.customization-panel {
+    background: #ECE9D8;
+    border-bottom: 2px solid;
+    border-color: #FFF #808080 #808080 #FFF;
+    padding: 8px 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.customization-panel h3 {
+    font-size: 11px;
+    font-weight: 700;
+    font-family: 'Tahoma', 'Arial', sans-serif;
+    text-transform: uppercase;
+    margin: 0 0 6px 0;
+    color: #000;
+    padding-bottom: 4px;
+    border-bottom: 1px solid #808080;
+}
+
+/* Toolbar Groups (fallback for non-tabbed view) */
+.customize-group {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px;
+    background: #ECE9D8;
+}
+
+.customize-group label {
+    font-size: 11px;
+    font-weight: 400;
+    font-family: 'Tahoma', 'Arial', sans-serif;
+    text-transform: none;
+    letter-spacing: 0;
+    white-space: nowrap;
+}
+
+/* Toolbar Controls */
+.customize-group select,
+.customize-group input[type="text"] {
+    padding: 2px 4px;
+    border: 1px solid;
+    border-color: #808080 #FFF #FFF #808080;
+    background: #FFF;
+    font-size: 11px;
+    font-family: 'Tahoma', 'Arial', sans-serif;
+    font-weight: 400;
+    height: 21px;
+}
+
+.customize-group select {
+    cursor: pointer;
+    min-width: 100px;
+}
+
+.customize-group input[type="range"] {
+    width: 80px;
+    height: 16px;
+    cursor: pointer;
+    -webkit-appearance: none;
+    background: #FFF;
+    border: 1px solid;
+    border-color: #808080 #FFF #FFF #808080;
+}
+
+.customize-group input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 12px;
+    height: 18px;
+    background: linear-gradient(to right, #ECE9D8 0%, #C0C0C0 50%, #ECE9D8 100%);
+    border: 1px solid;
+    border-color: #FFF #555 #555 #FFF;
+    cursor: pointer;
+}
+
+.customize-group input[type="range"]::-moz-range-thumb {
+    width: 12px;
+    height: 18px;
+    background: linear-gradient(to right, #ECE9D8 0%, #C0C0C0 50%, #ECE9D8 100%);
+    border: 1px solid;
+    border-color: #FFF #555 #555 #FFF;
+    cursor: pointer;
+    border-radius: 0;
+}
+
+.customize-group span {
+    font-size: 11px;
+    font-weight: 400;
+    font-family: 'Tahoma', 'Arial', sans-serif;
+    min-width: 32px;
+}
+
+/* Color Input */
+.color-input-group {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+}
+
+.color-input-group input[type="color"] {
+    width: 28px;
+    height: 21px;
+    border: 1px solid;
+    border-color: #808080 #FFF #FFF #808080;
+    cursor: pointer;
+    padding: 2px;
+}
+
+.color-input-group input[type="color"]::-webkit-color-swatch-wrapper {
+    padding: 0;
+}
+
+.color-input-group input[type="color"]::-webkit-color-swatch {
+    border: none;
+}
+
+.color-input-group input[type="text"] {
+    width: 70px;
+    text-transform: uppercase;
+    font-family: 'Courier New', monospace;
+    font-size: 11px;
+}
+
+/* Align Buttons - MS Paint Style */
+.button-group-inline {
+    display: flex;
+    gap: 2px;
+}
+
+.align-btn {
+    width: 24px;
+    height: 21px;
+    background: linear-gradient(to bottom, #FFF 0%, #ECE9D8 100%);
+    border: 1px solid;
+    border-color: #FFF #555 #555 #FFF;
+    font-size: 12px;
+    font-weight: 900;
+    font-family: 'Arial', sans-serif;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.align-btn:hover {
+    background: linear-gradient(to bottom, #FFF 0%, #DEDAD5 100%);
+}
+
+.align-btn:active,
+.align-btn.active {
+    background: #C0C0C0;
+    border-color: #555 #FFF #FFF #555;
+}
+
+/* Reset Button - XP Style */
+.reset-btn {
+    margin-top: 8px;
+    padding: 4px 12px;
+    background: linear-gradient(to bottom, #ECE9D8 0%, #C0C0C0 100%);
+    border: 1px solid;
+    border-color: #FFF #555 #555 #FFF;
+    color: #000;
+    font-size: 11px;
+    font-weight: 400;
+    font-family: 'Tahoma', 'Arial', sans-serif;
+    text-transform: none;
+    cursor: pointer;
+    height: 23px;
+    white-space: nowrap;
+    width: 100%;
+}
+
+.reset-btn:hover {
+    background: linear-gradient(to bottom, #F5F4F0 0%, #D0D0D0 100%);
+}
+
+.reset-btn:active {
+    border-color: #555 #FFF #FFF #555;
+    background: #C0C0C0;
+}
+
+/* Preview Panel */
+.preview-panel {
+    padding: 8px;
+    background: #ECE9D8;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    overflow: hidden;
+}
+
+.preview-panel h3 {
+    font-size: 11px;
+    font-weight: 700;
+    font-family: 'Tahoma', 'Arial', sans-serif;
+    text-transform: uppercase;
+    margin: 0;
+    color: #000;
+    flex-shrink: 0;
+}
+
+#preview-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #FFF;
+    padding: 15px;
+    border: 2px solid;
+    border-color: #808080 #FFF #FFF #808080;
+    min-height: 300px;
+    box-sizing: border-box;
+    overflow: hidden;
+    position: relative;
+}
+
+#live-preview {
+    flex-shrink: 0;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+/* Share Section - Horizontal Layout */
+.share-section {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 12px;
+}
+
+.share-heading {
+    font-size: 13px;
+    color: #666;
+    margin: 0;
+    white-space: nowrap;
+    font-family: 'Tahoma', 'Arial', sans-serif;
+}
+
+/* Share Options - Horizontal Row */
+.share-options {
+    display: flex;
+    gap: 2px;
+    padding: 2px;
+    background: #ECE9D8;
+    border: 1px solid;
+    border-color: #808080 #FFF #FFF #808080;
+    flex-wrap: wrap;
+}
+
+.share-option-btn {
+    width: 20px;
+    height: 20px;
+    padding: 1px;
+    background: linear-gradient(to bottom, #FFF 0%, #ECE9D8 100%);
+    border: 1px solid;
+    border-color: #FFF #555 #555 #FFF;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.1s ease;
+    position: relative;
+    flex-shrink: 0;
+}
+
+.share-option-btn span {
+    display: none;
+}
+
+.share-option-btn:hover {
+    background: linear-gradient(to bottom, #FFF 0%, #DEDAD5 100%);
+}
+
+.share-option-btn:active {
+    border-color: #555 #FFF #FFF #555;
+    background: #C0C0C0;
+}
+
+/* Tooltip on hover */
+.share-option-btn::after {
+    content: attr(title);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #FFFFE1;
+    border: 1px solid #000;
+    padding: 3px 6px;
+    font-size: 11px;
+    font-family: 'Tahoma', 'Arial', sans-serif;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+    margin-bottom: 4px;
+    z-index: 1000;
+}
+
+.share-option-btn:hover::after {
+    opacity: 1;
+}
+
+.share-option-btn svg {
+    width: 12px;
+    height: 12px;
+}
+
+.share-option-btn.embed-btn {
+    background: linear-gradient(to bottom, #B5D3FF 0%, #7AA5E6 100%);
+}
+
+.share-option-btn.embed-btn:hover {
+    background: linear-gradient(to bottom, #C5E3FF 0%, #8AB5F6 100%);
+}
+
+.share-option-btn.embed-btn:active {
+    background: #6A95D6;
+}
+
+/* Toast - XP Style */
+.share-toast {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    background: linear-gradient(to bottom, #B9D7FF 0%, #6BA4E8 100%);
+    color: #000;
+    padding: 12px 16px;
+    border: 1px solid;
+    border-color: #6BA4E8 #2B5C99 #2B5C99 #6BA4E8;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+    z-index: 20000;
+    font-size: 11px;
+    font-weight: 400;
+    font-family: 'Tahoma', 'Arial', sans-serif;
+    min-width: 200px;
+    animation: xpSlideIn 0.3s ease, xpSlideOut 0.3s ease 2.7s;
+}
+
+@keyframes xpSlideIn {
+    from { 
+        transform: translateX(400px); 
+        opacity: 0; 
+    }
+    to { 
+        transform: translateX(0); 
+        opacity: 1; 
+    }
+}
+
+@keyframes xpSlideOut {
+    from { 
+        transform: translateX(0); 
+        opacity: 1; 
+    }
+    to { 
+        transform: translateX(400px); 
+        opacity: 0; 
+    }
+}
+
+/* Desktop: Two-column layout */
+@media (min-width: 769px) {
+    .share-layout {
+        flex-direction: row;
+        gap: 4px;
+    }
+    
+    .customization-panel {
+        flex: 0 0 350px;
+        border-bottom: none;
+        border-right: 2px solid;
+        border-color: #FFF #808080 #808080 #FFF;
+        max-height: 600px;
+        overflow-y: auto;
+    }
+    
+    .preview-panel {
+        flex: 1;
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .modal {
+        padding: 5px;
+        align-items: flex-start;
+    }
+    
+    .modal-content {
+        max-height: 95vh;
+        margin: auto;
+    }
+    
+    .share-layout {
+        max-height: calc(95vh - 60px);
+    }
+    
+    .customization-panel {
+        max-height: none;
+        overflow: visible;
+    }
+    
+    .tab-content-container {
+        max-height: 300px;
+        overflow-y: auto;
+    }
+    
+    /* Mobile: Horizontal flowing layout */
+    .tab-content {
+        display: none !important;
+    }
+    
+    .tab-content.active {
+        display: flex !important;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: center;
+    }
+    
+    .tab-content .customize-group {
+        display: inline-flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        gap: 6px !important;
+        border: none !important;
+        padding: 4px 8px !important;
+        background: #F5F4F0;
+        border: 1px solid #D4D0C8;
+        flex: 0 0 auto;
+        white-space: nowrap;
+    }
+    
+    .tab-content .customize-group label {
+        width: auto !important;
+        min-width: auto !important;
+        font-size: 10px;
+        font-weight: 700;
+        flex-shrink: 0;
+    }
+    
+    .tab-content .customize-group select {
+        min-width: 100px;
+        max-width: 120px;
+    }
+    
+    .tab-content .customize-group input[type="range"] {
+        width: 80px;
+        min-width: 80px;
+    }
+    
+    .tab-content .customize-group .color-input-group {
+        display: flex;
+        gap: 4px;
+    }
+    
+    .tab-content .customize-group .button-group-inline {
+        display: flex;
+        gap: 2px;
+    }
+    
+    .customize-group span {
+        font-size: 10px;
+    }
+    
+    #preview-container {
+        min-height: 200px;
+        max-height: 300px;
+        padding: 10px;
+    }
+    
+    .preview-panel {
+        flex-shrink: 0;
+    }
+    
+    .share-section {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+    }
+    
+    .share-btn {
+        width: 60px;
+        height: 60px;
+        border: 4px solid #000000;
+    }
+    
+    .share-btn svg {
+        width: 28px;
+        height: 28px;
+    }
+}
+
+/* XP Style Tabs */
+.xp-tabs {
+    display: flex;
+    gap: 2px;
+    margin-bottom: 0;
+    border-bottom: 1px solid #808080;
+}
+
+.xp-tab {
+    padding: 4px 16px;
+    background: linear-gradient(to bottom, #ECE9D8 0%, #D4D0C8 100%);
+    border: 1px solid;
+    border-color: #FFF #808080 transparent #FFF;
+    border-radius: 3px 3px 0 0;
+    font-size: 11px;
+    font-weight: 400;
+    font-family: 'Tahoma', 'Arial', sans-serif;
+    color: #000;
+    cursor: pointer;
+    position: relative;
+    bottom: -1px;
+    transition: none;
+}
+
+.xp-tab:hover {
+    background: linear-gradient(to bottom, #F5F4F0 0%, #E0DCD8 100%);
+}
+
+.xp-tab.active {
+    background: #ECE9D8;
+    border-bottom-color: #ECE9D8;
+    font-weight: 700;
+    z-index: 1;
+}
+
+/* Tab Content */
+.tab-content-container {
+    border: 1px solid;
+    border-color: #808080 #FFF #FFF #808080;
+    background: #ECE9D8;
+    padding: 8px;
+    margin-top: -1px;
+    overflow-y: auto;
+    max-height: 400px;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* Default (Mobile-first): Vertical stacking within tabs */
+.tab-content .customize-group {
+    border-right: none;
+    border-bottom: 1px solid #D4D0C8;
+    padding: 10px 6px;
+    margin-right: 0;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+}
+
+.tab-content .customize-group:last-child {
+    border-bottom: none;
+}
+
+.tab-content .customize-group label {
+    font-weight: 700;
+    margin-bottom: 0;
+    flex-shrink: 0;
+    width: 90px;
+    font-size: 11px;
+    text-align: left;
+}
+
+.tab-content .customize-group select,
+.tab-content .customize-group input[type="range"],
+.tab-content .customize-group .color-input-group,
+.tab-content .customize-group .button-group-inline {
+    flex: 1;
+    min-width: 0;
+}
+
+@media (max-width: 480px) {
+    .modal {
+        padding: 0;
+    }
+    
+    .modal-content {
+        border: none;
+        max-height: 100vh;
+    }
+    
+    .modal-content h2 {
+        font-size: 12px;
+        padding: 4px 6px;
+    }
+    
+    .close-btn {
+        top: 3px;
+        right: 3px;
+        width: 19px;
+        height: 19px;
+        font-size: 14px;
+    }
+    
+    .share-btn {
+        width: 55px;
+        height: 55px;
+        border: 4px solid #000000;
+        box-shadow: 7px 7px 0px #000000;
+    }
+    
+    .share-btn:hover {
+        box-shadow: 9px 9px 0px #000000;
+    }
+    
+    .share-btn:active {
+        box-shadow: 3px 3px 0px #000000;
+    }
+    
+    .share-btn svg {
+        width: 24px;
+        height: 24px;
+    }
+    
+    .customize-group label {
+        font-size: 10px;
+    }
+    
+    .customize-group select,
+    .customize-group input[type="text"],
+    .customize-group span,
+    .reset-btn {
+        font-size: 10px;
+    }
+    
+    .xp-tab {
+        font-size: 10px;
+        padding: 4px 12px;
+    }
+    
+    .tab-content .customize-group {
+        padding: 6px 4px;
+    }
+}
