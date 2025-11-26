@@ -139,32 +139,29 @@ body.bg-fit {
    ---------------------------------------------------------------------------- */
 
 .refresh-btn {
-    background-color: #FFD700;
-    color: #000000;
-    border: 5px solid #000000;
-    padding: 15px 40px;
-    font-size: 40px;
+    background-color: #FF0000;
+    color: #FFFFFF;
+    border: 6px solid #000000;
+    padding: 20px 50px;
+    font-size: 28px;
     border-radius: 0px;
     cursor: pointer;
     font-weight: 900;
-    box-shadow: 10px 10px 0px #000000;
+    box-shadow: 12px 12px 0px #000000;
     transition: all 0.1s ease;
-    height: 70px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    line-height: 1;
+    text-transform: uppercase;
+    letter-spacing: 3px;
 }
 
 .refresh-btn:hover {
-    background-color: #FFED4E;
+    background-color: #FF3333;
     transform: translate(-3px, -3px);
-    box-shadow: 13px 13px 0px #000000;
+    box-shadow: 15px 15px 0px #000000;
 }
 
 .refresh-btn:active {
-    transform: translate(5px, 5px);
-    box-shadow: 5px 5px 0px #000000;
+    transform: translate(6px, 6px);
+    box-shadow: 6px 6px 0px #000000;
 }
 
 /* ----------------------------------------------------------------------------
@@ -176,7 +173,7 @@ body.bg-fit {
     bottom: 0;
     left: 0;
     right: 0;
-    height: 40px;
+    height: 30px;
     background: linear-gradient(to bottom, #3086EC 0%, #2A7DE6 10%, #1D6BD9 90%, #1454C4 100%);
     border-top: 1px solid #2A5FAC;
     display: flex;
@@ -188,10 +185,11 @@ body.bg-fit {
 }
 
 .menu-btn {
-    height: 32px;
+    height: 24px;
     background: linear-gradient(to bottom, #6FD86F 0%, #5BC75B 10%, #4EB94E 48%, #45B045 52%, #399F39 100%);
     color: #FFFFFF;
     border: 1px outset #4DB94D;
+    border-left: none;
     border-radius: 0 3px 3px 0;
     padding: 0 18px 0 8px;
     font-size: 11px;
@@ -204,7 +202,7 @@ body.bg-fit {
     transition: none;
     font-family: 'Tahoma', 'Arial', sans-serif;
     text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);
-    margin: 4px 0 4px 0;
+    margin: 3px 0 3px 3px;
     position: relative;
     font-style: italic;
 }
@@ -247,7 +245,7 @@ body.bg-fit {
 
 .start-menu {
     position: fixed;
-    bottom: 42px;
+    bottom: 32px;
     left: 0;
     width: 380px;
     max-width: calc(100vw - 20px);
@@ -692,11 +690,10 @@ body.bg-fit {
     }
     
     .refresh-btn {
-        padding: 12px 30px;
-        font-size: 32px;
-        border: 4px solid #000000;
+        padding: 15px 35px;
+        font-size: 24px;
+        border: 5px solid #000000;
         box-shadow: 8px 8px 0px #000000;
-        height: 60px;
     }
     
     .refresh-btn:hover {
@@ -773,10 +770,9 @@ body.bg-fit {
     }
     
     .refresh-btn {
-        padding: 10px 25px;
-        font-size: 28px;
-        border: 4px solid #000000;
-        height: 55px;
+        padding: 12px 30px;
+        font-size: 20px;
+        letter-spacing: 2px;
     }
     
     .taskbar {
@@ -797,5 +793,204 @@ body.bg-fit {
     .start-menu {
         width: calc(100vw - 20px);
         bottom: 30px;
+    }
+}
+
+/* ----------------------------------------------------------------------------
+   DESKTOP ICON
+   ---------------------------------------------------------------------------- */
+
+.desktop-icon {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    width: 80px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.desktop-icon:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.desktop-icon:active {
+    background: rgba(255, 255, 255, 0.4);
+}
+
+.desktop-icon-image {
+    font-size: 48px;
+    filter: drop-shadow(2px 2px 3px rgba(0, 0, 0, 0.5));
+}
+
+.desktop-icon-label {
+    color: #FFFFFF;
+    font-size: 12px;
+    text-align: center;
+    text-shadow: 
+        1px 1px 2px rgba(0, 0, 0, 0.8),
+        -1px -1px 2px rgba(0, 0, 0, 0.8);
+    font-family: 'Tahoma', 'Arial', sans-serif;
+    line-height: 1.2;
+}
+
+/* ----------------------------------------------------------------------------
+   SUBMIT & SUCCESS WINDOWS
+   ---------------------------------------------------------------------------- */
+
+.submit-window,
+.success-window {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #ECE9D8;
+    border: 3px solid #000000;
+    box-shadow: 8px 8px 0px rgba(0, 0, 0, 0.3);
+    width: 600px;
+    max-width: 95vw;
+    max-height: 90vh;
+    z-index: 10000;
+    overflow: hidden;
+    color: #000000;
+}
+
+.submit-window.hide,
+.success-window.hide {
+    display: none !important;
+}
+
+.submit-window.active,
+.success-window.active {
+    display: block !important;
+}
+
+.submit-window *,
+.success-window * {
+    color: #000000;
+}
+
+.submit-window input,
+.submit-window textarea,
+.success-window input,
+.success-window textarea {
+    color: #000000 !important;
+}
+
+.submit-intro {
+    margin-bottom: 20px;
+    padding: 15px;
+    background: #F7F4ED;
+    border: 2px solid #D4D0C8;
+}
+
+.submit-intro p {
+    font-size: 14px;
+    line-height: 1.5;
+    margin-bottom: 8px;
+    color: #000000;
+}
+
+.submit-note {
+    font-size: 12px;
+    color: #666 !important;
+    font-style: italic;
+}
+
+/* Form Styles */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-label {
+    display: block;
+    font-size: 14px;
+    font-weight: bold;
+    margin-bottom: 8px;
+    color: #000000 !important;
+}
+
+#phrase-input,
+#author-input {
+    width: 100%;
+    padding: 10px;
+    border: 3px solid #000000;
+    background: #FFFFFF;
+    font-family: 'Arial', sans-serif;
+    font-size: 14px;
+    resize: vertical;
+    color: #000000 !important;
+}
+
+#phrase-input:focus,
+#author-input:focus {
+    outline: none;
+    border-color: #0078D7;
+}
+
+.char-counter {
+    text-align: right;
+    font-size: 11px;
+    color: #666 !important;
+    margin-top: 4px;
+}
+
+/* Success Message */
+.success-message {
+    margin-bottom: 25px;
+    padding: 15px;
+    background: #DFF0D8;
+    border: 2px solid #A8D28F;
+}
+
+.success-message h3 {
+    font-size: 18px;
+    margin-bottom: 10px;
+    color: #000000 !important;
+}
+
+.success-message p {
+    font-size: 14px;
+    color: #333 !important;
+    line-height: 1.5;
+}
+
+/* Start Menu Divider */
+.start-menu-divider {
+    height: 2px;
+    background: #5A5A5A;
+    margin: 4px 0;
+    border-top: 1px solid #FFFFFF;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .desktop-icon {
+        top: 10px;
+        left: 10px;
+        width: 70px;
+    }
+    
+    .desktop-icon-image {
+        font-size: 40px;
+    }
+    
+    .desktop-icon-label {
+        font-size: 11px;
+    }
+    
+    .submit-window,
+    .success-window {
+        width: calc(100vw - 20px);
+        max-height: calc(100vh - 80px);
+    }
+    
+    .window-content {
+        max-height: calc(100vh - 160px);
     }
 }

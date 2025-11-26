@@ -367,6 +367,204 @@ function updateClock() {
 }
 
 // ----------------------------------------------------------------------------
+// PHRASE SUBMISSION
+// ----------------------------------------------------------------------------
+
+/**
+ * Get Supabase client
+ */
+function getSupabaseClient() {
+    // Supabase config from supabase-voting.js
+    const SUPABASE_URL = 'https://tsnehoknvrxouphrtpik.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRzbmVob2tudnJ4b3VwaHJ0cGlrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg1Nzg5MTEsImV4cCI6MjA3NDE1NDkxMX0._405Oa6iDtazAsy6TBrfG_vMHfEIFqW7M4GNKmd2Dxk';
+    
+    if (typeof supabase !== 'undefined' && supabase.createClient) {
+        return supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    }
+    return null;
+}
+
+/**
+ * Open submit phrase modal
+ */
+function openSubmitModal() {
+    const modal = document.getElementById('submit-window');
+    if (modal) {
+        modal.classList.remove('hide');
+        modal.classList.add('active');
+        // Reset form
+        const form = document.getElementById('submit-phrase-form');
+        if (form) {
+            form.reset();
+            updateCharCounter('phrase-input', 'phraseCounter', 280);
+            updateCharCounter('author-input', 'authorCounter', 50);
+        }
+    }
+}
+
+/**
+ * Close submit phrase modal
+ */
+function closeSubmitModal() {
+    const modal = document.getElementById('submit-window');
+    if (modal) {
+        modal.classList.remove('active');
+        modal.classList.add('hide');
+    }
+}
+
+/**
+ * Close success modal
+ */
+function closeSuccessModal() {
+    const modal = document.getElementById('success-window');
+    if (modal) {
+        modal.classList.remove('active');
+        modal.classList.add('hide');
+    }
+}
+
+/**
+ * Submit another phrase
+ */
+function submitAnother() {
+    // Close success modal
+    closeSuccessModal();
+    // Open submit modal
+    openSubmitModal();
+}
+
+/**
+ * Update character counter
+ */
+function updateCharCounter(inputId, counterId, maxLength) {
+    const input = document.getElementById(inputId);
+    const counter = document.getElementById(counterId);
+    
+    if (input && counter) {
+        counter.textContent = input.value.length;
+        
+        // Visual feedback when approaching limit
+        if (input.value.length > maxLength * 0.9) {
+            counter.style.color = '#d9534f';
+            counter.style.fontWeight = 'bold';
+        } else {
+            counter.style.color = '#666';
+            counter.style.fontWeight = 'normal';
+        }
+    }
+}
+
+/**
+ * Handle phrase submission
+ */
+async function handlePhraseSubmit(event) {
+    event.preventDefault();
+    
+    const form = event.target;
+    const phraseInput = document.getElementById('phrase-input');
+    const authorInput = document.getElementById('author-input');
+    
+    if (!phraseInput || !phraseInput.value.trim()) {
+        alert('Please enter a phrase!');
+        return;
+    }
+    
+    const phrase = phraseInput.value.trim();
+    const author = authorInput.value.trim() || 'Anonymous';
+    
+    // Close modal and show submitting message
+    closeSubmitModal();
+    showSubmittingMessage();
+    
+    try {
+        // Get Supabase client
+        const supabaseClient = getSupabaseClient();
+        
+        if (!supabaseClient) {
+            throw new Error('Supabase not available');
+        }
+        
+        // Insert submission into Supabase
+        const { data, error } = await supabaseClient
+            .from('phrase_submissions')
+            .insert([
+                {
+                    phrase: phrase,
+                    author: author,
+                    status: 'pending'
+                }
+            ]);
+        
+        if (error) {
+            console.error('Supabase error:', error);
+            throw error;
+        }
+        
+        console.log('Submission successful:', data);
+        
+        // Show success message
+        showSuccessMessage();
+        
+        // Reset form
+        form.reset();
+        updateCharCounter('phrase-input', 'phraseCounter', 280);
+        updateCharCounter('author-input', 'authorCounter', 50);
+        
+    } catch (error) {
+        console.error('Submission error:', error);
+        
+        // Show error message
+        const successModal = document.getElementById('success-window');
+        if (successModal) {
+            const successMessage = successModal.querySelector('.success-message');
+            if (successMessage) {
+                successMessage.innerHTML = `
+                    <h3>❌ Oops!</h3>
+                    <p>There was an error submitting your observation. Please try again.</p>
+                `;
+            }
+            successModal.classList.add('active');
+        }
+    }
+}
+
+/**
+ * Show submitting message
+ */
+function showSubmittingMessage() {
+    const successModal = document.getElementById('success-window');
+    if (successModal) {
+        const successMessage = successModal.querySelector('.success-message');
+        if (successMessage) {
+            successMessage.innerHTML = `
+                <h3>📤 Submitting...</h3>
+                <p>Sending your observation...</p>
+            `;
+        }
+        successModal.classList.remove('hide');
+        successModal.classList.add('active');
+    }
+}
+
+/**
+ * Show success message
+ */
+function showSuccessMessage() {
+    const successModal = document.getElementById('success-window');
+    if (successModal) {
+        const successMessage = successModal.querySelector('.success-message');
+        if (successMessage) {
+            successMessage.innerHTML = `
+                <h3>🎉 Thanks for your submission!</h3>
+                <p>Your observation has been sent and will be reviewed. If it makes the cut, it'll be added to the rotation.</p>
+                <p>Feel the chaos? Submit another.</p>
+            `;
+        }
+    }
+}
+
+// ----------------------------------------------------------------------------
 // INITIALIZATION
 // ----------------------------------------------------------------------------
 
@@ -398,6 +596,21 @@ async function init() {
         shareBtn.addEventListener('click', openShareModal);
     }
     
+    // Character counters for submission form
+    const phraseInput = document.getElementById('phrase-input');
+    if (phraseInput) {
+        phraseInput.addEventListener('input', () => {
+            updateCharCounter('phrase-input', 'phraseCounter', 280);
+        });
+    }
+    
+    const authorInput = document.getElementById('author-input');
+    if (authorInput) {
+        authorInput.addEventListener('input', () => {
+            updateCharCounter('author-input', 'authorCounter', 50);
+        });
+    }
+    
     // Start clock
     updateClock();
     setInterval(updateClock, 1000);
@@ -417,6 +630,26 @@ async function init() {
         if (settingsWindow && settingsWindow.classList.contains('active')) {
             if (e.target === settingsWindow) {
                 closeSettings();
+            }
+        }
+    });
+    
+    // Close submit modal when clicking outside
+    document.addEventListener('click', (e) => {
+        const submitWindow = document.getElementById('submit-window');
+        if (submitWindow && submitWindow.classList.contains('active')) {
+            if (e.target === submitWindow) {
+                closeSubmitModal();
+            }
+        }
+    });
+    
+    // Close success modal when clicking outside
+    document.addEventListener('click', (e) => {
+        const successWindow = document.getElementById('success-window');
+        if (successWindow && successWindow.classList.contains('active')) {
+            if (e.target === successWindow) {
+                closeSuccessModal();
             }
         }
     });

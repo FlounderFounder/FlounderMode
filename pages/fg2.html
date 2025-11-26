@@ -20,7 +20,7 @@
         
         <!-- Action Buttons -->
         <div class="button-group">
-            <button class="refresh-btn" id="refresh-btn">🔀</button>
+            <button class="refresh-btn" id="refresh-btn">NEXT</button>
             <button class="share-btn" id="share-btn" title="Share as PNG">
                 <!-- Upload/Share Icon -->
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="square" stroke-linejoin="miter">
@@ -30,6 +30,14 @@
                 </svg>
             </button>
         </div>
+    </div>
+
+    <!-- ========================================================================
+         DESKTOP ICON - Submit Phrase
+         ======================================================================== -->
+    <div class="desktop-icon" id="submit-icon" onclick="openSubmitModal()">
+        <div class="desktop-icon-image">📝</div>
+        <div class="desktop-icon-label">Add Yours</div>
     </div>
 
     <!-- ========================================================================
@@ -57,6 +65,13 @@
         <div class="start-menu-items" id="start-menu-items">
             <!-- Projects will be loaded from config.js -->
         </div>
+        
+        <!-- Submit Phrase Menu Item -->
+        <div class="start-menu-divider"></div>
+        <a href="#" class="start-menu-item" onclick="openSubmitModal(); toggleMenu(); return false;">
+            <div class="start-menu-item-icon">📝</div>
+            <div class="start-menu-item-text">Add Yours</div>
+        </a>
         
         <!-- Settings Footer -->
         <div class="start-menu-settings">
@@ -144,6 +159,83 @@
         </div>
     </div>
 
+    <!-- ========================================================================
+         SUBMIT PHRASE MODAL
+         ======================================================================== -->
+    <div class="submit-window hide" id="submit-window">
+        <!-- Window Title Bar -->
+        <div class="window-titlebar">
+            <div class="window-title">
+                <span class="window-icon">📝</span>
+                Submit your observation
+            </div>
+            <button class="window-close-btn" onclick="closeSubmitModal()">&times;</button>
+        </div>
+        
+        <!-- Window Content -->
+        <div class="window-content">
+            <div class="submit-intro">
+                <p>Survived something worth documenting? Submit your own one-liner about tech culture, startup life, or 2025's particular brand of chaos.</p>
+                <p class="submit-note">Your submission will be reviewed and added to the rotation.</p>
+            </div>
+            
+            <form id="submit-phrase-form" onsubmit="handlePhraseSubmit(event)">
+                <div class="form-group">
+                    <label class="form-label">Your Phrase *</label>
+                    <textarea 
+                        id="phrase-input" 
+                        name="phrase" 
+                        placeholder="e.g., My AI wrapper got wrapped by another AI wrapper. That's innovation now."
+                        maxlength="280"
+                        required
+                        rows="4"
+                    ></textarea>
+                    <div class="char-counter"><span id="phraseCounter">0</span>/280</div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Your Name (Optional)</label>
+                    <input 
+                        type="text" 
+                        id="author-input" 
+                        name="author" 
+                        placeholder="e.g., Anonymous Founder"
+                        maxlength="50"
+                    />
+                    <div class="char-counter"><span id="authorCounter">0</span>/50</div>
+                </div>
+                
+                <div class="buttons-row">
+                    <button type="button" class="action-button" onclick="closeSubmitModal()">CANCEL</button>
+                    <button type="submit" class="action-button action-button-primary">SUBMIT</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div class="success-window hide" id="success-window">
+        <div class="window-titlebar">
+            <div class="window-title">
+                <span class="window-icon">✅</span>
+                Submission Sent!
+            </div>
+            <button class="window-close-btn" onclick="closeSuccessModal()">&times;</button>
+        </div>
+        
+        <div class="window-content">
+            <div class="success-message">
+                <h3>🎉 Thanks for your submission!</h3>
+                <p>Your observation has been sent and will be reviewed. If it makes the cut, it'll be added to the rotation.</p>
+                <p>Feel the chaos? Submit another.</p>
+            </div>
+            
+            <div class="buttons-row">
+                <button class="action-button" onclick="closeSuccessModal()">CLOSE</button>
+                <button class="action-button action-button-primary" onclick="submitAnother()">SUBMIT ANOTHER</button>
+            </div>
+        </div>
+    </div>
 
     <!-- ========================================================================
          SHARE MODAL - Export & Social Sharing
@@ -158,17 +250,13 @@
                 <div class="customization-panel">
                     <h3>Customize Design</h3>
                     
-                    <!-- XP Style Tabs -->
-                    <div class="xp-tabs">
-                        <button class="xp-tab active" data-tab="text">Text</button>
-                        <button class="xp-tab" data-tab="background">Background</button>
-                        <button class="xp-tab" data-tab="logo">Logo</button>
-                    </div>
-                    
-                    <!-- Tab Content Container -->
-                    <div class="tab-content-container">
-                        <!-- TEXT TAB -->
-                        <div class="tab-content active" data-content="text">
+                    <!-- TEXT SETTINGS SECTION -->
+                    <div class="accordion-section">
+                        <button class="accordion-header" data-section="text">
+                            <span>✏️ Text Settings</span>
+                            <span class="accordion-icon">▼</span>
+                        </button>
+                        <div class="accordion-content" data-content="text">
                             <!-- Font Selection -->
                             <div class="customize-group">
                                 <label>Font</label>
@@ -203,9 +291,15 @@
                                 </div>
                             </div>
                         </div>
-                        
-                        <!-- BACKGROUND TAB -->
-                        <div class="tab-content" data-content="background">
+                    </div>
+                    
+                    <!-- BACKGROUND SECTION -->
+                    <div class="accordion-section">
+                        <button class="accordion-header" data-section="background">
+                            <span>🎨 Background</span>
+                            <span class="accordion-icon">▼</span>
+                        </button>
+                        <div class="accordion-content" data-content="background">
                             <!-- Background Color -->
                             <div class="customize-group">
                                 <label>Solid Color</label>
@@ -229,32 +323,22 @@
                             
                             <!-- Background Image -->
                             <div class="customize-group">
-                                <label>Image</label>
+                                <label>Background Image</label>
                                 <select id="background-image-select">
                                     <option value="">None</option>
                                     <!-- Options loaded from png-config.js -->
                                 </select>
                             </div>
-                            
-                            <!-- Text Box Color (for image backgrounds) -->
-                            <div class="customize-group">
-                                <label>Text Box Color</label>
-                                <div class="color-input-group">
-                                    <input type="color" id="text-box-color" value="#FFFFFF">
-                                    <input type="text" id="text-box-color-hex" value="#FFFFFF">
-                                </div>
-                            </div>
-                            
-                            <!-- Text Box Opacity -->
-                            <div class="customize-group">
-                                <label>Text Box Opacity</label>
-                                <input type="range" id="text-box-opacity" min="0" max="1" step="0.05" value="1">
-                                <span id="text-box-opacity-value">100%</span>
-                            </div>
                         </div>
-                        
-                        <!-- LOGO TAB -->
-                        <div class="tab-content" data-content="logo">
+                    </div>
+                    
+                    <!-- LOGO SECTION -->
+                    <div class="accordion-section">
+                        <button class="accordion-header" data-section="logo">
+                            <span>🏷️ Logo</span>
+                            <span class="accordion-icon">▼</span>
+                        </button>
+                        <div class="accordion-content" data-content="logo">
                             <!-- Logo Selection -->
                             <div class="customize-group">
                                 <label>Logo</label>
@@ -265,7 +349,7 @@
                             
                             <!-- Logo Position -->
                             <div class="customize-group">
-                                <label>Position</label>
+                                <label>Logo Position</label>
                                 <select id="logo-position-select">
                                     <!-- Options loaded from png-config.js -->
                                 </select>
@@ -294,6 +378,7 @@
     <!-- ========================================================================
          SCRIPTS - Load in correct order at end of body
          ======================================================================== -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="/scripts/features/fg2-config.js?v=5"></script>
     <script src="/scripts/features/fg2-png-config.js?v=4"></script>
     <script src="/scripts/lib/html2canvas.min.js"></script>
