@@ -558,11 +558,13 @@ function updatePreview() {
             return `rgba(${r}, ${g}, ${b}, ${alpha})`;
         };
         const bgColorWithOpacity = hexToRgba(customization.textBoxColor, customization.textBoxOpacity);
+        const borderColorWithOpacity = `rgba(0, 0, 0, ${customization.textBoxOpacity})`;
+        const shadowColorWithOpacity = `rgba(0, 0, 0, ${customization.textBoxOpacity})`;
         
         textWrapperStyle = `
             background: ${bgColorWithOpacity};
-            border: ${textBoxBorder}px solid #000;
-            box-shadow: ${textBoxShadow}px ${textBoxShadow}px 0 #000;
+            border: ${textBoxBorder}px solid ${borderColorWithOpacity};
+            box-shadow: ${textBoxShadow}px ${textBoxShadow}px 0 ${shadowColorWithOpacity};
             padding: ${textBoxPadding}px;
             max-width: 80%;
         `;
@@ -773,11 +775,13 @@ function createExportPreview() {
             return `rgba(${r}, ${g}, ${b}, ${alpha})`;
         };
         const bgColorWithOpacity = hexToRgba(customization.textBoxColor, customization.textBoxOpacity);
+        const borderColorWithOpacity = `rgba(0, 0, 0, ${customization.textBoxOpacity})`;
+        const shadowColorWithOpacity = `rgba(0, 0, 0, ${customization.textBoxOpacity})`;
         
         textWrapperStyle = `
             background: ${bgColorWithOpacity};
-            border: 3px solid #000;
-            box-shadow: 6px 6px 0 #000;
+            border: 3px solid ${borderColorWithOpacity};
+            box-shadow: 6px 6px 0 ${shadowColorWithOpacity};
             padding: 20px;
             max-width: 80%;
         `;
