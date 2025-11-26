@@ -822,6 +822,7 @@ body.bg-fit {
     z-index: 10000;
     overflow: hidden;
     color: #000000;
+    display: none;
 }
 
 .submit-window.hide,
