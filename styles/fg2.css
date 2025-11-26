@@ -141,27 +141,31 @@ body.bg-fit {
 .refresh-btn {
     background-color: #FF0000;
     color: #FFFFFF;
-    border: 6px solid #000000;
-    padding: 20px 50px;
-    font-size: 28px;
+    border: 5px solid #000000;
+    padding: 15px 40px;
+    font-size: 24px;
     border-radius: 0px;
     cursor: pointer;
     font-weight: 900;
-    box-shadow: 12px 12px 0px #000000;
+    box-shadow: 10px 10px 0px #000000;
     transition: all 0.1s ease;
     text-transform: uppercase;
     letter-spacing: 3px;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .refresh-btn:hover {
     background-color: #FF3333;
     transform: translate(-3px, -3px);
-    box-shadow: 15px 15px 0px #000000;
+    box-shadow: 13px 13px 0px #000000;
 }
 
 .refresh-btn:active {
-    transform: translate(6px, 6px);
-    box-shadow: 6px 6px 0px #000000;
+    transform: translate(5px, 5px);
+    box-shadow: 5px 5px 0px #000000;
 }
 
 /* ----------------------------------------------------------------------------
@@ -690,10 +694,11 @@ body.bg-fit {
     }
     
     .refresh-btn {
-        padding: 15px 35px;
-        font-size: 24px;
-        border: 5px solid #000000;
+        padding: 12px 30px;
+        font-size: 20px;
+        border: 4px solid #000000;
         box-shadow: 8px 8px 0px #000000;
+        height: 60px;
     }
     
     .refresh-btn:hover {
@@ -770,9 +775,11 @@ body.bg-fit {
     }
     
     .refresh-btn {
-        padding: 12px 30px;
-        font-size: 20px;
+        padding: 10px 25px;
+        font-size: 18px;
         letter-spacing: 2px;
+        border: 4px solid #000000;
+        height: 55px;
     }
     
     .taskbar {
@@ -794,49 +801,6 @@ body.bg-fit {
         width: calc(100vw - 20px);
         bottom: 30px;
     }
-}
-
-/* ----------------------------------------------------------------------------
-   DESKTOP ICON
-   ---------------------------------------------------------------------------- */
-
-.desktop-icon {
-    position: fixed;
-    top: 20px;
-    left: 20px;
-    width: 80px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-    cursor: pointer;
-    padding: 8px;
-    border-radius: 4px;
-    transition: background-color 0.2s;
-}
-
-.desktop-icon:hover {
-    background: rgba(255, 255, 255, 0.2);
-}
-
-.desktop-icon:active {
-    background: rgba(255, 255, 255, 0.4);
-}
-
-.desktop-icon-image {
-    font-size: 48px;
-    filter: drop-shadow(2px 2px 3px rgba(0, 0, 0, 0.5));
-}
-
-.desktop-icon-label {
-    color: #FFFFFF;
-    font-size: 12px;
-    text-align: center;
-    text-shadow: 
-        1px 1px 2px rgba(0, 0, 0, 0.8),
-        -1px -1px 2px rgba(0, 0, 0, 0.8);
-    font-family: 'Tahoma', 'Arial', sans-serif;
-    line-height: 1.2;
 }
 
 /* ----------------------------------------------------------------------------
@@ -919,10 +883,10 @@ body.bg-fit {
 #author-input {
     width: 100%;
     padding: 10px;
-    border: 3px solid #000000;
+    border: 2px solid #7F9DB9;
     background: #FFFFFF;
-    font-family: 'Arial', sans-serif;
     font-size: 14px;
+    font-family: 'Tahoma', 'Arial', sans-serif;
     resize: vertical;
     color: #000000 !important;
 }
@@ -935,62 +899,75 @@ body.bg-fit {
 
 .char-counter {
     text-align: right;
-    font-size: 11px;
+    font-size: 12px;
     color: #666 !important;
     margin-top: 4px;
 }
 
-/* Success Message */
+.buttons-row {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    padding-top: 10px;
+}
+
+.action-button {
+    padding: 8px 20px;
+    border: 2px solid #000000;
+    background: #D4D0C8;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    font-family: 'Tahoma', 'Arial', sans-serif;
+    transition: all 0.1s;
+}
+
+.action-button:hover {
+    background: #E8E5DD;
+}
+
+.action-button:active {
+    background: #C8C4BC;
+}
+
+.action-button-primary {
+    background: #0078D7;
+    color: #FFFFFF;
+    border-color: #0078D7;
+}
+
+.action-button-primary:hover {
+    background: #0063B1;
+    border-color: #0063B1;
+}
+
+.action-button-primary:active {
+    background: #004E8C;
+}
+
 .success-message {
-    margin-bottom: 25px;
-    padding: 15px;
-    background: #DFF0D8;
-    border: 2px solid #A8D28F;
+    padding: 20px;
+    text-align: center;
 }
 
 .success-message h3 {
-    font-size: 18px;
-    margin-bottom: 10px;
-    color: #000000 !important;
+    font-size: 20px;
+    margin-bottom: 15px;
+    color: #000000;
 }
 
 .success-message p {
     font-size: 14px;
-    color: #333 !important;
     line-height: 1.5;
+    margin-bottom: 10px;
+    color: #000000;
 }
 
-/* Start Menu Divider */
-.start-menu-divider {
-    height: 2px;
-    background: #5A5A5A;
-    margin: 4px 0;
-    border-top: 1px solid #FFFFFF;
-}
-
-/* Mobile Responsive */
+/* Mobile responsive */
 @media (max-width: 768px) {
-    .desktop-icon {
-        top: 10px;
-        left: 10px;
-        width: 70px;
-    }
-    
-    .desktop-icon-image {
-        font-size: 40px;
-    }
-    
-    .desktop-icon-label {
-        font-size: 11px;
-    }
-    
     .submit-window,
     .success-window {
         width: calc(100vw - 20px);
-        max-height: calc(100vh - 80px);
-    }
-    
-    .window-content {
-        max-height: calc(100vh - 160px);
+        max-height: calc(100vh - 100px);
     }
 }

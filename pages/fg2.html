@@ -33,14 +33,6 @@
     </div>
 
     <!-- ========================================================================
-         DESKTOP ICON - Submit Phrase
-         ======================================================================== -->
-    <div class="desktop-icon" id="submit-icon" onclick="openSubmitModal()">
-        <div class="desktop-icon-image">📝</div>
-        <div class="desktop-icon-label">Add Yours</div>
-    </div>
-
-    <!-- ========================================================================
          WINDOWS XP TASKBAR
          ======================================================================== -->
     <div class="taskbar">
@@ -189,6 +181,7 @@
                         maxlength="280"
                         required
                         rows="4"
+                        oninput="updateCharCounter('phrase-input', 'phraseCounter', 280)"
                     ></textarea>
                     <div class="char-counter"><span id="phraseCounter">0</span>/280</div>
                 </div>
@@ -201,6 +194,7 @@
                         name="author" 
                         placeholder="e.g., Anonymous Founder"
                         maxlength="50"
+                        oninput="updateCharCounter('author-input', 'authorCounter', 50)"
                     />
                     <div class="char-counter"><span id="authorCounter">0</span>/50</div>
                 </div>
@@ -250,13 +244,17 @@
                 <div class="customization-panel">
                     <h3>Customize Design</h3>
                     
-                    <!-- TEXT SETTINGS SECTION -->
-                    <div class="accordion-section">
-                        <button class="accordion-header" data-section="text">
-                            <span>✏️ Text Settings</span>
-                            <span class="accordion-icon">▼</span>
-                        </button>
-                        <div class="accordion-content" data-content="text">
+                    <!-- XP Style Tabs -->
+                    <div class="xp-tabs">
+                        <button class="xp-tab active" data-tab="text">Text</button>
+                        <button class="xp-tab" data-tab="background">Background</button>
+                        <button class="xp-tab" data-tab="logo">Logo</button>
+                    </div>
+                    
+                    <!-- Tab Content Container -->
+                    <div class="tab-content-container">
+                        <!-- TEXT TAB -->
+                        <div class="tab-content active" data-content="text">
                             <!-- Font Selection -->
                             <div class="customize-group">
                                 <label>Font</label>
@@ -291,15 +289,9 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    
-                    <!-- BACKGROUND SECTION -->
-                    <div class="accordion-section">
-                        <button class="accordion-header" data-section="background">
-                            <span>🎨 Background</span>
-                            <span class="accordion-icon">▼</span>
-                        </button>
-                        <div class="accordion-content" data-content="background">
+                        
+                        <!-- BACKGROUND TAB -->
+                        <div class="tab-content" data-content="background">
                             <!-- Background Color -->
                             <div class="customize-group">
                                 <label>Solid Color</label>
@@ -323,22 +315,16 @@
                             
                             <!-- Background Image -->
                             <div class="customize-group">
-                                <label>Background Image</label>
+                                <label>Image</label>
                                 <select id="background-image-select">
                                     <option value="">None</option>
                                     <!-- Options loaded from png-config.js -->
                                 </select>
                             </div>
                         </div>
-                    </div>
-                    
-                    <!-- LOGO SECTION -->
-                    <div class="accordion-section">
-                        <button class="accordion-header" data-section="logo">
-                            <span>🏷️ Logo</span>
-                            <span class="accordion-icon">▼</span>
-                        </button>
-                        <div class="accordion-content" data-content="logo">
+                        
+                        <!-- LOGO TAB -->
+                        <div class="tab-content" data-content="logo">
                             <!-- Logo Selection -->
                             <div class="customize-group">
                                 <label>Logo</label>
@@ -349,7 +335,7 @@
                             
                             <!-- Logo Position -->
                             <div class="customize-group">
-                                <label>Logo Position</label>
+                                <label>Position</label>
                                 <select id="logo-position-select">
                                     <!-- Options loaded from png-config.js -->
                                 </select>
